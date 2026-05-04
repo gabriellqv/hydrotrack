@@ -80,6 +80,35 @@ class HydrometerSeeder extends Seeder
             foreach (array_chunk($allReadings, 500) as $chunk) {
                 DB::table('readings')->insert($chunk);
             }
+
+            // Gera alertas para hidrômetros com status 'alert'
+            $alertHydrometers = Hydrometer::where('status', 'alert')->pluck('id');
+            $alerts = [];
+            $types = ['high_consumption', 'zero_reading', 'offline'];
+            $messages = [
+                'high_consumption' => 'Consumo acima de 150% da média detectado nas últimas 24h.',
+                'zero_reading' => 'Nenhuma leitura registrada nas últimas 48 horas.',
+                'offline' => 'Dispositivo sem comunicação há mais de 72 horas.',
+            ];
+
+            foreach ($alertHydrometers as $hydrometer_id) {
+                $type = fake()->randomElement($types);
+                $resolved = fake()->boolean(30); // 30% já resolvidos
+
+                $alerts[] = [
+                    'hydrometer_id' => $hydrometer_id,
+                    'type' => $type,
+                    'message' => $messages[$type],
+                    'resolved' => $resolved,
+                    'resolved_at' => $resolved ? $now->copy()->subHours(rand(1, 48)) : null,
+                    'created_at' => $now->copy()->subHours(rand(1, 168)),
+                    'updated_at' => $now,
+                ];
+            }
+
+            foreach (array_chunk($alerts, 50) as $chunk) {
+                DB::table('alerts')->insert($chunk);
+            }
         });
     }
 

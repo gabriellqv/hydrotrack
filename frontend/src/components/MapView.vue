@@ -110,5 +110,5 @@ watch(() => props.hydrometers, renderMarkers, { deep: true })
 </script>
 
 <template>
-  <div ref="mapContainer" class="w-full h-[500px] rounded-xl overflow-hidden shadow-lg" />
+  <div ref="mapContainer" class="w-full h-[700px] rounded-xl overflow-hidden shadow-lg" />
 </template>

@@ -64,7 +64,7 @@ class DashboardService
      */
     public function getMapData()
     {
-        return Hydrometer::select('id', 'code', 'latitude', 'longitude', 'status', 'neighborhood', 'last_reading_at')
+        return Hydrometer::select('id', 'code', 'latitude', 'longitude', 'address', 'neighborhood', 'type', 'status', 'last_reading_at')
             ->get();
     }
 }

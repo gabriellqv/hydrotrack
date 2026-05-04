@@ -58,10 +58,21 @@ function createApiClient(): AxiosInstance {
         router.push({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } })
       }
 
-      const message =
-        error.response?.data?.message || 'Erro inesperado na comunicação com o servidor.'
       const status = error.response?.status || 500
       const errors = error.response?.data?.errors
+
+      /** Mensagens amigáveis por status — nunca expõe detalhes técnicos ao usuário */
+      const friendlyMessages: Record<number, string> = {
+        400: 'Requisição inválida. Verifique os dados informados.',
+        401: 'Credenciais inválidas. Verifique seu e-mail e senha.',
+        403: 'Você não tem permissão para realizar esta ação.',
+        404: 'Recurso não encontrado.',
+        422: error.response?.data?.message || 'Erro de validação. Verifique os campos.',
+        429: 'Muitas tentativas. Aguarde um momento e tente novamente.',
+      }
+
+      const message =
+        friendlyMessages[status] || 'Erro inesperado na comunicação com o servidor. Tente novamente.'
 
       throw new ApiError(message, status, errors)
     },
