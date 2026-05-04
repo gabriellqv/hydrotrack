@@ -25,6 +25,12 @@ const search = ref('')
 const statusFilter = ref('')
 const showCreateModal = ref(false)
 
+const typeMap: Record<string, string> = {
+  residential: 'Residencial',
+  commercial: 'Comercial',
+  industrial: 'Industrial',
+}
+
 /** Dados do formulário de criação */
 const form = ref({
   code: '',
@@ -129,7 +135,7 @@ async function handleCreate() {
               <td class="py-3 px-4 font-mono font-medium text-primary-400">{{ h.code }}</td>
               <td class="py-3 px-4 text-slate-300">{{ h.address }}</td>
               <td class="py-3 px-4 text-slate-400">{{ h.neighborhood }}</td>
-              <td class="py-3 px-4 text-slate-400 capitalize">{{ h.type }}</td>
+              <td class="py-3 px-4 text-slate-400">{{ typeMap[h.type] || h.type }}</td>
               <td class="py-3 px-4"><StatusBadge :status="h.status" /></td>
               <td class="py-3 px-4 text-slate-500 text-xs">
                 {{ h.last_reading_at ? new Date(h.last_reading_at).toLocaleString('pt-BR') : '—' }}
