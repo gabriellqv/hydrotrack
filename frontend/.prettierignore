@@ -1,0 +1,11 @@
+node_modules
+vendor
+dist
+coverage
+*.log
+package-lock.json
+composer.lock
+backend/storage
+backend/bootstrap/cache
+backend/public/build
+backend/database/database.sqlite

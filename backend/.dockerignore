@@ -1,0 +1,35 @@
+# Controle de versao e sistema
+.git
+.gitignore
+.dockerignore
+README.md
+
+# Dependencias (Docker baixa via composer install no container)
+vendor/
+
+# Runtime do Laravel
+storage/logs/
+storage/framework/cache/
+storage/framework/sessions/
+storage/framework/views/
+public/build/
+
+# Banco local
+database/database.sqlite
+
+# Variaveis de ambiente
+.env
+.env.*
+!.env.example
+
+# Builds e logs
+*.log
+npm-debug.log*
+
+# Testes e cache
+.phpunit.result.cache
+.phpunit.cache/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db

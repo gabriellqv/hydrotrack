@@ -1,0 +1,28 @@
+# Controle de versao e sistema
+.git
+.gitignore
+.dockerignore
+README.md
+
+# Dependencias (Docker baixa via npm ci no container)
+node_modules/
+
+# Builds e artefatos locais
+dist/
+dist-ssr/
+coverage/
+*.log
+npm-debug.log*
+
+# Variaveis de ambiente
+.env
+.env.*
+!.env.example
+
+# Cache de ferramentas
+.eslintcache
+*.tsbuildinfo
+
+# Sistema operacional
+.DS_Store
+Thumbs.db

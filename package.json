@@ -1,0 +1,15 @@
+{
+  "name": "hydrotrack",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Plataforma de monitoramento de telemetria hidrica IoT",
+  "scripts": {
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@commitlint/config-conventional": "^20.5.3",
+    "commitlint": "^20.5.3",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0"
+  }
+}

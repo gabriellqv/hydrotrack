@@ -1,0 +1,9 @@
+{
+  "frontend/**/*.{ts,vue,js}": [
+    "node frontend/node_modules/eslint/bin/eslint.js -c frontend/eslint.config.ts --fix",
+    "node frontend/node_modules/prettier/bin/prettier.cjs --write"
+  ],
+  "backend/**/*.php": [
+    "php backend/vendor/bin/pint"
+  ]
+}
