@@ -25,7 +25,7 @@ class HydrometerFactory extends Factory
     public function definition(): array
     {
         return [
-            'code' => 'HYD-' . $this->faker->unique()->randomNumber(3, true),
+            'code' => 'HYD-'.$this->faker->unique()->randomNumber(3, true),
             'latitude' => $this->faker->latitude(-17.13, -17.08),
             'longitude' => $this->faker->longitude(-43.84, -43.79),
             'address' => $this->faker->streetAddress(),

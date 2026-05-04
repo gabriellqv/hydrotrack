@@ -4,6 +4,12 @@ import type { User } from '@/types'
 import { api } from '@/services/api'
 import router from '@/router'
 
+/**
+ * Store de autenticação (Pinia).
+ *
+ * Gerencia o estado do usuário logado, o token Sanctum persistido
+ * em localStorage e as funções de login/logout da API.
+ */
 export const useAuthStore = defineStore('auth', () => {
   const token = ref<string | null>(localStorage.getItem('auth_token'))
   const user = ref<User | null>(null)
@@ -30,7 +36,7 @@ export const useAuthStore = defineStore('auth', () => {
       loading.value = true
       const { data } = await api.get<User>('/auth/me')
       user.value = data
-    } catch (error) {
+    } catch {
       logout()
     } finally {
       loading.value = false

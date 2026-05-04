@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use App\Models\Reading;
 use App\Models\Hydrometer;
+use App\Models\Reading;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

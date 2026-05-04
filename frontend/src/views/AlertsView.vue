@@ -4,6 +4,13 @@ import { useAlertStore } from '@/stores/alert'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import AlertItem from '@/components/AlertItem.vue'
 
+/**
+ * View de Alertas.
+ *
+ * Exibe a listagem de todos os alertas do sistema (anomalias de telemetria
+ * e falhas de comunicação) geridos pelo AlertStore.
+ */
+
 const store = useAlertStore()
 
 onMounted(() => store.fetchAlerts())

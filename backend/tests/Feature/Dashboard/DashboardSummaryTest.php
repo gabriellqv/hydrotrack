@@ -14,7 +14,6 @@ uses(RefreshDatabase::class);
  * Validam que os totais retornados refletem fielmente o estado atual
  * do banco de dados, incluindo contagens por status e alertas pendentes.
  */
-
 it('retorna o resumo correto do dashboard', function () {
     $user = User::factory()->create();
 

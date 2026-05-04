@@ -7,6 +7,14 @@ import StatusBadge from '@/components/StatusBadge.vue'
 import type { Hydrometer } from '@/types'
 import { ref } from 'vue'
 
+/**
+ * View Dedicada do Mapa.
+ *
+ * Utiliza o componente base MapView para exibir a mancha de dispositivos,
+ * adicionando um painel lateral dinâmico para exibição de detalhes de telemetria
+ * quando um pino é clicado.
+ */
+
 const store = useDashboardStore()
 const selectedHydrometer = ref<Hydrometer | null>(null)
 
