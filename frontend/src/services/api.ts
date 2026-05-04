@@ -52,7 +52,7 @@ function createApiClient(): AxiosInstance {
   client.interceptors.response.use(
     (response) => response,
     (error: AxiosError<{ message: string; errors?: Record<string, string[]> }>) => {
-      if (error.response?.status === 401) {
+      if (error.response?.status === 401 && error.config?.url !== '/auth/logout') {
         const authStore = useAuthStore()
         authStore.logout()
         router.push({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } })
