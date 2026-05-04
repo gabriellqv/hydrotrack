@@ -116,7 +116,13 @@ onMounted(() => {
     },
   )
 
-  darkMap.addTo(map)
+  const savedTheme = localStorage.getItem('mapTheme') || 'dark'
+
+  if (savedTheme === 'light') {
+    lightMap.addTo(map)
+  } else {
+    darkMap.addTo(map)
+  }
 
   const baseMaps = {
     'Modo Escuro': darkMap,
@@ -124,6 +130,10 @@ onMounted(() => {
   }
 
   L.control.layers(baseMaps).addTo(map)
+
+  map.on('baselayerchange', (e: any) => {
+    localStorage.setItem('mapTheme', e.name === 'Modo Claro' ? 'light' : 'dark')
+  })
 
   markersLayer = L.layerGroup().addTo(map)
   renderMarkers()
