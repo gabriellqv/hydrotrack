@@ -5,13 +5,14 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * Seeder principal do banco de dados.
  *
  * Orquestra a execução de todos os seeders da aplicação.
- * Utiliza WithoutModelEvents para evitar disparos de eventos
- * durante a população inicial dos dados.
+ * Cria o usuário administrador padrão e delega a criação de
+ * hidrômetros e leituras ao HydrometerSeeder.
  */
 class DatabaseSeeder extends Seeder
 {
@@ -22,11 +23,23 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
+        // Cria o usuário administrador padrão
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name' => 'Admin HydroTrack',
+            'email' => 'admin@hydrotrack.com',
+            'password' => Hash::make('admin123'),
+            'role' => 'admin',
         ]);
+
+        // Cria um operador de exemplo
+        User::factory()->create([
+            'name' => 'Operador Demo',
+            'email' => 'operador@hydrotrack.com',
+            'password' => Hash::make('operador123'),
+            'role' => 'operator',
+        ]);
+
+        // Popula hidrômetros com leituras históricas
+        $this->call(HydrometerSeeder::class);
     }
 }

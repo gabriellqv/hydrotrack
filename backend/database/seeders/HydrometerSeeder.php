@@ -1,0 +1,108 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Hydrometer;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+
+/**
+ * Popula o banco com hidrômetros realistas distribuídos na mancha urbana de Bocaiúva-MG.
+ *
+ * Gera 200 hidrômetros com coordenadas GPS contidas em um raio de ~3.5 km
+ * do centro da cidade (Lat: -17.1085, Lng: -43.8143), garantindo que todos
+ * os pinos do mapa caiam em ruas e bairros reais.
+ */
+class HydrometerSeeder extends Seeder
+{
+    /** Centro de Bocaiúva-MG (Praça Wandick Dumont) */
+    private const CENTER_LAT = -17.1085;
+
+    private const CENTER_LNG = -43.8143;
+
+    private const RADIUS_KM = 3.5;
+
+    private const NEIGHBORHOODS = [
+        'Centro', 'Pernambuco', 'Bonfim', 'Alterosa', 'São José',
+        'Santo Antônio', 'Cidade Nova', 'Industrial', 'Recanto das Águas',
+        'Jardim Primavera', 'Santa Cruz', 'Planalto',
+    ];
+
+    /**
+     * Executa o seeder utilizando inserção em lote para performance.
+     */
+    public function run(): void
+    {
+        DB::transaction(function () {
+            $now = Carbon::now();
+            $hydrometers = [];
+
+            for ($i = 1; $i <= 200; $i++) {
+                [$lat, $lng] = $this->generateCoordinatesInRadius();
+
+                $hydrometers[] = [
+                    'code' => sprintf('HYD-%03d', $i),
+                    'latitude' => $lat,
+                    'longitude' => $lng,
+                    'address' => fake('pt_BR')->streetAddress(),
+                    'neighborhood' => fake()->randomElement(self::NEIGHBORHOODS),
+                    'status' => fake()->randomElement(['online', 'online', 'online', 'offline', 'alert']),
+                    'type' => fake()->randomElement(['residential', 'residential', 'commercial', 'industrial']),
+                    'last_reading_at' => $now->copy()->subMinutes(rand(1, 2880)),
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
+            }
+
+            // Insere hidrômetros em lotes de 50
+            foreach (array_chunk($hydrometers, 50) as $chunk) {
+                Hydrometer::insert($chunk);
+            }
+
+            // Gera leituras em lote para cada hidrômetro
+            $allReadings = [];
+            $hydrometerIds = Hydrometer::pluck('id');
+
+            foreach ($hydrometerIds as $hydrometer_id) {
+                for ($day = 30; $day >= 1; $day--) {
+                    $allReadings[] = [
+                        'hydrometer_id' => $hydrometer_id,
+                        'value_m3' => fake()->randomFloat(3, 0.1, 15.0),
+                        'reading_at' => $now->copy()->subDays($day)->setHour(rand(6, 22)),
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }
+            }
+
+            // Insere leituras em lotes de 500
+            foreach (array_chunk($allReadings, 500) as $chunk) {
+                DB::table('readings')->insert($chunk);
+            }
+        });
+    }
+
+    /**
+     * Gera coordenadas aleatórias dentro do raio definido ao redor do centro de Bocaiúva.
+     *
+     * Utiliza distribuição polar uniforme para evitar concentração de pontos no centro.
+     *
+     * @return array{float, float} [latitude, longitude]
+     */
+    private function generateCoordinatesInRadius(): array
+    {
+        $radiusInDegrees = self::RADIUS_KM / 111.32;
+
+        $u = mt_rand() / mt_getrandmax();
+        $v = mt_rand() / mt_getrandmax();
+
+        $w = $radiusInDegrees * sqrt($u);
+        $t = 2 * M_PI * $v;
+
+        $lat = self::CENTER_LAT + ($w * cos($t));
+        $lng = self::CENTER_LNG + ($w * sin($t) / cos(deg2rad(self::CENTER_LAT)));
+
+        return [round($lat, 7), round($lng, 7)];
+    }
+}
