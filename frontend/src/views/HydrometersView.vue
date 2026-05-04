@@ -58,8 +58,8 @@ async function handleCreate() {
   try {
     await store.createHydrometer({
       ...form.value,
-      latitude: Number(form.value.latitude),
-      longitude: Number(form.value.longitude),
+      latitude: form.value.latitude === '' ? '' : Number(form.value.latitude),
+      longitude: form.value.longitude === '' ? '' : Number(form.value.longitude),
     } as unknown as Omit<Hydrometer, 'id' | 'created_at' | 'status' | 'last_reading_at'>)
     showCreateModal.value = false
     form.value = { code: '', latitude: '', longitude: '', address: '', neighborhood: '', type: 'residential' }
