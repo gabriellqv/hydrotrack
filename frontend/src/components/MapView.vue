@@ -50,20 +50,22 @@ function getMarkerColor(status: string): string {
  * Cria um ícone SVG circular customizado para os marcadores do mapa.
  *
  * @param {string} color - Cor de preenchimento do ícone
+ * @param {string} status - Status do hidrômetro
  * @returns {L.DivIcon} Ícone Leaflet customizado
  */
-function createIcon(color: string): L.DivIcon {
+function createIcon(color: string, status: string): L.DivIcon {
+  const isAlert = status === 'alert'
+  
   return L.divIcon({
-    className: 'custom-marker',
-    html: `<div style="
-      width: 14px; height: 14px;
-      background: ${color};
-      border: 2px solid white;
-      border-radius: 50%;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    "></div>`,
-    iconSize: [14, 14],
-    iconAnchor: [7, 7],
+    className: 'custom-marker bg-transparent border-0',
+    html: `
+      <div class="relative flex items-center justify-center" style="width: 16px; height: 16px;">
+        ${isAlert ? `<span class="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" style="background: ${color};"></span>` : ''}
+        <span class="relative inline-flex rounded-full border-2 border-white" style="width: 14px; height: 14px; background: ${color}; box-shadow: 0 2px 4px rgba(0,0,0,0.4);"></span>
+      </div>
+    `,
+    iconSize: [16, 16],
+    iconAnchor: [8, 8],
   })
 }
 
@@ -78,7 +80,7 @@ function renderMarkers() {
 
   props.hydrometers.forEach((h) => {
     const marker = L.marker([h.latitude, h.longitude], {
-      icon: createIcon(getMarkerColor(h.status)),
+      icon: createIcon(getMarkerColor(h.status), h.status),
     })
 
     const statusMap: Record<string, string> = {
@@ -102,11 +104,48 @@ function renderMarkers() {
 onMounted(() => {
   if (!mapContainer.value) return
 
-  map = L.map(mapContainer.value).setView(BOCAIUVA_CENTER, DEFAULT_ZOOM)
+  map = L.map(mapContainer.value, {
+    center: BOCAIUVA_CENTER,
+    zoom: DEFAULT_ZOOM,
+    minZoom: 4, // Bloqueia zoom out excessivo
+    maxBounds: [
+      [-90, -180],
+      [90, 180],
+    ], // Trava o mapa dentro dos limites do mundo real
+  })
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  const lightMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors',
-  }).addTo(map)
+    noWrap: true,
+  })
+
+  const darkMap = L.tileLayer(
+    'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png',
+    {
+      attribution:
+        '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a>',
+      noWrap: true,
+    },
+  )
+
+  const savedTheme = localStorage.getItem('mapTheme') || 'dark'
+
+  if (savedTheme === 'light') {
+    lightMap.addTo(map)
+  } else {
+    darkMap.addTo(map)
+  }
+
+  const baseMaps = {
+    'Modo Escuro': darkMap,
+    'Modo Claro': lightMap,
+  }
+
+  L.control.layers(baseMaps).addTo(map)
+
+  map.on('baselayerchange', (e: L.LayersControlEvent) => {
+    localStorage.setItem('mapTheme', e.name === 'Modo Claro' ? 'light' : 'dark')
+  })
 
   markersLayer = L.layerGroup().addTo(map)
   renderMarkers()
