@@ -16,6 +16,19 @@ import type { Hydrometer } from '@/types'
 
 const store = useDashboardStore()
 const selectedHydrometer = ref<Hydrometer | null>(null)
+const activeFilter = ref<'all' | 'online' | 'offline' | 'alert'>('all')
+
+const filteredHydrometers = computed(() => {
+  if (activeFilter.value === 'all') return store.mapHydrometers
+  return store.mapHydrometers.filter((h) => h.status === activeFilter.value)
+})
+
+const filterCounts = computed(() => ({
+  all: store.mapHydrometers.length,
+  online: store.mapHydrometers.filter((h) => h.status === 'online').length,
+  offline: store.mapHydrometers.filter((h) => h.status === 'offline').length,
+  alert: store.mapHydrometers.filter((h) => h.status === 'alert').length,
+}))
 
 const typeMap: Record<string, string> = {
   residential: 'Residencial',

@@ -143,7 +143,7 @@ onMounted(() => {
 
   L.control.layers(baseMaps).addTo(map)
 
-  map.on('baselayerchange', (e: any) => {
+  map.on('baselayerchange', (e: L.LayersControlEvent) => {
     localStorage.setItem('mapTheme', e.name === 'Modo Claro' ? 'light' : 'dark')
   })
 
