@@ -104,9 +104,26 @@ onMounted(() => {
 
   map = L.map(mapContainer.value).setView(BOCAIUVA_CENTER, DEFAULT_ZOOM)
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  const lightMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors',
-  }).addTo(map)
+  })
+
+  const darkMap = L.tileLayer(
+    'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png',
+    {
+      attribution:
+        '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a>',
+    },
+  )
+
+  darkMap.addTo(map)
+
+  const baseMaps = {
+    'Modo Escuro': darkMap,
+    'Modo Claro': lightMap,
+  }
+
+  L.control.layers(baseMaps).addTo(map)
 
   markersLayer = L.layerGroup().addTo(map)
   renderMarkers()
