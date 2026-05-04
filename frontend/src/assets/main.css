@@ -1,0 +1,78 @@
+@import 'tailwindcss';
+
+/* ----------------------------------------------------------------
+ * Tokens de Design — HydroTrack
+ * Paleta corporativa inspirada em tons aquáticos (água/telemetria)
+ * ---------------------------------------------------------------- */
+
+@theme {
+  /* Cores primárias */
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+
+  /* Cores de status */
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-muted: #94a3b8;
+
+  /* Background do layout */
+  --color-surface: #0f172a;
+  --color-surface-card: #1e293b;
+  --color-surface-hover: #334155;
+
+  /* Tipografia */
+  --font-sans: 'Inter', system-ui, sans-serif;
+
+  /* Sombras */
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.25);
+}
+
+/* Reset e base */
+body {
+  @apply bg-surface text-slate-100 font-sans antialiased;
+}
+
+/* Garante cursor pointer em todos os elementos clicáveis */
+button,
+[role='button'],
+a,
+select {
+  cursor: pointer;
+}
+
+/* Scrollbar customizada (Webkit) */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-surface-hover);
+  border-radius: 3px;
+}
+
+/* Animação de fade-in para transições de página */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
