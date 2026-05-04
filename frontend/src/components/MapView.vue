@@ -102,10 +102,19 @@ function renderMarkers() {
 onMounted(() => {
   if (!mapContainer.value) return
 
-  map = L.map(mapContainer.value).setView(BOCAIUVA_CENTER, DEFAULT_ZOOM)
+  map = L.map(mapContainer.value, {
+    center: BOCAIUVA_CENTER,
+    zoom: DEFAULT_ZOOM,
+    minZoom: 4, // Bloqueia zoom out excessivo
+    maxBounds: [
+      [-90, -180],
+      [90, 180],
+    ], // Trava o mapa dentro dos limites do mundo real
+  })
 
   const lightMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors',
+    noWrap: true,
   })
 
   const darkMap = L.tileLayer(
@@ -113,6 +122,7 @@ onMounted(() => {
     {
       attribution:
         '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a>',
+      noWrap: true,
     },
   )
 
