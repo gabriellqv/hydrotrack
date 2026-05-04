@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Hydrometer;
+use App\Models\Reading;
 use App\Services\HydrometerService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -12,9 +13,8 @@ uses(RefreshDatabase::class);
  * Validam a lógica de negócio de listagem, criação, atualização e
  * exclusão de hidrômetros de forma isolada do Controller.
  */
-
 beforeEach(function () {
-    $this->service = new HydrometerService();
+    $this->service = new HydrometerService;
 });
 
 it('lista hidrômetros com paginação', function () {
@@ -80,5 +80,5 @@ it('exclui um hidrômetro e suas leituras em cascata', function () {
     $this->service->delete($hydrometer);
 
     expect(Hydrometer::count())->toBe(0);
-    expect(\App\Models\Reading::count())->toBe(0);
+    expect(Reading::count())->toBe(0);
 });

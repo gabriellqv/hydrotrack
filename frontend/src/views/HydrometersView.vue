@@ -10,6 +10,14 @@ import StatusBadge from '@/components/StatusBadge.vue'
 import type { Hydrometer } from '@/types'
 import { Plus, Search, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 
+/**
+ * View de Gerenciamento de Hidrômetros (CRUD).
+ *
+ * Exibe a tabela paginada com buscas e filtros integrados via HydrometerStore.
+ * Controla os privilégios de acesso: apenas usuários com role 'admin'
+ * têm permissão para criar, editar ou excluir hidrômetros.
+ */
+
 const store = useHydrometerStore()
 const { isAdmin } = useIsAdmin()
 

@@ -7,6 +7,13 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import { Droplets } from 'lucide-vue-next'
 
+/**
+ * View de Autenticação.
+ *
+ * Exibe o formulário de login e faz a interface com o AuthStore
+ * para requisição de token Sanctum. Trata erros visuais (401, 422, etc).
+ */
+
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()

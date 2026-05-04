@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Hydrometer;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -11,7 +12,6 @@ uses(RefreshDatabase::class);
  * Validam o fluxo completo: autenticação → validação → criação → resposta,
  * incluindo cenários de erro (sem auth, dados inválidos, role insuficiente).
  */
-
 it('permite que um admin crie um hidrômetro', function () {
     // Arrange: cria um usuário admin e autentica
     $admin = User::factory()->create(['role' => 'admin']);
@@ -61,7 +61,7 @@ it('rejeita criação com código duplicado', function () {
     $admin = User::factory()->create(['role' => 'admin']);
 
     // Cria o primeiro
-    \App\Models\Hydrometer::factory()->create(['code' => 'HYD-DUP']);
+    Hydrometer::factory()->create(['code' => 'HYD-DUP']);
 
     // Tenta criar com o mesmo código
     $response = $this->actingAs($admin)->postJson('/api/hydrometers', [

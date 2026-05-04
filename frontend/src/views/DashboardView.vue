@@ -6,6 +6,14 @@ import ConsumptionChart from '@/components/ConsumptionChart.vue'
 import MapView from '@/components/MapView.vue'
 import { Droplets, Wifi, WifiOff, AlertTriangle, BarChart3, Bell } from 'lucide-vue-next'
 
+/**
+ * View Principal do Dashboard.
+ *
+ * Consolida as três principais métricas do sistema: resumo em cards,
+ * gráfico de evolução do consumo e mapa interativo. Todos os dados são
+ * cacheados/gerenciados pelo DashboardStore.
+ */
+
 const store = useDashboardStore()
 
 onMounted(async () => {
