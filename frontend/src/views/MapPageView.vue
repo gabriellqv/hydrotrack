@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { useDashboardStore } from '@/stores/dashboard'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import MapView from '@/components/MapView.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import type { Hydrometer } from '@/types'
-import { ref } from 'vue'
 
 /**
  * View Dedicada do Mapa.
@@ -41,10 +40,38 @@ function handleMarkerClick(hydrometer: Hydrometer) {
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-      <!-- Mapa -->
-      <div class="lg:col-span-3">
+      <!-- Mapa e Filtros -->
+      <div class="lg:col-span-3 space-y-4">
+        <!-- Filtros Rápidos -->
+        <div class="flex flex-wrap gap-3">
+          <button 
+            @click="activeFilter = 'all'"
+            :class="['px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200', activeFilter === 'all' ? 'bg-primary-600 text-white shadow-lg shadow-primary-900/20 border-transparent' : 'bg-surface-card border border-slate-700/50 text-slate-400 hover:text-slate-200']"
+          >
+            Todos <span class="ml-1 opacity-60">({{ filterCounts.all }})</span>
+          </button>
+          <button 
+            @click="activeFilter = 'online'"
+            :class="['px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2', activeFilter === 'online' ? 'bg-green-600/20 border border-green-500/50 text-green-400 shadow-lg shadow-green-900/10' : 'bg-surface-card border border-slate-700/50 text-slate-400 hover:text-green-400 hover:border-green-500/30']"
+          >
+            <span class="w-2 h-2 rounded-full bg-green-500"></span> Online <span class="opacity-60">({{ filterCounts.online }})</span>
+          </button>
+          <button 
+            @click="activeFilter = 'alert'"
+            :class="['px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2', activeFilter === 'alert' ? 'bg-red-600/20 border border-red-500/50 text-red-400 shadow-lg shadow-red-900/10' : 'bg-surface-card border border-slate-700/50 text-slate-400 hover:text-red-400 hover:border-red-500/30']"
+          >
+            <span class="w-2 h-2 rounded-full bg-red-500" :class="{ 'animate-pulse': filterCounts.alert > 0 }"></span> Alertas <span class="opacity-60">({{ filterCounts.alert }})</span>
+          </button>
+          <button 
+            @click="activeFilter = 'offline'"
+            :class="['px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2', activeFilter === 'offline' ? 'bg-slate-700/50 border border-slate-500/50 text-slate-300 shadow-lg shadow-slate-900/10' : 'bg-surface-card border border-slate-700/50 text-slate-400 hover:text-slate-300 hover:border-slate-500/30']"
+          >
+            <span class="w-2 h-2 rounded-full bg-slate-500"></span> Offline <span class="opacity-60">({{ filterCounts.offline }})</span>
+          </button>
+        </div>
+
         <BaseCard compact>
-          <MapView :hydrometers="store.mapHydrometers" @marker-click="handleMarkerClick" />
+          <MapView :hydrometers="filteredHydrometers" @marker-click="handleMarkerClick" />
         </BaseCard>
       </div>
 
