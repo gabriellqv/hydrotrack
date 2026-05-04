@@ -18,6 +18,12 @@ import { ref } from 'vue'
 const store = useDashboardStore()
 const selectedHydrometer = ref<Hydrometer | null>(null)
 
+const typeMap: Record<string, string> = {
+  residential: 'Residencial',
+  commercial: 'Comercial',
+  industrial: 'Industrial',
+}
+
 onMounted(() => store.fetchMap())
 
 function handleMarkerClick(hydrometer: Hydrometer) {
@@ -61,7 +67,7 @@ function handleMarkerClick(hydrometer: Hydrometer) {
               </div>
               <div class="flex justify-between">
                 <span class="text-slate-500">Tipo</span>
-                <span class="text-slate-300 capitalize">{{ selectedHydrometer.type }}</span>
+                <span class="text-slate-300">{{ typeMap[selectedHydrometer.type] || selectedHydrometer.type }}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-slate-500">Coordenadas</span>

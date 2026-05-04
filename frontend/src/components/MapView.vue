@@ -81,11 +81,17 @@ function renderMarkers() {
       icon: createIcon(getMarkerColor(h.status)),
     })
 
+    const statusMap: Record<string, string> = {
+      online: 'Online',
+      offline: 'Offline',
+      alert: 'Em Alerta',
+    }
+
     marker.bindPopup(`
       <strong>${h.code}</strong><br>
       ${h.address}<br>
       <em>${h.neighborhood}</em><br>
-      Status: <strong>${h.status.toUpperCase()}</strong>
+      Status: <strong>${(statusMap[h.status] || h.status).toUpperCase()}</strong>
     `)
 
     marker.on('click', () => emit('marker-click', h))
