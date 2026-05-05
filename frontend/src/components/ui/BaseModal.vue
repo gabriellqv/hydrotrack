@@ -43,7 +43,7 @@ watch(
         <!-- Conteúdo do modal -->
         <div
           :class="[
-            'relative rounded-xl border border-slate-600/30 bg-surface-card/90 backdrop-blur-xl shadow-2xl shadow-black/40',
+            'relative rounded-2xl border border-white/10 bg-gradient-to-b from-slate-800/80 to-slate-900/90 backdrop-blur-2xl shadow-2xl shadow-primary-900/20 ring-1 ring-white/5',
             'animate-fade-in',
             {
               'w-full max-w-sm': size === 'sm',
