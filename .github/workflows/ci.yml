@@ -1,0 +1,90 @@
+# Pipeline de Integração Contínua — HydroTrack
+#
+# Executado automaticamente em todo push e pull request para a branch develop.
+# Roda lint (Pint + ESLint + Prettier) e testes (Pest) para garantir
+# que o código mergeado esteja sempre correto e padronizado.
+
+name: CI
+
+on:
+  push:
+    branches: [develop, main]
+  pull_request:
+    branches: [develop, main]
+
+jobs:
+  # ─────────────────────────────────────────────
+  # Backend: lint (Pint) + testes (Pest)
+  # ─────────────────────────────────────────────
+  backend:
+    name: Backend (Pint + Pest)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, sqlite3, pdo_sqlite
+          coverage: none
+
+      - name: Cache do Composer
+        uses: actions/cache@v4
+        with:
+          path: backend/vendor
+          key: composer-${{ hashFiles('backend/composer.lock') }}
+          restore-keys: composer-
+
+      - name: Instalar dependências
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Copiar .env de testes
+        run: cp .env.example .env
+
+      - name: Gerar chave da aplicação
+        run: php artisan key:generate
+
+      - name: Verificar code style (Pint)
+        run: vendor/bin/pint --test
+
+      - name: Executar testes (Pest)
+        run: vendor/bin/pest --colors=always
+
+  # ─────────────────────────────────────────────
+  # Frontend: lint (ESLint + Prettier) + type-check
+  # ─────────────────────────────────────────────
+  frontend:
+    name: Frontend (Lint + Type Check)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Verificar formatação (Prettier)
+        run: npx prettier --check "src/**/*.{vue,ts,js,css}"
+
+      - name: Verificar lint (ESLint)
+        run: npx eslint src --ext .vue,.ts,.js
+
+      - name: Verificar tipos (TypeScript)
+        run: npx vue-tsc --build
