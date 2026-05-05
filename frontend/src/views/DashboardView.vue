@@ -61,7 +61,7 @@ const summaryCards = [
 </script>
 
 <template>
-  <div class="animate-fade-in space-y-8">
+  <div class="animate-fade-in space-y-4">
     <div>
       <h1 class="text-2xl font-bold text-text-heading">Dashboard</h1>
       <p class="text-sm text-text-muted mt-1">Visão geral do sistema de monitoramento</p>

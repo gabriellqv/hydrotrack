@@ -171,6 +171,6 @@ watch(() => props.hydrometers, renderMarkers, { deep: true })
 <template>
   <div
     ref="mapContainer"
-    class="relative z-0 isolate w-full h-full min-h-[300px] lg:min-h-[400px] rounded-xl overflow-hidden shadow-lg"
+    class="relative z-0 isolate w-full h-full min-h-[300px] lg:min-h-[350px] rounded-xl overflow-hidden shadow-lg"
   />
 </template>
