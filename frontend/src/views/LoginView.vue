@@ -50,7 +50,7 @@ async function handleLogin() {
 </script>
 
 <template>
-  <div class="flex min-h-screen items-center justify-center bg-surface">
+  <div class="flex min-h-dvh items-center justify-center bg-surface px-4">
     <div class="w-full max-w-md animate-fade-in">
       <!-- Logo -->
       <div class="flex flex-col items-center mb-8">
@@ -60,7 +60,7 @@ async function handleLogin() {
       </div>
 
       <!-- Formulário -->
-      <div class="rounded-xl border border-border bg-surface-card p-8 shadow-card">
+      <div class="rounded-xl border border-border bg-surface-card p-6 sm:p-8 shadow-card">
         <h2 class="text-lg font-semibold text-text-heading mb-6">Entrar na plataforma</h2>
 
         <div
@@ -85,7 +85,9 @@ async function handleLogin() {
           </BaseButton>
         </form>
 
-        <p class="text-xs text-text-muted text-center mt-6">Demo: admin@hydrotrack.com / admin123</p>
+        <p class="text-xs text-text-muted text-center mt-6">
+          Demo: admin@hydrotrack.com / admin123
+        </p>
       </div>
     </div>
   </div>

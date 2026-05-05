@@ -24,7 +24,9 @@ onMounted(() => store.fetchAlerts())
     </div>
 
     <BaseCard>
-      <div v-if="store.loading" class="text-center py-12 text-text-muted">Carregando alertas...</div>
+      <div v-if="store.loading" class="text-center py-12 text-text-muted">
+        Carregando alertas...
+      </div>
 
       <div v-else-if="store.alerts.length === 0" class="text-center py-12 text-text-muted">
         Nenhum alerta registrado. ✓

@@ -83,7 +83,7 @@ const summaryCards = [
     </div>
 
     <!-- Gráfico de consumo -->
-    <BaseCard title="Consumo Diário (últimos 30 dias)">
+    <BaseCard title="Consumo Diário (últimos 30 dias)" class="min-w-0">
       <ConsumptionChart v-if="store.consumption.length" :data="store.consumption" />
       <p v-else class="text-sm text-text-muted text-center py-12">Carregando dados...</p>
     </BaseCard>

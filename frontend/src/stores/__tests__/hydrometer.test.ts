@@ -48,7 +48,16 @@ describe('useHydrometerStore', () => {
 
   it('define loading como true durante o fetch', async () => {
     vi.mocked(api.get).mockImplementation(
-      () => new Promise((resolve) => setTimeout(() => resolve({ data: { data: [], meta: { current_page: 1, last_page: 1, per_page: 15, total: 0 } } }), 100)),
+      () =>
+        new Promise((resolve) =>
+          setTimeout(
+            () =>
+              resolve({
+                data: { data: [], meta: { current_page: 1, last_page: 1, per_page: 15, total: 0 } },
+              }),
+            100,
+          ),
+        ),
     )
 
     const store = useHydrometerStore()

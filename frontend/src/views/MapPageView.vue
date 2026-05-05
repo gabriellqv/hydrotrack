@@ -44,7 +44,9 @@ function handleMarkerClick(hydrometer: Hydrometer) {
 </script>
 
 <template>
-  <div class="animate-fade-in flex flex-col h-[calc(100vh-64px)] overflow-hidden gap-4">
+  <div
+    class="animate-fade-in flex flex-col overflow-hidden gap-4 h-[calc(100dvh-3.5rem-2rem)] lg:h-[calc(100dvh-4rem)]"
+  >
     <div>
       <h1 class="text-2xl font-bold text-text-heading">Mapa</h1>
       <p class="text-sm text-text-muted mt-1">
@@ -56,30 +58,58 @@ function handleMarkerClick(hydrometer: Hydrometer) {
       <!-- Mapa e Filtros -->
       <div class="lg:col-span-3 flex flex-col gap-3 min-h-0">
         <!-- Filtros Rápidos -->
-        <div class="flex flex-wrap gap-3 bg-surface-card/60 backdrop-blur-xl rounded-xl px-4 py-3 border border-border ring-1 ring-white/5">
-          <button 
+        <div
+          class="flex flex-wrap gap-3 bg-surface-card/60 backdrop-blur-xl rounded-xl px-4 py-3 border border-border ring-1 ring-white/5"
+        >
+          <button
             @click="activeFilter = 'all'"
-            :class="['px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200', activeFilter === 'all' ? 'bg-primary-600 text-white shadow-lg shadow-primary-900/20 border-transparent' : 'bg-surface-card border border-slate-700/50 text-slate-400 hover:text-slate-200']"
+            :class="[
+              'px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200',
+              activeFilter === 'all'
+                ? 'bg-primary-600 text-white shadow-lg shadow-primary-900/20 border-transparent'
+                : 'bg-surface-card border border-border text-text-muted hover:text-text-heading',
+            ]"
           >
             Todos <span class="ml-1 opacity-60">({{ filterCounts.all }})</span>
           </button>
-          <button 
+          <button
             @click="activeFilter = 'online'"
-            :class="['px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2', activeFilter === 'online' ? 'bg-green-600/20 border border-green-500/50 text-green-400 shadow-lg shadow-green-900/10' : 'bg-surface-card border border-slate-700/50 text-slate-400 hover:text-green-400 hover:border-green-500/30']"
+            :class="[
+              'px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2',
+              activeFilter === 'online'
+                ? 'bg-green-600/20 border border-green-500/50 text-green-400 shadow-lg shadow-green-900/10'
+                : 'bg-surface-card border border-border text-text-muted hover:text-green-400 hover:border-green-500/30',
+            ]"
           >
-            <span class="w-2 h-2 rounded-full bg-green-500"></span> Online <span class="opacity-60">({{ filterCounts.online }})</span>
+            <span class="w-2 h-2 rounded-full bg-green-500"></span> Online
+            <span class="opacity-60">({{ filterCounts.online }})</span>
           </button>
-          <button 
+          <button
             @click="activeFilter = 'alert'"
-            :class="['px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2', activeFilter === 'alert' ? 'bg-red-600/20 border border-red-500/50 text-red-400 shadow-lg shadow-red-900/10' : 'bg-surface-card border border-slate-700/50 text-slate-400 hover:text-red-400 hover:border-red-500/30']"
+            :class="[
+              'px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2',
+              activeFilter === 'alert'
+                ? 'bg-red-600/20 border border-red-500/50 text-red-400 shadow-lg shadow-red-900/10'
+                : 'bg-surface-card border border-border text-text-muted hover:text-red-400 hover:border-red-500/30',
+            ]"
           >
-            <span class="w-2 h-2 rounded-full bg-red-500" :class="{ 'animate-pulse': filterCounts.alert > 0 }"></span> Alertas <span class="opacity-60">({{ filterCounts.alert }})</span>
+            <span
+              class="w-2 h-2 rounded-full bg-red-500"
+              :class="{ 'animate-pulse': filterCounts.alert > 0 }"
+            ></span>
+            Alertas <span class="opacity-60">({{ filterCounts.alert }})</span>
           </button>
-          <button 
+          <button
             @click="activeFilter = 'offline'"
-            :class="['px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2', activeFilter === 'offline' ? 'bg-slate-700/50 border border-slate-500/50 text-slate-300 shadow-lg shadow-slate-900/10' : 'bg-surface-card border border-slate-700/50 text-slate-400 hover:text-slate-300 hover:border-slate-500/30']"
+            :class="[
+              'px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2',
+              activeFilter === 'offline'
+                ? 'bg-slate-700/50 border border-slate-500/50 text-slate-300 shadow-lg shadow-slate-900/10'
+                : 'bg-surface-card border border-border text-text-muted hover:text-slate-300 hover:border-slate-500/30',
+            ]"
           >
-            <span class="w-2 h-2 rounded-full bg-slate-500"></span> Offline <span class="opacity-60">({{ filterCounts.offline }})</span>
+            <span class="w-2 h-2 rounded-full bg-slate-500"></span> Offline
+            <span class="opacity-60">({{ filterCounts.offline }})</span>
           </button>
         </div>
 
@@ -107,11 +137,13 @@ function handleMarkerClick(hydrometer: Hydrometer) {
               </div>
               <div class="flex justify-between">
                 <span class="text-text-muted">Tipo</span>
-                <span class="text-text-body">{{ typeMap[selectedHydrometer.type] || selectedHydrometer.type }}</span>
+                <span class="text-text-body">{{
+                  typeMap[selectedHydrometer.type] || selectedHydrometer.type
+                }}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-text-muted">Coordenadas</span>
-                <span class="text-slate-400 font-mono text-xs">
+                <span class="text-text-muted font-mono text-xs">
                   {{ selectedHydrometer.latitude }}, {{ selectedHydrometer.longitude }}
                 </span>
               </div>

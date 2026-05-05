@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import type { Hydrometer } from '@/types'
@@ -55,7 +55,7 @@ function getMarkerColor(status: string): string {
  */
 function createIcon(color: string, status: string): L.DivIcon {
   const isAlert = status === 'alert'
-  
+
   return L.divIcon({
     className: 'custom-marker bg-transparent border-0',
     html: `
@@ -149,11 +149,28 @@ onMounted(() => {
 
   markersLayer = L.layerGroup().addTo(map)
   renderMarkers()
+
+  let resizeObserver: ResizeObserver | null = null
+
+  if (mapContainer.value) {
+    resizeObserver = new ResizeObserver(() => {
+      map?.invalidateSize()
+    })
+    resizeObserver.observe(mapContainer.value)
+  }
+
+  onUnmounted(() => {
+    resizeObserver?.disconnect()
+    map?.remove()
+  })
 })
 
 watch(() => props.hydrometers, renderMarkers, { deep: true })
 </script>
 
 <template>
-  <div ref="mapContainer" class="w-full h-full min-h-[400px] rounded-xl overflow-hidden shadow-lg" />
+  <div
+    ref="mapContainer"
+    class="relative z-0 isolate w-full h-full min-h-[300px] lg:min-h-[400px] rounded-xl overflow-hidden shadow-lg"
+  />
 </template>

@@ -33,10 +33,10 @@ withDefaults(
       {
         'bg-primary-600 text-white hover:bg-primary-500 active:bg-primary-700':
           variant === 'primary',
-        'bg-surface-hover text-slate-200 hover:bg-slate-600 active:bg-slate-700':
+        'bg-surface-hover text-text-body hover:bg-slate-600 active:bg-slate-700':
           variant === 'secondary',
         'bg-danger text-white hover:bg-red-500 active:bg-red-700': variant === 'danger',
-        'bg-transparent text-slate-300 hover:bg-surface-hover hover:text-white':
+        'bg-transparent text-text-body hover:bg-surface-hover hover:text-text-heading':
           variant === 'ghost',
       },
       {
