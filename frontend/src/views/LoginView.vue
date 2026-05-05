@@ -39,7 +39,12 @@ async function handleLogin() {
     router.push(redirect)
   } catch (e) {
     if (e instanceof ApiError) {
-      error.value = e.message
+      // Exibe todos os erros de validação em vez da mensagem truncada do Laravel
+      if (e.errors) {
+        error.value = Object.values(e.errors).flat().join('\n')
+      } else {
+        error.value = e.message
+      }
     } else {
       error.value = 'Erro inesperado. Tente novamente.'
     }
@@ -66,6 +71,7 @@ async function handleLogin() {
         <div
           v-if="error"
           class="mb-4 rounded-lg bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400"
+          style="white-space: pre-line"
         >
           {{ error }}
         </div>
