@@ -2,12 +2,15 @@
 import { onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useTheme } from '@/composables/useTheme'
 import AppSidebar from '@/components/AppSidebar.vue'
 
 const route = useRoute()
 const authStore = useAuthStore()
+const { initTheme } = useTheme()
 
 onMounted(async () => {
+  initTheme()
   if (authStore.token) {
     await authStore.fetchUser()
   }

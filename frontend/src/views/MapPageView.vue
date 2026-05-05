@@ -46,7 +46,7 @@ function handleMarkerClick(hydrometer: Hydrometer) {
 <template>
   <div class="animate-fade-in space-y-6">
     <div>
-      <h1 class="text-2xl font-bold text-white">Mapa</h1>
+      <h1 class="text-2xl font-bold text-text-heading">Mapa</h1>
       <p class="text-sm text-slate-500 mt-1">
         Distribuição geográfica dos hidrômetros em Bocaiúva-MG
       </p>
@@ -56,7 +56,7 @@ function handleMarkerClick(hydrometer: Hydrometer) {
       <!-- Mapa e Filtros -->
       <div class="lg:col-span-3 space-y-4">
         <!-- Filtros Rápidos -->
-        <div class="flex flex-wrap gap-3 bg-gradient-to-r from-slate-800/50 to-slate-900/50 backdrop-blur-xl rounded-xl px-4 py-3 border border-white/10 ring-1 ring-white/5">
+        <div class="flex flex-wrap gap-3 bg-surface-card/60 backdrop-blur-xl rounded-xl px-4 py-3 border border-border ring-1 ring-white/5">
           <button 
             @click="activeFilter = 'all'"
             :class="['px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200', activeFilter === 'all' ? 'bg-primary-600 text-white shadow-lg shadow-primary-900/20 border-transparent' : 'bg-surface-card border border-slate-700/50 text-slate-400 hover:text-slate-200']"
@@ -94,30 +94,30 @@ function handleMarkerClick(hydrometer: Hydrometer) {
           <template v-if="selectedHydrometer">
             <div class="space-y-3 text-sm">
               <div class="flex justify-between">
-                <span class="text-slate-500">Status</span>
+                <span class="text-text-muted">Status</span>
                 <StatusBadge :status="selectedHydrometer.status" />
               </div>
               <div class="flex justify-between">
-                <span class="text-slate-500">Endereço</span>
-                <span class="text-slate-300 text-right">{{ selectedHydrometer.address }}</span>
+                <span class="text-text-muted">Endereço</span>
+                <span class="text-text-body text-right">{{ selectedHydrometer.address }}</span>
               </div>
               <div class="flex justify-between">
-                <span class="text-slate-500">Bairro</span>
-                <span class="text-slate-300">{{ selectedHydrometer.neighborhood }}</span>
+                <span class="text-text-muted">Bairro</span>
+                <span class="text-text-body">{{ selectedHydrometer.neighborhood }}</span>
               </div>
               <div class="flex justify-between">
-                <span class="text-slate-500">Tipo</span>
-                <span class="text-slate-300">{{ typeMap[selectedHydrometer.type] || selectedHydrometer.type }}</span>
+                <span class="text-text-muted">Tipo</span>
+                <span class="text-text-body">{{ typeMap[selectedHydrometer.type] || selectedHydrometer.type }}</span>
               </div>
               <div class="flex justify-between">
-                <span class="text-slate-500">Coordenadas</span>
+                <span class="text-text-muted">Coordenadas</span>
                 <span class="text-slate-400 font-mono text-xs">
                   {{ selectedHydrometer.latitude }}, {{ selectedHydrometer.longitude }}
                 </span>
               </div>
             </div>
           </template>
-          <p v-else class="text-sm text-slate-500 text-center py-8">
+          <p v-else class="text-sm text-text-muted text-center py-8">
             Clique em um pino no mapa para ver os detalhes.
           </p>
         </BaseCard>

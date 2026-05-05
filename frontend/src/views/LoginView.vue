@@ -58,13 +58,13 @@ async function handleLogin() {
         <div class="flex items-center justify-center h-16 w-16 rounded-2xl bg-primary-600/20 mb-4">
           <Droplets class="h-8 w-8 text-primary-400" />
         </div>
-        <h1 class="text-2xl font-bold text-white">HydroTrack</h1>
-        <p class="text-sm text-slate-500 mt-1">Monitoramento Hídrico Inteligente</p>
+        <h1 class="text-2xl font-bold text-text-heading">HydroTrack</h1>
+        <p class="text-sm text-text-muted mt-1">Monitoramento Hídrico Inteligente</p>
       </div>
 
       <!-- Formulário -->
-      <div class="rounded-xl border border-slate-700/50 bg-surface-card p-8 shadow-card">
-        <h2 class="text-lg font-semibold text-slate-100 mb-6">Entrar na plataforma</h2>
+      <div class="rounded-xl border border-border bg-surface-card p-8 shadow-card">
+        <h2 class="text-lg font-semibold text-text-heading mb-6">Entrar na plataforma</h2>
 
         <div
           v-if="error"
@@ -88,7 +88,7 @@ async function handleLogin() {
           </BaseButton>
         </form>
 
-        <p class="text-xs text-slate-600 text-center mt-6">Demo: admin@hydrotrack.com / admin123</p>
+        <p class="text-xs text-text-muted text-center mt-6">Demo: admin@hydrotrack.com / admin123</p>
       </div>
     </div>
   </div>

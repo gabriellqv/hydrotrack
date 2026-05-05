@@ -19,14 +19,14 @@ onMounted(() => store.fetchAlerts())
 <template>
   <div class="animate-fade-in space-y-6">
     <div>
-      <h1 class="text-2xl font-bold text-white">Alertas</h1>
-      <p class="text-sm text-slate-500 mt-1">Notificações de anomalias no sistema</p>
+      <h1 class="text-2xl font-bold text-text-heading">Alertas</h1>
+      <p class="text-sm text-text-muted mt-1">Notificações de anomalias no sistema</p>
     </div>
 
     <BaseCard>
-      <div v-if="store.loading" class="text-center py-12 text-slate-500">Carregando alertas...</div>
+      <div v-if="store.loading" class="text-center py-12 text-text-muted">Carregando alertas...</div>
 
-      <div v-else-if="store.alerts.length === 0" class="text-center py-12 text-slate-500">
+      <div v-else-if="store.alerts.length === 0" class="text-center py-12 text-text-muted">
         Nenhum alerta registrado. ✓
       </div>
 

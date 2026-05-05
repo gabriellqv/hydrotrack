@@ -3,7 +3,40 @@
 /* ----------------------------------------------------------------
  * Tokens de Design — HydroTrack
  * Paleta corporativa inspirada em tons aquáticos (água/telemetria)
+ * Suporte a tema claro e escuro via CSS custom properties.
  * ---------------------------------------------------------------- */
+
+/* === Tema Escuro (padrão) === */
+:root {
+  --color-surface: #0f172a;
+  --color-surface-card: #1e293b;
+  --color-surface-hover: #334155;
+  --color-text-heading: #f1f5f9;
+  --color-text-body: #cbd5e1;
+  --color-text-muted: #64748b;
+  --color-border: rgba(51, 65, 85, 0.5);
+  --color-border-hover: rgba(71, 85, 105, 0.6);
+  --sidebar-from: rgba(30, 41, 59, 0.7);
+  --sidebar-to: rgba(15, 23, 42, 0.7);
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.25);
+}
+
+/* === Tema Claro === */
+.light {
+  --color-surface: #f1f5f9;
+  --color-surface-card: #ffffff;
+  --color-surface-hover: #e2e8f0;
+  --color-text-heading: #0f172a;
+  --color-text-body: #334155;
+  --color-text-muted: #64748b;
+  --color-border: rgba(203, 213, 225, 0.6);
+  --color-border-hover: rgba(148, 163, 184, 0.5);
+  --sidebar-from: rgba(255, 255, 255, 0.85);
+  --sidebar-to: rgba(241, 245, 249, 0.85);
+  --sidebar-border: rgba(203, 213, 225, 0.5);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.06);
+}
 
 @theme {
   /* Cores primárias */
@@ -24,22 +57,33 @@
   --color-danger: #ef4444;
   --color-muted: #94a3b8;
 
-  /* Background do layout */
-  --color-surface: #0f172a;
-  --color-surface-card: #1e293b;
-  --color-surface-hover: #334155;
+  /* Background do layout (referência às variáveis dinâmicas) */
+  --color-surface: var(--color-surface);
+  --color-surface-card: var(--color-surface-card);
+  --color-surface-hover: var(--color-surface-hover);
 
-  /* Tipografia */
+  /* Tipografia semântica */
+  --color-text-heading: var(--color-text-heading);
+  --color-text-body: var(--color-text-body);
+  --color-text-muted: var(--color-text-muted);
+
+  /* Bordas */
+  --color-border: var(--color-border);
+  --color-border-hover: var(--color-border-hover);
+
+  /* Fontes */
   --font-sans: 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
   /* Sombras */
-  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.25);
+  --shadow-card: var(--shadow-card);
 }
 
 /* Reset e base */
 body {
-  @apply bg-surface text-slate-100 font-sans antialiased;
+  @apply bg-surface font-sans antialiased;
+  color: var(--color-text-body);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Garante cursor pointer em todos os elementos clicáveis */
@@ -76,4 +120,11 @@ select {
 
 .animate-fade-in {
   animation: fade-in 0.3s ease-out;
+}
+
+/* Transição suave global para troca de tema */
+*,
+*::before,
+*::after {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.2s ease, box-shadow 0.3s ease;
 }
