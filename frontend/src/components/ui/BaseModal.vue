@@ -38,12 +38,12 @@ watch(
     <Transition name="modal">
       <div v-if="open" class="fixed inset-0 z-50 flex items-center justify-center p-4">
         <!-- Backdrop -->
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="emit('close')" />
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-md" @click="emit('close')" />
 
         <!-- Conteúdo do modal -->
         <div
           :class="[
-            'relative rounded-xl border border-slate-700/50 bg-surface-card shadow-2xl',
+            'relative rounded-2xl border border-white/10 bg-gradient-to-b from-slate-800/80 to-slate-900/90 backdrop-blur-2xl shadow-2xl shadow-primary-900/20 ring-1 ring-white/5',
             'animate-fade-in',
             {
               'w-full max-w-sm': size === 'sm',

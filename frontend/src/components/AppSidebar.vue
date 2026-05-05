@@ -25,7 +25,7 @@ const currentRoute = computed(() => route.name)
 
 <template>
   <aside
-    class="fixed left-0 top-0 h-screen w-64 bg-surface-card border-r border-slate-700/50 flex flex-col"
+    class="fixed left-0 top-0 h-screen w-64 flex flex-col border-r border-white/10 bg-gradient-to-b from-slate-800/70 to-slate-900/70 backdrop-blur-2xl"
   >
     <!-- Logo -->
     <div class="flex items-center gap-3 px-6 py-5 border-b border-slate-700/50">
