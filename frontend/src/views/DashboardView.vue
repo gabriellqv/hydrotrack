@@ -88,7 +88,9 @@ const summaryCards = [
 </script>
 
 <template>
-  <div class="animate-fade-in flex flex-col h-[calc(100vh-4rem)] lg:h-[calc(100vh-4rem)] space-y-3 min-h-0">
+  <div
+    class="animate-fade-in flex flex-col h-[calc(100vh-4rem)] lg:h-[calc(100vh-4rem)] space-y-3 min-h-0"
+  >
     <div class="shrink-0">
       <h1 class="text-2xl font-bold text-text-heading leading-tight">Dashboard</h1>
       <p class="text-sm text-text-muted">Visão geral do sistema de monitoramento</p>
@@ -96,9 +98,11 @@ const summaryCards = [
 
     <!-- Layout 2x2: Gráfico | Mapa // Status | Alertas -->
     <div class="grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-3 gap-4 flex-1 min-h-0">
-      
       <!-- Top Left: Gráfico -->
-      <BaseCard title="Consumo Diário (últimos 30 dias)" class="flex flex-col lg:row-span-2 min-h-0">
+      <BaseCard
+        title="Consumo Diário (últimos 30 dias)"
+        class="flex flex-col lg:row-span-2 min-h-0"
+      >
         <div class="flex-1 w-full min-h-0">
           <ConsumptionChart v-if="store.consumption.length" :data="store.consumption" />
           <p v-else class="text-sm text-text-muted text-center py-8">Carregando dados...</p>
@@ -107,25 +111,24 @@ const summaryCards = [
 
       <!-- Top Right: Mapa -->
       <BaseCard title="Mapa de Hidrômetros" class="flex flex-col lg:row-span-2 min-h-0">
-        <!-- Cards super compactos no topo do mapa -->
-        <div class="grid grid-cols-3 lg:grid-cols-6 gap-2 mb-3">
+        <!-- Data Ribbon HUD -->
+        <div class="flex w-full bg-surface/40 rounded-lg border border-border/50 py-2.5 mb-3">
           <div
-            v-for="card in summaryCards"
+            v-for="(card, index) in summaryCards"
             :key="card.key"
-            class="flex items-center gap-2 bg-surface/50 rounded-lg p-2 border border-border/50"
+            class="flex flex-1 flex-col items-center justify-center relative min-w-0"
+            :class="{ 'border-l border-border/50': index > 0 }"
           >
-            <div :class="['flex h-7 w-7 shrink-0 items-center justify-center rounded-md', card.bg]">
-              <component :is="card.icon" :class="['h-3.5 w-3.5', card.color]" />
+            <div class="flex items-center gap-1.5 mb-1 w-full justify-center px-1">
+              <component :is="card.icon" :class="['h-3.5 w-3.5 shrink-0', card.color]" />
+              <span class="text-[10px] font-medium text-text-muted truncate">{{ card.label }}</span>
             </div>
-            <div class="flex flex-col min-w-0">
-              <span class="text-sm font-bold text-text-heading leading-none">
-                {{ store.summary?.[card.key as keyof typeof store.summary] ?? '—' }}
-              </span>
-              <span class="text-[10px] text-text-muted truncate leading-tight mt-0.5">{{ card.label }}</span>
-            </div>
+            <span class="text-base font-bold text-text-heading leading-none">
+              {{ store.summary?.[card.key as keyof typeof store.summary] ?? '—' }}
+            </span>
           </div>
         </div>
-        
+
         <div class="flex-1 w-full min-h-0">
           <MapView :hydrometers="store.mapHydrometers" />
         </div>
@@ -133,7 +136,7 @@ const summaryCards = [
 
       <!-- Bottom Left: Donut Chart -->
       <BaseCard title="Distribuição por Status" class="flex flex-col lg:row-span-1 min-h-0">
-        <StatusDonutChart v-if="store.summary" :summary="store.summary" />
+        <StatusDonutChart v-if="store.summary" :summary="store.summary" class="flex-1 min-h-0" />
         <p v-else class="text-sm text-text-muted text-center py-4">Carregando...</p>
       </BaseCard>
 
@@ -141,7 +144,6 @@ const summaryCards = [
       <BaseCard title="Últimos Alertas" class="flex flex-col lg:row-span-1 min-h-0">
         <RecentAlerts :alerts="store.recentAlerts" />
       </BaseCard>
-
     </div>
   </div>
 </template>

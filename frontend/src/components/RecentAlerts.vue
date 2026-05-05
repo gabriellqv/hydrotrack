@@ -46,10 +46,7 @@ function timeAgo(dateStr: string): string {
           alertConfig[alert.type]?.color || 'text-slate-400 bg-slate-500/15',
         ]"
       >
-        <component
-          :is="alertConfig[alert.type]?.icon || AlertTriangle"
-          class="h-4 w-4"
-        />
+        <component :is="alertConfig[alert.type]?.icon || AlertTriangle" class="h-4 w-4" />
       </div>
       <div class="flex-1 min-w-0">
         <p class="text-sm text-text-body truncate">{{ alert.message }}</p>

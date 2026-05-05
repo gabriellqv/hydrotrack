@@ -62,7 +62,7 @@ const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
   layout: {
-    padding: 10
+    padding: 2,
   },
   plugins: {
     legend: { display: false },
@@ -80,9 +80,9 @@ const chartOptions = {
 </script>
 
 <template>
-  <div class="flex items-center gap-6 h-full">
+  <div class="flex items-center gap-2 h-full min-h-0 -my-4">
     <!-- Gráfico -->
-    <div class="relative flex-1 h-full min-h-0">
+    <div class="relative flex-1 h-full min-h-0 flex items-center justify-center">
       <Pie :data="chartData" :options="chartOptions" />
     </div>
 
