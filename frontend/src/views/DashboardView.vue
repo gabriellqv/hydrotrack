@@ -63,8 +63,8 @@ const summaryCards = [
 <template>
   <div class="animate-fade-in space-y-8">
     <div>
-      <h1 class="text-2xl font-bold text-white">Dashboard</h1>
-      <p class="text-sm text-slate-500 mt-1">Visão geral do sistema de monitoramento</p>
+      <h1 class="text-2xl font-bold text-text-heading">Dashboard</h1>
+      <p class="text-sm text-text-muted mt-1">Visão geral do sistema de monitoramento</p>
     </div>
 
     <!-- Cards de resumo -->
@@ -74,10 +74,10 @@ const summaryCards = [
           <div :class="['flex h-10 w-10 items-center justify-center rounded-lg', card.bg]">
             <component :is="card.icon" :class="['h-5 w-5', card.color]" />
           </div>
-          <span class="text-2xl font-bold text-white">
+          <span class="text-2xl font-bold text-text-heading">
             {{ store.summary?.[card.key as keyof typeof store.summary] ?? '—' }}
           </span>
-          <span class="text-xs text-slate-500">{{ card.label }}</span>
+          <span class="text-xs text-text-muted">{{ card.label }}</span>
         </div>
       </BaseCard>
     </div>
@@ -85,7 +85,7 @@ const summaryCards = [
     <!-- Gráfico de consumo -->
     <BaseCard title="Consumo Diário (últimos 30 dias)">
       <ConsumptionChart v-if="store.consumption.length" :data="store.consumption" />
-      <p v-else class="text-sm text-slate-500 text-center py-12">Carregando dados...</p>
+      <p v-else class="text-sm text-text-muted text-center py-12">Carregando dados...</p>
     </BaseCard>
 
     <!-- Preview do mapa -->

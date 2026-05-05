@@ -43,7 +43,7 @@ watch(
         <!-- Conteúdo do modal -->
         <div
           :class="[
-            'relative rounded-2xl border border-white/10 bg-gradient-to-b from-slate-800/80 to-slate-900/90 backdrop-blur-2xl shadow-2xl shadow-primary-900/20 ring-1 ring-white/5',
+            'relative rounded-2xl border border-border bg-surface-card/95 backdrop-blur-2xl shadow-2xl ring-1 ring-white/5',
             'animate-fade-in',
             {
               'w-full max-w-sm': size === 'sm',
@@ -55,12 +55,12 @@ watch(
           <!-- Header -->
           <div
             v-if="title"
-            class="flex items-center justify-between border-b border-slate-700/50 px-6 py-4"
+            class="flex items-center justify-between border-b border-border px-6 py-4"
           >
-            <h2 class="text-lg font-semibold text-slate-100">{{ title }}</h2>
+            <h2 class="text-lg font-semibold text-text-heading">{{ title }}</h2>
             <button
               @click="emit('close')"
-              class="rounded-lg p-1 text-slate-400 hover:bg-surface-hover hover:text-white transition-colors"
+              class="rounded-lg p-1 text-text-muted hover:bg-surface-hover hover:text-text-heading transition-colors"
             >
               <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -81,7 +81,7 @@ watch(
           <!-- Footer -->
           <div
             v-if="$slots.footer"
-            class="border-t border-slate-700/50 px-6 py-4 flex justify-end gap-3"
+            class="border-t border-border px-6 py-4 flex justify-end gap-3"
           >
             <slot name="footer" />
           </div>

@@ -25,7 +25,7 @@ const emit = defineEmits<{
 
 <template>
   <div class="space-y-1.5">
-    <label v-if="label" class="block text-sm font-medium text-slate-300">
+    <label v-if="label" class="block text-sm font-medium text-text-body">
       {{ label }}
     </label>
 
@@ -38,13 +38,13 @@ const emit = defineEmits<{
         :disabled="disabled"
         @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
         :class="[
-          'w-full rounded-lg border bg-surface-card px-4 py-2.5 text-sm text-slate-100',
-          'placeholder:text-slate-500 transition-colors duration-200',
+          'w-full rounded-lg border bg-surface-card px-4 py-2.5 text-sm text-text-heading',
+          'placeholder:text-text-muted transition-colors duration-200',
           'focus:outline-none focus:ring-2 focus:ring-primary-500/50',
           'disabled:opacity-50 disabled:cursor-not-allowed',
           error
             ? 'border-danger focus:border-danger'
-            : 'border-slate-700 focus:border-primary-500 hover:border-slate-600',
+            : 'border-border focus:border-primary-500 hover:border-border-hover',
           $slots.icon ? 'pl-10' : '',
         ]"
       />

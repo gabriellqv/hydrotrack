@@ -80,8 +80,8 @@ async function handleCreate() {
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-2xl font-bold text-white">Hidrômetros</h1>
-        <p class="text-sm text-slate-500 mt-1">
+        <h1 class="text-2xl font-bold text-text-heading">Hidrômetros</h1>
+        <p class="text-sm text-text-muted mt-1">
           {{ store.pagination.total }} dispositivos cadastrados
         </p>
       </div>
@@ -100,14 +100,14 @@ async function handleCreate() {
             @keyup.enter="applyFilters"
           >
             <template #icon>
-              <Search class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+              <Search class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted" />
             </template>
           </BaseInput>
         </div>
         <select
           v-model="statusFilter"
           @change="applyFilters"
-          class="rounded-lg border border-slate-700 bg-surface-card px-4 py-2.5 text-sm text-slate-300"
+          class="rounded-lg border border-border bg-surface-card px-4 py-2.5 text-sm text-text-body"
         >
           <option value="">Todos os Status</option>
           <option value="online">Online</option>
@@ -123,20 +123,20 @@ async function handleCreate() {
         <table class="w-full text-sm">
           <thead>
             <tr class="border-b border-slate-700/50">
-              <th class="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase">
+              <th class="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase">
                 Código
               </th>
-              <th class="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase">
+              <th class="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase">
                 Endereço
               </th>
-              <th class="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase">
+              <th class="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase">
                 Bairro
               </th>
-              <th class="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase">Tipo</th>
-              <th class="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase">
+              <th class="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase">Tipo</th>
+              <th class="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase">
                 Status
               </th>
-              <th class="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase">
+              <th class="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase">
                 Última Leitura
               </th>
             </tr>
@@ -148,11 +148,11 @@ async function handleCreate() {
               class="border-b border-slate-700/30 hover:bg-surface-hover transition-colors"
             >
               <td class="py-3 px-4 font-mono font-medium text-primary-400">{{ h.code }}</td>
-              <td class="py-3 px-4 text-slate-300">{{ h.address }}</td>
-              <td class="py-3 px-4 text-slate-400">{{ h.neighborhood }}</td>
-              <td class="py-3 px-4 text-slate-400">{{ typeMap[h.type] || h.type }}</td>
+              <td class="py-3 px-4 text-text-body">{{ h.address }}</td>
+              <td class="py-3 px-4 text-text-muted">{{ h.neighborhood }}</td>
+              <td class="py-3 px-4 text-text-muted">{{ typeMap[h.type] || h.type }}</td>
               <td class="py-3 px-4"><StatusBadge :status="h.status" /></td>
-              <td class="py-3 px-4 text-slate-500 text-xs">
+              <td class="py-3 px-4 text-text-muted text-xs">
                 {{ h.last_reading_at ? new Date(h.last_reading_at).toLocaleString('pt-BR') : '—' }}
               </td>
             </tr>
@@ -162,7 +162,7 @@ async function handleCreate() {
 
       <!-- Paginação -->
       <div class="flex items-center justify-between border-t border-slate-700/50 pt-4 mt-4">
-        <p class="text-xs text-slate-500">
+        <p class="text-xs text-text-muted">
           Página {{ store.pagination.currentPage }} de {{ store.pagination.lastPage }}
         </p>
         <div class="flex gap-2">

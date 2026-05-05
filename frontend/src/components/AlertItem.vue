@@ -36,7 +36,7 @@ const typeMap: Record<string, { variant: 'danger' | 'warning' | 'muted'; label: 
       'flex items-start gap-4 rounded-lg border p-4 transition-colors',
       alert.resolved
         ? 'border-slate-700/30 bg-surface opacity-60'
-        : 'border-slate-700/50 bg-surface-card hover:border-slate-600',
+        : 'border-border bg-surface-card hover:border-border-hover',
     ]"
   >
     <!-- Conteúdo -->
@@ -48,9 +48,9 @@ const typeMap: Record<string, { variant: 'danger' | 'warning' | 'muted'; label: 
         <span v-if="alert.resolved" class="text-xs text-green-400">✓ Resolvido</span>
       </div>
 
-      <p class="text-sm text-slate-300 truncate">{{ alert.message }}</p>
+      <p class="text-sm text-text-body truncate">{{ alert.message }}</p>
 
-      <p class="text-xs text-slate-500 mt-1">
+      <p class="text-xs text-text-muted mt-1">
         {{ new Date(alert.created_at).toLocaleString('pt-BR') }}
       </p>
     </div>
