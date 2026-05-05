@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Doughnut } from 'vue-chartjs'
+import { Pie } from 'vue-chartjs'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 import type { DashboardSummary } from '@/types'
 
@@ -34,7 +34,7 @@ const chartData = computed(() => ({
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
-  cutout: '65%',
+
   plugins: {
     legend: {
       position: 'bottom' as const,
@@ -61,6 +61,6 @@ const chartOptions = {
 
 <template>
   <div class="relative w-full h-full" style="min-height: 14rem">
-    <Doughnut :data="chartData" :options="chartOptions" />
+    <Pie :data="chartData" :options="chartOptions" />
   </div>
 </template>
