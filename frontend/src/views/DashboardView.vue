@@ -97,14 +97,16 @@ const summaryCards = [
     <!-- Cards de resumo -->
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
       <BaseCard v-for="card in summaryCards" :key="card.key" compact hoverable>
-        <div class="flex flex-col items-center text-center gap-1.5">
-          <div :class="['flex h-9 w-9 items-center justify-center rounded-lg', card.bg]">
+        <div class="flex items-center gap-3">
+          <div :class="['flex h-9 w-9 shrink-0 items-center justify-center rounded-lg', card.bg]">
             <component :is="card.icon" :class="['h-4 w-4', card.color]" />
           </div>
-          <span class="text-xl font-bold text-text-heading">
-            {{ store.summary?.[card.key as keyof typeof store.summary] ?? '—' }}
-          </span>
-          <span class="text-xs text-text-muted">{{ card.label }}</span>
+          <div class="flex flex-col min-w-0">
+            <span class="text-lg font-bold text-text-heading leading-tight">
+              {{ store.summary?.[card.key as keyof typeof store.summary] ?? '—' }}
+            </span>
+            <span class="text-xs text-text-muted truncate">{{ card.label }}</span>
+          </div>
         </div>
       </BaseCard>
     </div>
