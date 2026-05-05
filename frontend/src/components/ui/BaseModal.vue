@@ -79,10 +79,7 @@ watch(
           </div>
 
           <!-- Footer -->
-          <div
-            v-if="$slots.footer"
-            class="border-t border-border px-6 py-4 flex justify-end gap-3"
-          >
+          <div v-if="$slots.footer" class="border-t border-border px-6 py-4 flex justify-end gap-3">
             <slot name="footer" />
           </div>
         </div>

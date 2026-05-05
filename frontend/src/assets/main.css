@@ -19,7 +19,11 @@
   --sidebar-from: rgba(30, 41, 59, 0.7);
   --sidebar-to: rgba(15, 23, 42, 0.7);
   --sidebar-border: rgba(255, 255, 255, 0.1);
-  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.25);
+  --shadow-card: 0 0.25rem 1.5rem rgba(0, 0, 0, 0.25);
+
+  /* Espaçamentos e layout */
+  --sidebar-width: 16rem;
+  --layout-padding: 2rem;
 }
 
 /* === Tema Claro === */
@@ -35,7 +39,7 @@
   --sidebar-from: rgba(255, 255, 255, 0.85);
   --sidebar-to: rgba(241, 245, 249, 0.85);
   --sidebar-border: rgba(203, 213, 225, 0.5);
-  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.06);
+  --shadow-card: 0 0.25rem 1.5rem rgba(0, 0, 0, 0.06);
 }
 
 @theme {
@@ -83,7 +87,9 @@
 body {
   @apply bg-surface font-sans antialiased;
   color: var(--color-text-body);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 /* Garante cursor pointer em todos os elementos clicáveis */
@@ -96,21 +102,21 @@ select {
 
 /* Scrollbar customizada (Webkit) */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 0.375rem;
 }
 ::-webkit-scrollbar-track {
   background: var(--color-surface);
 }
 ::-webkit-scrollbar-thumb {
   background: var(--color-surface-hover);
-  border-radius: 3px;
+  border-radius: 0.1875rem;
 }
 
 /* Animação de fade-in para transições de página */
 @keyframes fade-in {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(0.5rem);
   }
   to {
     opacity: 1;
@@ -122,9 +128,20 @@ select {
   animation: fade-in 0.3s ease-out;
 }
 
-/* Transição suave global para troca de tema */
-*,
-*::before,
-*::after {
-  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.2s ease, box-shadow 0.3s ease;
+/*
+ * Transição suave seletiva para troca de tema.
+ * Aplicada apenas em elementos que mudam visualmente com o tema,
+ * evitando repaints desnecessários em SVGs, canvas, tiles do mapa, etc.
+ */
+body,
+aside,
+main,
+.bg-surface-card,
+[class*='border-border'],
+[class*='text-text-'] {
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    color 0.2s ease,
+    box-shadow 0.3s ease;
 }

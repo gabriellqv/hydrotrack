@@ -28,24 +28,29 @@ const props = defineProps<{
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler)
 
-const chartData = computed(() => ({
-  labels: props.data.map((p) => {
-    const date = new Date(p.date)
-    return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
-  }),
-  datasets: [
-    {
-      label: 'Consumo (m³)',
-      data: props.data.map((p) => p.total_m3),
-      borderColor: '#3b82f6',
-      backgroundColor: 'rgba(59, 130, 246, 0.1)',
-      fill: true,
-      tension: 0.4,
-      pointRadius: 3,
-      pointHoverRadius: 6,
-    },
-  ],
-}))
+const chartData = computed(() => {
+  const style = getComputedStyle(document.documentElement)
+  const primaryColor = style.getPropertyValue('--color-primary-500').trim() || '#3b82f6'
+
+  return {
+    labels: props.data.map((p) => {
+      const date = new Date(p.date)
+      return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
+    }),
+    datasets: [
+      {
+        label: 'Consumo (m³)',
+        data: props.data.map((p) => p.total_m3),
+        borderColor: primaryColor,
+        backgroundColor: `${primaryColor}1a`,
+        fill: true,
+        tension: 0.4,
+        pointRadius: 3,
+        pointHoverRadius: 6,
+      },
+    ],
+  }
+})
 
 const chartOptions = {
   responsive: true,
@@ -53,7 +58,7 @@ const chartOptions = {
   plugins: {
     tooltip: {
       callbacks: {
-        label: (ctx: TooltipItem<'line'>) => `${ctx.parsed.y.toFixed(3)} m³`,
+        label: (ctx: TooltipItem<'line'>) => `${(ctx.parsed.y ?? 0).toFixed(3)} m³`,
       },
     },
   },
@@ -67,7 +72,7 @@ const chartOptions = {
 </script>
 
 <template>
-  <div class="h-[350px]">
+  <div class="relative w-full" style="aspect-ratio: 16 / 7; min-height: 15rem">
     <Line :data="chartData" :options="chartOptions" />
   </div>
 </template>

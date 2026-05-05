@@ -72,7 +72,8 @@ function createApiClient(): AxiosInstance {
       }
 
       const message =
-        friendlyMessages[status] || 'Erro inesperado na comunicação com o servidor. Tente novamente.'
+        friendlyMessages[status] ||
+        'Erro inesperado na comunicação com o servidor. Tente novamente.'
 
       throw new ApiError(message, status, errors)
     },

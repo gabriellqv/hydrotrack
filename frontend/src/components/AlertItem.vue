@@ -35,7 +35,7 @@ const typeMap: Record<string, { variant: 'danger' | 'warning' | 'muted'; label: 
     :class="[
       'flex items-start gap-4 rounded-lg border p-4 transition-colors',
       alert.resolved
-        ? 'border-slate-700/30 bg-surface opacity-60'
+        ? 'border-border/60 bg-surface opacity-60'
         : 'border-border bg-surface-card hover:border-border-hover',
     ]"
   >

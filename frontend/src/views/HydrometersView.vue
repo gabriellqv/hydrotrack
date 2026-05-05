@@ -62,13 +62,21 @@ async function handleCreate() {
       longitude: form.value.longitude === '' ? '' : Number(form.value.longitude),
     } as unknown as Omit<Hydrometer, 'id' | 'created_at' | 'status' | 'last_reading_at'>)
     showCreateModal.value = false
-    form.value = { code: '', latitude: '', longitude: '', address: '', neighborhood: '', type: 'residential' }
+    form.value = {
+      code: '',
+      latitude: '',
+      longitude: '',
+      address: '',
+      neighborhood: '',
+      type: 'residential',
+    }
   } catch (error) {
     if (error instanceof ApiError && error.status === 422 && error.errors) {
       for (const [field, messages] of Object.entries(error.errors)) {
-        formErrors.value[field] = messages[0]
+        formErrors.value[field] = messages[0] || 'Erro de validação'
       }
     } else {
+      // eslint-disable-next-line no-console
       console.error(error)
     }
   }
@@ -93,7 +101,7 @@ async function handleCreate() {
     <!-- Filtros -->
     <BaseCard compact>
       <div class="flex flex-wrap gap-3">
-        <div class="flex-1 min-w-[200px]">
+        <div class="flex-1 min-w-[12.5rem]">
           <BaseInput
             v-model="search"
             placeholder="Buscar por código ou endereço..."
@@ -122,7 +130,7 @@ async function handleCreate() {
       <div class="overflow-x-auto">
         <table class="w-full text-sm">
           <thead>
-            <tr class="border-b border-slate-700/50">
+            <tr class="border-b border-border">
               <th class="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase">
                 Código
               </th>
@@ -132,7 +140,9 @@ async function handleCreate() {
               <th class="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase">
                 Bairro
               </th>
-              <th class="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase">Tipo</th>
+              <th class="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase">
+                Tipo
+              </th>
               <th class="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase">
                 Status
               </th>
@@ -145,7 +155,7 @@ async function handleCreate() {
             <tr
               v-for="h in store.hydrometers"
               :key="h.id"
-              class="border-b border-slate-700/30 hover:bg-surface-hover transition-colors"
+              class="border-b border-border/60 hover:bg-surface-hover transition-colors"
             >
               <td class="py-3 px-4 font-mono font-medium text-primary-400">{{ h.code }}</td>
               <td class="py-3 px-4 text-text-body">{{ h.address }}</td>
@@ -161,7 +171,7 @@ async function handleCreate() {
       </div>
 
       <!-- Paginação -->
-      <div class="flex items-center justify-between border-t border-slate-700/50 pt-4 mt-4">
+      <div class="flex items-center justify-between border-t border-border pt-4 mt-4">
         <p class="text-xs text-text-muted">
           Página {{ store.pagination.currentPage }} de {{ store.pagination.lastPage }}
         </p>
@@ -189,7 +199,12 @@ async function handleCreate() {
     <!-- Modal de criação -->
     <BaseModal :open="showCreateModal" title="Novo Hidrômetro" @close="showCreateModal = false">
       <form @submit.prevent="handleCreate" class="space-y-4">
-        <BaseInput v-model="form.code" label="Código" placeholder="HYD-201" :error="formErrors.code" />
+        <BaseInput
+          v-model="form.code"
+          label="Código"
+          placeholder="HYD-201"
+          :error="formErrors.code"
+        />
         <div class="grid grid-cols-2 gap-4">
           <BaseInput
             v-model="form.latitude"
@@ -208,13 +223,28 @@ async function handleCreate() {
             :error="formErrors.longitude"
           />
         </div>
-        <BaseInput v-model="form.address" label="Endereço" placeholder="Rua das Águas, 100" :error="formErrors.address" />
-        <BaseInput v-model="form.neighborhood" label="Bairro" placeholder="Centro" :error="formErrors.neighborhood" />
+        <BaseInput
+          v-model="form.address"
+          label="Endereço"
+          placeholder="Rua das Águas, 100"
+          :error="formErrors.address"
+        />
+        <BaseInput
+          v-model="form.neighborhood"
+          label="Bairro"
+          placeholder="Centro"
+          :error="formErrors.neighborhood"
+        />
         <div class="space-y-1.5">
-          <label class="block text-sm font-medium text-slate-300">Tipo</label>
+          <label class="block text-sm font-medium text-text-body">Tipo</label>
           <select
             v-model="form.type"
-            :class="['w-full rounded-lg border bg-surface-card px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:ring-2', formErrors.type ? 'border-danger focus:ring-danger/50' : 'border-slate-700 focus:ring-primary-500/50']"
+            :class="[
+              'w-full rounded-lg border bg-surface-card px-4 py-2.5 text-sm text-text-heading focus:outline-none focus:ring-2',
+              formErrors.type
+                ? 'border-danger focus:ring-danger/50'
+                : 'border-border focus:ring-primary-500/50',
+            ]"
           >
             <option value="residential">Residencial</option>
             <option value="commercial">Comercial</option>
