@@ -44,7 +44,7 @@ function handleMarkerClick(hydrometer: Hydrometer) {
 </script>
 
 <template>
-  <div class="animate-fade-in space-y-6">
+  <div class="animate-fade-in flex flex-col h-[calc(100vh-64px)] overflow-hidden gap-4">
     <div>
       <h1 class="text-2xl font-bold text-text-heading">Mapa</h1>
       <p class="text-sm text-slate-500 mt-1">
@@ -52,9 +52,9 @@ function handleMarkerClick(hydrometer: Hydrometer) {
       </p>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 flex-1 min-h-0">
       <!-- Mapa e Filtros -->
-      <div class="lg:col-span-3 space-y-4">
+      <div class="lg:col-span-3 flex flex-col gap-3 min-h-0">
         <!-- Filtros Rápidos -->
         <div class="flex flex-wrap gap-3 bg-surface-card/60 backdrop-blur-xl rounded-xl px-4 py-3 border border-border ring-1 ring-white/5">
           <button 
@@ -83,7 +83,7 @@ function handleMarkerClick(hydrometer: Hydrometer) {
           </button>
         </div>
 
-        <BaseCard compact>
+        <BaseCard compact class="flex-1 min-h-0 flex flex-col [&>*]:flex-1">
           <MapView :hydrometers="filteredHydrometers" @marker-click="handleMarkerClick" />
         </BaseCard>
       </div>
