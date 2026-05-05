@@ -14,11 +14,11 @@ use Illuminate\Support\Facades\Route;
 */
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 });
 
-// Endpoint de ingestão M2M (autenticado via API key, não via Sanctum)
-Route::post('/ingest', [IngestController::class, 'store']);
+// Endpoint de ingestão M2M (autenticado via API key no header X-API-Key)
+Route::post('/ingest', [IngestController::class, 'store'])->middleware(['ingest.auth', 'throttle:60,1']);
 
 /*
 |--------------------------------------------------------------------------

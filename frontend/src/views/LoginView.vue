@@ -26,6 +26,22 @@ async function handleLogin() {
   loading.value = true
   error.value = ''
 
+  // Validação client-side customizada (substitui tooltips nativos do browser)
+  const errors: string[] = []
+  if (!email.value) {
+    errors.push('O campo e-mail é obrigatório.')
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+    errors.push('Informe um endereço de e-mail válido.')
+  }
+  if (!password.value) {
+    errors.push('O campo senha é obrigatório.')
+  }
+  if (errors.length) {
+    error.value = errors.join('\n')
+    loading.value = false
+    return
+  }
+
   try {
     const { data } = await api.post('/auth/login', {
       email: email.value,
@@ -39,7 +55,11 @@ async function handleLogin() {
     router.push(redirect)
   } catch (e) {
     if (e instanceof ApiError) {
-      error.value = e.message
+      if (e.errors) {
+        error.value = Object.values(e.errors).flat().join('\n')
+      } else {
+        error.value = e.message
+      }
     } else {
       error.value = 'Erro inesperado. Tente novamente.'
     }
@@ -66,11 +86,12 @@ async function handleLogin() {
         <div
           v-if="error"
           class="mb-4 rounded-lg bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400"
+          style="white-space: pre-line"
         >
           {{ error }}
         </div>
 
-        <form @submit.prevent="handleLogin" class="space-y-4">
+        <form @submit.prevent="handleLogin" novalidate class="space-y-4">
           <BaseInput
             v-model="email"
             label="E-mail"
