@@ -94,51 +94,56 @@ const summaryCards = [
       <p class="text-sm text-text-muted mt-1">Visão geral do sistema de monitoramento</p>
     </div>
 
-    <!-- Cards de resumo -->
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-      <BaseCard v-for="card in summaryCards" :key="card.key" compact hoverable>
-        <div class="flex items-center gap-3">
-          <div :class="['flex h-9 w-9 shrink-0 items-center justify-center rounded-lg', card.bg]">
-            <component :is="card.icon" :class="['h-4 w-4', card.color]" />
-          </div>
-          <div class="flex flex-col min-w-0">
-            <span class="text-lg font-bold text-text-heading leading-tight">
-              {{ store.summary?.[card.key as keyof typeof store.summary] ?? '—' }}
-            </span>
-            <span class="text-xs text-text-muted truncate">{{ card.label }}</span>
-          </div>
+    <!-- Layout Principal: 2 Colunas (Esquerda: Dados / Direita: Visuais) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      
+      <!-- Coluna Esquerda: Métricas, Status e Alertas (Span 4) -->
+      <div class="lg:col-span-4 flex flex-col gap-4">
+        <!-- Cards de resumo (Grid 2x3) -->
+        <div class="grid grid-cols-2 gap-3">
+          <BaseCard v-for="card in summaryCards" :key="card.key" compact hoverable>
+            <div class="flex flex-col justify-center gap-1">
+              <div class="flex items-center gap-2">
+                <div :class="['flex h-6 w-6 shrink-0 items-center justify-center rounded-md', card.bg]">
+                  <component :is="card.icon" :class="['h-3 w-3', card.color]" />
+                </div>
+                <span class="text-xs text-text-muted truncate">{{ card.label }}</span>
+              </div>
+              <span class="text-xl font-bold text-text-heading leading-tight ml-1">
+                {{ store.summary?.[card.key as keyof typeof store.summary] ?? '—' }}
+              </span>
+            </div>
+          </BaseCard>
         </div>
-      </BaseCard>
-    </div>
 
-    <!-- Linha 2: Gráfico + Mapa + (Status & Alertas) -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 flex-1 min-h-0">
-      <!-- Gráfico de consumo -->
-      <BaseCard title="Consumo Diário (últimos 30 dias)" class="min-w-0 flex flex-col">
-        <div class="flex-1 h-full w-full">
-          <ConsumptionChart v-if="store.consumption.length" :data="store.consumption" />
-          <p v-else class="text-sm text-text-muted text-center py-8">Carregando dados...</p>
-        </div>
-      </BaseCard>
-
-      <!-- Mapa de Hidrômetros -->
-      <BaseCard title="Mapa de Hidrômetros" class="flex flex-col">
-        <div class="flex-1 h-full w-full">
-          <MapView :hydrometers="store.mapHydrometers" />
-        </div>
-      </BaseCard>
-
-      <!-- Coluna 3: Status + Alertas empilhados -->
-      <div class="flex flex-col gap-3 min-h-0">
+        <!-- Donut Chart -->
         <BaseCard title="Distribuição por Status" class="flex flex-col">
           <StatusDonutChart v-if="store.summary" :summary="store.summary" />
           <p v-else class="text-sm text-text-muted text-center py-4">Carregando...</p>
         </BaseCard>
 
-        <BaseCard title="Últimos Alertas" class="flex flex-col flex-1 min-h-0">
+        <!-- Últimos Alertas -->
+        <BaseCard title="Últimos Alertas" class="flex flex-col flex-1">
           <RecentAlerts :alerts="store.recentAlerts" />
         </BaseCard>
       </div>
+
+      <!-- Coluna Direita: Gráfico e Mapa (Span 8) -->
+      <div class="lg:col-span-8 flex flex-col gap-4">
+        <BaseCard title="Consumo Diário (últimos 30 dias)" class="flex flex-col h-auto">
+          <div class="w-full">
+            <ConsumptionChart v-if="store.consumption.length" :data="store.consumption" />
+            <p v-else class="text-sm text-text-muted text-center py-8">Carregando dados...</p>
+          </div>
+        </BaseCard>
+
+        <BaseCard title="Mapa de Hidrômetros" class="flex flex-col flex-1">
+          <div class="h-full w-full">
+            <MapView :hydrometers="store.mapHydrometers" />
+          </div>
+        </BaseCard>
+      </div>
+
     </div>
   </div>
 </template>
