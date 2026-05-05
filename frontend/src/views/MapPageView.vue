@@ -56,7 +56,7 @@ function handleMarkerClick(hydrometer: Hydrometer) {
       <!-- Mapa e Filtros -->
       <div class="lg:col-span-3 space-y-4">
         <!-- Filtros Rápidos -->
-        <div class="flex flex-wrap gap-3">
+        <div class="flex flex-wrap gap-3 bg-surface-card/60 backdrop-blur-lg rounded-xl px-4 py-3 border border-slate-700/30">
           <button 
             @click="activeFilter = 'all'"
             :class="['px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200', activeFilter === 'all' ? 'bg-primary-600 text-white shadow-lg shadow-primary-900/20 border-transparent' : 'bg-surface-card border border-slate-700/50 text-slate-400 hover:text-slate-200']"
