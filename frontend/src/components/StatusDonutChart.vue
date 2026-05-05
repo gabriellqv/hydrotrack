@@ -61,6 +61,9 @@ const chartData = computed(() => ({
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
+  layout: {
+    padding: 10
+  },
   plugins: {
     legend: { display: false },
     tooltip: {
