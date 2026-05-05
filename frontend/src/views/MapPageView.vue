@@ -22,7 +22,7 @@ const selectedHydrometer = ref<Hydrometer | null>(null)
 const activeFilter = ref<'all' | 'online' | 'offline' | 'alert'>('all')
 
 /** Intervalo de polling em milissegundos */
-const POLLING_INTERVAL = 10_000
+const POLLING_INTERVAL = 5_000
 let pollingTimer: ReturnType<typeof setInterval> | null = null
 
 const filteredHydrometers = computed(() => {

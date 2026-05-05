@@ -20,7 +20,7 @@ import { Droplets, Wifi, WifiOff, AlertTriangle, BarChart3, Bell } from 'lucide-
 const store = useDashboardStore()
 
 /** Intervalo de polling em milissegundos */
-const POLLING_INTERVAL = 10_000
+const POLLING_INTERVAL = 5_000
 
 let pollingTimer: ReturnType<typeof setInterval> | null = null
 
