@@ -5,10 +5,10 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 import type { DashboardSummary } from '@/types'
 
 /**
- * Gráfico de rosca que exibe a distribuição de status dos hidrômetros.
+ * Gráfico de pizza com legenda custom para distribuição de status.
  *
  * Mostra a proporção de dispositivos Online, Offline e Em Alerta,
- * oferecendo uma visão rápida da saúde da rede de sensores.
+ * com legenda HTML rica exibindo valor absoluto e percentual.
  *
  * @prop {DashboardSummary} summary - Dados de resumo do dashboard
  */
@@ -17,6 +17,33 @@ const props = defineProps<{
 }>()
 
 ChartJS.register(ArcElement, Tooltip, Legend)
+
+const statusItems = computed(() => {
+  const total = props.summary.online + props.summary.offline + props.summary.alert
+  return [
+    {
+      label: 'Online',
+      value: props.summary.online,
+      pct: total > 0 ? ((props.summary.online / total) * 100).toFixed(1) : '0',
+      color: '#22c55e',
+      dotClass: 'bg-green-500',
+    },
+    {
+      label: 'Offline',
+      value: props.summary.offline,
+      pct: total > 0 ? ((props.summary.offline / total) * 100).toFixed(1) : '0',
+      color: '#64748b',
+      dotClass: 'bg-slate-500',
+    },
+    {
+      label: 'Em Alerta',
+      value: props.summary.alert,
+      pct: total > 0 ? ((props.summary.alert / total) * 100).toFixed(1) : '0',
+      color: '#ef4444',
+      dotClass: 'bg-red-500',
+    },
+  ]
+})
 
 const chartData = computed(() => ({
   labels: ['Online', 'Offline', 'Em Alerta'],
@@ -34,18 +61,8 @@ const chartData = computed(() => ({
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
-
   plugins: {
-    legend: {
-      position: 'bottom' as const,
-      labels: {
-        color: '#94a3b8',
-        padding: 16,
-        usePointStyle: true,
-        pointStyleWidth: 8,
-        font: { size: 12 },
-      },
-    },
+    legend: { display: false },
     tooltip: {
       callbacks: {
         label: (ctx: { label: string; parsed: number; dataset: { data: number[] } }) => {
@@ -60,7 +77,24 @@ const chartOptions = {
 </script>
 
 <template>
-  <div class="relative w-full h-full" style="min-height: 14rem">
-    <Pie :data="chartData" :options="chartOptions" />
+  <div class="flex items-center gap-6 h-full">
+    <!-- Gráfico -->
+    <div class="relative flex-1 h-full" style="min-height: 12rem">
+      <Pie :data="chartData" :options="chartOptions" />
+    </div>
+
+    <!-- Legenda Custom -->
+    <div class="flex flex-col gap-3 shrink-0">
+      <div v-for="item in statusItems" :key="item.label" class="flex items-center gap-3">
+        <span :class="['w-3 h-3 rounded-full shrink-0', item.dotClass]"></span>
+        <div class="flex flex-col">
+          <span class="text-sm font-semibold text-text-heading">
+            {{ item.value }}
+            <span class="text-xs font-normal text-text-muted ml-1">({{ item.pct }}%)</span>
+          </span>
+          <span class="text-xs text-text-muted">{{ item.label }}</span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
