@@ -5,7 +5,7 @@ import { useAuthStore } from '@/stores/auth'
 import { api, ApiError } from '@/services/api'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
-import { Droplets } from 'lucide-vue-next'
+
 
 /**
  * View de Autenticação.
@@ -55,9 +55,7 @@ async function handleLogin() {
     <div class="w-full max-w-md animate-fade-in">
       <!-- Logo -->
       <div class="flex flex-col items-center mb-8">
-        <div class="flex items-center justify-center h-16 w-16 rounded-2xl bg-primary-600/20 mb-4">
-          <Droplets class="h-8 w-8 text-primary-400" />
-        </div>
+        <img src="/favicon.svg" alt="HydroTrack" class="h-16 w-16 mb-4 drop-shadow-lg" />
         <h1 class="text-2xl font-bold text-text-heading">HydroTrack</h1>
         <p class="text-sm text-text-muted mt-1">Monitoramento Hídrico Inteligente</p>
       </div>
