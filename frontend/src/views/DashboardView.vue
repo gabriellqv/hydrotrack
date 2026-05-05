@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import { useDashboardStore } from '@/stores/dashboard'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import ConsumptionChart from '@/components/ConsumptionChart.vue'
@@ -12,12 +12,34 @@ import { Droplets, Wifi, WifiOff, AlertTriangle, BarChart3, Bell } from 'lucide-
  * Consolida as três principais métricas do sistema: resumo em cards,
  * gráfico de evolução do consumo e mapa interativo. Todos os dados são
  * cacheados/gerenciados pelo DashboardStore.
+ *
+ * Implementa polling a cada 10 segundos para atualização em tempo real
+ * enquanto o simulador IoT está rodando.
  */
 
 const store = useDashboardStore()
 
-onMounted(async () => {
+/** Intervalo de polling em milissegundos */
+const POLLING_INTERVAL = 10_000
+
+let pollingTimer: ReturnType<typeof setInterval> | null = null
+
+/** Busca todos os dados do dashboard */
+async function refreshDashboard() {
   await Promise.all([store.fetchSummary(), store.fetchConsumption(), store.fetchMap()])
+}
+
+onMounted(async () => {
+  await refreshDashboard()
+
+  pollingTimer = setInterval(refreshDashboard, POLLING_INTERVAL)
+})
+
+onUnmounted(() => {
+  if (pollingTimer) {
+    clearInterval(pollingTimer)
+    pollingTimer = null
+  }
 })
 
 const summaryCards = [
