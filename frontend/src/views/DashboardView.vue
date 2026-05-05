@@ -95,10 +95,10 @@ const summaryCards = [
     </div>
 
     <!-- Layout 2x2: Gráfico | Mapa // Status | Alertas -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 min-h-0">
+    <div class="grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-3 gap-4 flex-1 min-h-0">
       
       <!-- Top Left: Gráfico -->
-      <BaseCard title="Consumo Diário (últimos 30 dias)" class="flex flex-col h-full">
+      <BaseCard title="Consumo Diário (últimos 30 dias)" class="flex flex-col lg:row-span-2 min-h-0">
         <div class="flex-1 w-full min-h-0">
           <ConsumptionChart v-if="store.consumption.length" :data="store.consumption" />
           <p v-else class="text-sm text-text-muted text-center py-8">Carregando dados...</p>
@@ -106,7 +106,7 @@ const summaryCards = [
       </BaseCard>
 
       <!-- Top Right: Mapa -->
-      <BaseCard title="Mapa de Hidrômetros" class="flex flex-col h-full">
+      <BaseCard title="Mapa de Hidrômetros" class="flex flex-col lg:row-span-2 min-h-0">
         <!-- Cards super compactos no topo do mapa -->
         <div class="grid grid-cols-3 lg:grid-cols-6 gap-2 mb-3">
           <div
@@ -132,13 +132,13 @@ const summaryCards = [
       </BaseCard>
 
       <!-- Bottom Left: Donut Chart -->
-      <BaseCard title="Distribuição por Status" class="flex flex-col h-full">
+      <BaseCard title="Distribuição por Status" class="flex flex-col lg:row-span-1 min-h-0">
         <StatusDonutChart v-if="store.summary" :summary="store.summary" />
         <p v-else class="text-sm text-text-muted text-center py-4">Carregando...</p>
       </BaseCard>
 
       <!-- Bottom Right: Últimos Alertas -->
-      <BaseCard title="Últimos Alertas" class="flex flex-col h-full">
+      <BaseCard title="Últimos Alertas" class="flex flex-col lg:row-span-1 min-h-0">
         <RecentAlerts :alerts="store.recentAlerts" />
       </BaseCard>
 
