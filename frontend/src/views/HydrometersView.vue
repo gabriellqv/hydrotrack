@@ -81,7 +81,7 @@ async function handleCreate() {
     <div class="flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-bold text-text-heading">Hidrômetros</h1>
-        <p class="text-sm text-slate-500 mt-1">
+        <p class="text-sm text-text-muted mt-1">
           {{ store.pagination.total }} dispositivos cadastrados
         </p>
       </div>
@@ -100,7 +100,7 @@ async function handleCreate() {
             @keyup.enter="applyFilters"
           >
             <template #icon>
-              <Search class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+              <Search class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted" />
             </template>
           </BaseInput>
         </div>

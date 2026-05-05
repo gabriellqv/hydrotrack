@@ -6,7 +6,6 @@ import { api, ApiError } from '@/services/api'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 
-
 /**
  * View de Autenticação.
  *

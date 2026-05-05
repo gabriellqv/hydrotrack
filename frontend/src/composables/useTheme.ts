@@ -9,6 +9,10 @@ import { ref } from 'vue'
  */
 const isDark = ref(true)
 
+/**
+ * Inicializa o tema a partir do valor persistido no localStorage.
+ * Deve ser chamado uma vez no onMounted do App.vue.
+ */
 function initTheme() {
   const saved = localStorage.getItem('theme')
   if (saved === 'light') {
@@ -17,12 +21,18 @@ function initTheme() {
   applyTheme()
 }
 
+/**
+ * Alterna entre tema claro e escuro, persistindo a escolha.
+ */
 function toggleTheme() {
   isDark.value = !isDark.value
   localStorage.setItem('theme', isDark.value ? 'dark' : 'light')
   applyTheme()
 }
 
+/**
+ * Aplica ou remove a classe 'light' no elemento raiz do DOM.
+ */
 function applyTheme() {
   const html = document.documentElement
   if (isDark.value) {

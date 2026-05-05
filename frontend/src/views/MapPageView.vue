@@ -47,7 +47,7 @@ function handleMarkerClick(hydrometer: Hydrometer) {
   <div class="animate-fade-in flex flex-col h-[calc(100vh-64px)] overflow-hidden gap-4">
     <div>
       <h1 class="text-2xl font-bold text-text-heading">Mapa</h1>
-      <p class="text-sm text-slate-500 mt-1">
+      <p class="text-sm text-text-muted mt-1">
         Distribuição geográfica dos hidrômetros em Bocaiúva-MG
       </p>
     </div>
