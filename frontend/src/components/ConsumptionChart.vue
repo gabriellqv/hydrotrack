@@ -72,7 +72,7 @@ const chartOptions = {
 </script>
 
 <template>
-  <div class="relative w-full h-full" style="aspect-ratio: 16 / 9; min-height: 14rem">
+  <div class="relative w-full h-full min-h-0">
     <Line :data="chartData" :options="chartOptions" />
   </div>
 </template>

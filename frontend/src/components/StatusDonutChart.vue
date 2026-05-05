@@ -79,7 +79,7 @@ const chartOptions = {
 <template>
   <div class="flex items-center gap-6 h-full">
     <!-- Gráfico -->
-    <div class="relative flex-1 h-full" style="min-height: 12rem">
+    <div class="relative flex-1 h-full min-h-0">
       <Pie :data="chartData" :options="chartOptions" />
     </div>
 

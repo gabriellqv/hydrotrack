@@ -34,7 +34,7 @@ function timeAgo(dateStr: string): string {
 </script>
 
 <template>
-  <div class="space-y-2 overflow-y-auto max-h-[16rem] pr-1">
+  <div class="space-y-2 overflow-y-auto h-full pr-1">
     <div
       v-for="alert in alerts"
       :key="alert.id"
