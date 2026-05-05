@@ -6,6 +6,7 @@ use App\Http\Requests\IngestReadingRequest;
 use App\Http\Resources\ReadingResource;
 use App\Models\Hydrometer;
 use App\Models\Reading;
+use App\Services\DashboardService;
 use Illuminate\Http\JsonResponse;
 
 /**
@@ -20,8 +21,8 @@ class IngestController extends Controller
     /**
      * Registra uma nova leitura de consumo hídrico.
      *
-     * Localiza o hidrômetro pelo código, cria a leitura e atualiza
-     * o timestamp da última leitura no hidrômetro.
+     * Localiza o hidrômetro pelo código, cria a leitura, atualiza
+     * o timestamp da última leitura e invalida o cache do dashboard.
      *
      * @param  IngestReadingRequest  $request  Dados validados: hydrometer_code, value_m3, reading_at
      * @return JsonResponse 201 Created com a leitura registrada
@@ -40,6 +41,8 @@ class IngestController extends Controller
             'last_reading_at' => $request->reading_at,
             'status' => 'online',
         ]);
+
+        DashboardService::invalidateCache();
 
         return (new ReadingResource($reading))
             ->response()

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\AlertResource;
 use App\Models\Alert;
+use App\Services\DashboardService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -40,6 +41,8 @@ class AlertController extends Controller
             'resolved' => true,
             'resolved_at' => now(),
         ]);
+
+        DashboardService::invalidateCache();
 
         return response()->json(new AlertResource($alert->fresh('hydrometer')));
     }
