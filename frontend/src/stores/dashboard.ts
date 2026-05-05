@@ -1,15 +1,16 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { api } from '@/services/api'
-import type { DashboardSummary, ConsumptionPoint, Hydrometer } from '@/types'
+import type { DashboardSummary, ConsumptionPoint, Hydrometer, Alert } from '@/types'
 
 /**
- * Store do dashboard — gerencia dados de resumo, gráfico e mapa.
+ * Store do dashboard — gerencia dados de resumo, gráfico, mapa e alertas.
  */
 export const useDashboardStore = defineStore('dashboard', () => {
   const summary = ref<DashboardSummary | null>(null)
   const consumption = ref<ConsumptionPoint[]>([])
   const mapHydrometers = ref<Hydrometer[]>([])
+  const recentAlerts = ref<Alert[]>([])
   const loading = ref(false)
 
   async function fetchSummary() {
@@ -32,5 +33,20 @@ export const useDashboardStore = defineStore('dashboard', () => {
     mapHydrometers.value = data
   }
 
-  return { summary, consumption, mapHydrometers, loading, fetchSummary, fetchConsumption, fetchMap }
+  async function fetchAlerts() {
+    const { data } = await api.get<{ data: Alert[] }>('/alerts')
+    recentAlerts.value = (data.data || data).slice(0, 5)
+  }
+
+  return {
+    summary,
+    consumption,
+    mapHydrometers,
+    recentAlerts,
+    loading,
+    fetchSummary,
+    fetchConsumption,
+    fetchMap,
+    fetchAlerts,
+  }
 })
