@@ -61,7 +61,7 @@ const summaryCards = [
 </script>
 
 <template>
-  <div class="animate-fade-in space-y-8">
+  <div class="animate-fade-in space-y-4">
     <div>
       <h1 class="text-2xl font-bold text-text-heading">Dashboard</h1>
       <p class="text-sm text-text-muted mt-1">Visão geral do sistema de monitoramento</p>
@@ -82,15 +82,22 @@ const summaryCards = [
       </BaseCard>
     </div>
 
-    <!-- Gráfico de consumo -->
-    <BaseCard title="Consumo Diário (últimos 30 dias)" class="min-w-0">
-      <ConsumptionChart v-if="store.consumption.length" :data="store.consumption" />
-      <p v-else class="text-sm text-text-muted text-center py-12">Carregando dados...</p>
-    </BaseCard>
+    <!-- Grid Lado a Lado (Gráfico + Mapa) -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <!-- Gráfico de consumo -->
+      <BaseCard title="Consumo Diário (últimos 30 dias)" class="min-w-0 flex flex-col">
+        <div class="flex-1 h-full w-full">
+          <ConsumptionChart v-if="store.consumption.length" :data="store.consumption" />
+          <p v-else class="text-sm text-text-muted text-center py-12">Carregando dados...</p>
+        </div>
+      </BaseCard>
 
-    <!-- Preview do mapa -->
-    <BaseCard title="Mapa de Hidrômetros">
-      <MapView :hydrometers="store.mapHydrometers" />
-    </BaseCard>
+      <!-- Preview do mapa -->
+      <BaseCard title="Mapa de Hidrômetros" class="flex flex-col">
+        <div class="flex-1 h-full w-full">
+          <MapView :hydrometers="store.mapHydrometers" />
+        </div>
+      </BaseCard>
+    </div>
   </div>
 </template>
