@@ -140,6 +140,7 @@ onMounted(() => {
   watch(
     isDark,
     (dark) => {
+      if (!map) return
       if (dark) {
         if (map.hasLayer(lightMap)) map.removeLayer(lightMap)
         darkMap.addTo(map)
