@@ -14,8 +14,6 @@ import { useTheme } from '@/composables/useTheme'
  * @emits marker-click - Emitido quando o usuário clica em um pino do mapa
  */
 
-const { isDark } = useTheme()
-
 const props = defineProps<{
   hydrometers: Hydrometer[]
 }>()
@@ -23,6 +21,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   'marker-click': [hydrometer: Hydrometer]
 }>()
+
+const { isDark } = useTheme()
 
 /** Referência ao container DOM do mapa */
 const mapContainer = ref<HTMLElement | null>(null)
@@ -81,6 +81,7 @@ function renderMarkers() {
   markersLayer.clearLayers()
 
   if (!Array.isArray(props.hydrometers)) {
+    // eslint-disable-next-line no-console
     console.error('MapView: hydrometers is not an array', props.hydrometers)
     return
   }

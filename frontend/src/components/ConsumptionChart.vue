@@ -14,8 +14,6 @@ import {
 } from 'chart.js'
 import type { ConsumptionPoint } from '@/types'
 import { useTheme } from '@/composables/useTheme'
-
-const { isDark } = useTheme()
 /**
  * Gráfico de linha que exibe o consumo hídrico diário acumulado.
  *
@@ -27,6 +25,8 @@ const { isDark } = useTheme()
 const props = defineProps<{
   data: ConsumptionPoint[]
 }>()
+
+const { isDark } = useTheme()
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler)
 
