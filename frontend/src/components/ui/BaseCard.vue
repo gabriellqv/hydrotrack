@@ -29,7 +29,7 @@ withDefaults(
         : '',
       compact ? 'p-4' : 'p-6',
     ]"
-    style="background-color: var(--color-glass);"
+    style="background-color: var(--color-glass)"
   >
     <h3 v-if="title" class="text-lg font-semibold text-text-heading mb-4">
       {{ title }}
