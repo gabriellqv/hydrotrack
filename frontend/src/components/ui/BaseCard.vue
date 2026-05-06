@@ -22,13 +22,14 @@ withDefaults(
 <template>
   <div
     :class="[
-      'rounded-xl border border-border bg-surface-card shadow-card',
+      'rounded-xl border border-border/50 bg-transparent backdrop-blur-xl shadow-card',
       'transition-all duration-300',
       hoverable
         ? 'hover:border-primary-500/30 hover:shadow-primary-500/5 hover:-translate-y-0.5'
         : '',
       compact ? 'p-4' : 'p-6',
     ]"
+    style="background-color: var(--color-glass);"
   >
     <h3 v-if="title" class="text-lg font-semibold text-text-heading mb-4">
       {{ title }}
