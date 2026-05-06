@@ -20,6 +20,7 @@
   --sidebar-to: rgba(15, 23, 42, 0.7);
   --sidebar-border: rgba(255, 255, 255, 0.1);
   --shadow-card: 0 0.25rem 1.5rem rgba(0, 0, 0, 0.25);
+  --color-glass: rgba(30, 41, 59, 0.6); /* Dark Glass */
 
   /* Espaçamentos e layout */
   --sidebar-width: 16rem;
@@ -40,6 +41,7 @@
   --sidebar-to: rgba(241, 245, 249, 0.85);
   --sidebar-border: rgba(203, 213, 225, 0.5);
   --shadow-card: 0 0.25rem 1.5rem rgba(0, 0, 0, 0.06);
+  --color-glass: rgba(255, 255, 255, 0.6); /* Light Glass */
 }
 
 @theme {
@@ -54,6 +56,16 @@
   --color-primary-700: #1d4ed8;
   --color-primary-800: #1e40af;
   --color-primary-900: #1e3a8a;
+
+  /* Cores do Tema Dinâmico */
+  --color-surface: var(--color-surface);
+  --color-surface-card: var(--color-surface-card);
+  --color-surface-hover: var(--color-surface-hover);
+  --color-text-heading: var(--color-text-heading);
+  --color-text-body: var(--color-text-body);
+  --color-text-muted: var(--color-text-muted);
+  --color-border: var(--color-border);
+  --color-border-hover: var(--color-border-hover);
 
   /* Cores de status */
   --color-success: #22c55e;

@@ -13,7 +13,7 @@ import {
   type TooltipItem,
 } from 'chart.js'
 import type { ConsumptionPoint } from '@/types'
-
+import { useTheme } from '@/composables/useTheme'
 /**
  * Gráfico de linha que exibe o consumo hídrico diário acumulado.
  *
@@ -25,6 +25,8 @@ import type { ConsumptionPoint } from '@/types'
 const props = defineProps<{
   data: ConsumptionPoint[]
 }>()
+
+const { isDark } = useTheme()
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler)
 
@@ -43,7 +45,7 @@ const chartData = computed(() => {
         data: props.data.map((p) => p.total_m3),
         borderColor: primaryColor,
         backgroundColor: `${primaryColor}1a`,
-        fill: true,
+        fill: isDark.value,
         tension: 0.4,
         pointRadius: 3,
         pointHoverRadius: 6,

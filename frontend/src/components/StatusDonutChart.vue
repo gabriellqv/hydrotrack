@@ -50,10 +50,22 @@ const chartData = computed(() => ({
   datasets: [
     {
       data: [props.summary.online, props.summary.offline, props.summary.alert],
-      backgroundColor: ['#22c55e', '#64748b', '#ef4444'],
-      borderColor: 'transparent',
-      borderWidth: 0,
-      hoverOffset: 6,
+      // Transparência intensa para simular o vidro (35% a 40%)
+      backgroundColor: [
+        'rgba(34, 197, 94, 0.35)', // Verde Translúcido
+        'rgba(148, 163, 184, 0.20)', // Cinza Translúcido
+        'rgba(239, 68, 68, 0.35)', // Vermelho Translúcido
+      ],
+      // Bordas quase sólidas para dar definição à fatia de vidro
+      borderColor: ['rgba(34, 197, 94, 0.8)', 'rgba(148, 163, 184, 0.4)', 'rgba(239, 68, 68, 0.8)'],
+      borderWidth: 2,
+      hoverOffset: 8,
+      // Fica mais denso ao passar o mouse
+      hoverBackgroundColor: [
+        'rgba(34, 197, 94, 0.6)',
+        'rgba(148, 163, 184, 0.4)',
+        'rgba(239, 68, 68, 0.6)',
+      ],
     },
   ],
 }))
@@ -80,24 +92,32 @@ const chartOptions = {
 </script>
 
 <template>
-  <div class="flex items-center gap-2 h-full min-h-0 -my-4">
-    <!-- Gráfico -->
-    <div class="relative flex-1 h-full min-h-0 flex items-center justify-center">
-      <Pie :data="chartData" :options="chartOptions" />
-    </div>
-
+  <div
+    class="flex flex-col-reverse sm:flex-row items-center justify-center gap-6 sm:gap-4 h-full min-h-0 sm:-my-4 sm:pl-2"
+  >
     <!-- Legenda Custom -->
-    <div class="flex flex-col gap-3 shrink-0">
-      <div v-for="item in statusItems" :key="item.label" class="flex items-center gap-3">
+    <div
+      class="flex flex-row sm:flex-col flex-wrap justify-center gap-4 sm:gap-3 shrink-0 w-full sm:w-auto"
+    >
+      <div v-for="item in statusItems" :key="item.label" class="flex items-center gap-2 sm:gap-3">
         <span :class="['w-3 h-3 rounded-full shrink-0', item.dotClass]"></span>
         <div class="flex flex-col">
           <span class="text-sm font-semibold text-text-heading">
             {{ item.value }}
-            <span class="text-xs font-normal text-text-muted ml-1">({{ item.pct }}%)</span>
+            <span class="text-xs font-normal text-text-muted ml-0.5 sm:ml-1"
+              >({{ item.pct }}%)</span
+            >
           </span>
-          <span class="text-xs text-text-muted">{{ item.label }}</span>
+          <span class="hidden sm:block text-xs text-text-muted">{{ item.label }}</span>
         </div>
       </div>
+    </div>
+
+    <!-- Gráfico -->
+    <div
+      class="relative flex-1 w-full sm:w-auto h-full min-h-[150px] sm:min-h-0 flex items-center justify-center"
+    >
+      <Pie :data="chartData" :options="chartOptions" />
     </div>
   </div>
 </template>

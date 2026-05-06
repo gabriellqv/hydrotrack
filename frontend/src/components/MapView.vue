@@ -3,7 +3,7 @@ import { ref, onMounted, onUnmounted, watch } from 'vue'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import type { Hydrometer } from '@/types'
-
+import { useTheme } from '@/composables/useTheme'
 /**
  * Componente de mapa interativo que renderiza hidrômetros como pinos coloridos.
  *
@@ -21,6 +21,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   'marker-click': [hydrometer: Hydrometer]
 }>()
+
+const { isDark } = useTheme()
 
 /** Referência ao container DOM do mapa */
 const mapContainer = ref<HTMLElement | null>(null)
@@ -78,6 +80,12 @@ function renderMarkers() {
 
   markersLayer.clearLayers()
 
+  if (!Array.isArray(props.hydrometers)) {
+    // eslint-disable-next-line no-console
+    console.error('MapView: hydrometers is not an array', props.hydrometers)
+    return
+  }
+
   props.hydrometers.forEach((h) => {
     const marker = L.marker([h.latitude, h.longitude], {
       icon: createIcon(getMarkerColor(h.status), h.status),
@@ -128,13 +136,21 @@ onMounted(() => {
     },
   )
 
-  const savedTheme = localStorage.getItem('mapTheme') || 'dark'
-
-  if (savedTheme === 'light') {
-    lightMap.addTo(map)
-  } else {
-    darkMap.addTo(map)
-  }
+  // Sincroniza as camadas de tile com o tema global (Light/Dark Mode)
+  watch(
+    isDark,
+    (dark) => {
+      if (!map) return
+      if (dark) {
+        if (map.hasLayer(lightMap)) map.removeLayer(lightMap)
+        darkMap.addTo(map)
+      } else {
+        if (map.hasLayer(darkMap)) map.removeLayer(darkMap)
+        lightMap.addTo(map)
+      }
+    },
+    { immediate: true },
+  )
 
   const baseMaps = {
     'Modo Escuro': darkMap,
