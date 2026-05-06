@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, onUnmounted, ref, computed } from 'vue'
 import { useDashboardStore } from '@/stores/dashboard'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import MapView from '@/components/MapView.vue'
@@ -12,11 +12,18 @@ import type { Hydrometer } from '@/types'
  * Utiliza o componente base MapView para exibir a mancha de dispositivos,
  * adicionando um painel lateral dinâmico para exibição de detalhes de telemetria
  * quando um pino é clicado.
+ *
+ * Implementa polling a cada 10 segundos para refletir mudanças de status
+ * dos hidrômetros enquanto o simulador IoT está rodando.
  */
 
 const store = useDashboardStore()
 const selectedHydrometer = ref<Hydrometer | null>(null)
 const activeFilter = ref<'all' | 'online' | 'offline' | 'alert'>('all')
+
+/** Intervalo de polling em milissegundos */
+const POLLING_INTERVAL = 5_000
+let pollingTimer: ReturnType<typeof setInterval> | null = null
 
 const filteredHydrometers = computed(() => {
   if (activeFilter.value === 'all') return store.mapHydrometers
@@ -36,7 +43,17 @@ const typeMap: Record<string, string> = {
   industrial: 'Industrial',
 }
 
-onMounted(() => store.fetchMap())
+onMounted(() => {
+  store.fetchMap()
+  pollingTimer = setInterval(() => store.fetchMap(), POLLING_INTERVAL)
+})
+
+onUnmounted(() => {
+  if (pollingTimer) {
+    clearInterval(pollingTimer)
+    pollingTimer = null
+  }
+})
 
 function handleMarkerClick(hydrometer: Hydrometer) {
   selectedHydrometer.value = hydrometer

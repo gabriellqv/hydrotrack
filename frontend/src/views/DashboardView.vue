@@ -1,23 +1,50 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import { useDashboardStore } from '@/stores/dashboard'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import ConsumptionChart from '@/components/ConsumptionChart.vue'
 import MapView from '@/components/MapView.vue'
+import StatusDonutChart from '@/components/StatusDonutChart.vue'
+import RecentAlerts from '@/components/RecentAlerts.vue'
 import { Droplets, Wifi, WifiOff, AlertTriangle, BarChart3, Bell } from 'lucide-vue-next'
 
 /**
  * View Principal do Dashboard.
  *
- * Consolida as três principais métricas do sistema: resumo em cards,
- * gráfico de evolução do consumo e mapa interativo. Todos os dados são
- * cacheados/gerenciados pelo DashboardStore.
+ * Consolida as métricas do sistema em 4 blocos: cards de resumo,
+ * gráfico de consumo + mapa interativo, e donut de status + alertas recentes.
+ *
+ * Implementa polling a cada 5 segundos para atualização em tempo real.
  */
 
 const store = useDashboardStore()
 
+/** Intervalo de polling em milissegundos */
+const POLLING_INTERVAL = 5_000
+
+let pollingTimer: ReturnType<typeof setInterval> | null = null
+
+/** Busca todos os dados do dashboard */
+async function refreshDashboard() {
+  await Promise.all([
+    store.fetchSummary(),
+    store.fetchConsumption(),
+    store.fetchMap(),
+    store.fetchAlerts(),
+  ])
+}
+
 onMounted(async () => {
-  await Promise.all([store.fetchSummary(), store.fetchConsumption(), store.fetchMap()])
+  await refreshDashboard()
+
+  pollingTimer = setInterval(refreshDashboard, POLLING_INTERVAL)
+})
+
+onUnmounted(() => {
+  if (pollingTimer) {
+    clearInterval(pollingTimer)
+    pollingTimer = null
+  }
 })
 
 const summaryCards = [
@@ -61,42 +88,61 @@ const summaryCards = [
 </script>
 
 <template>
-  <div class="animate-fade-in space-y-4">
-    <div>
-      <h1 class="text-2xl font-bold text-text-heading">Dashboard</h1>
-      <p class="text-sm text-text-muted mt-1">Visão geral do sistema de monitoramento</p>
+  <div
+    class="animate-fade-in flex flex-col h-[calc(100vh-4rem)] lg:h-[calc(100vh-4rem)] space-y-3 min-h-0"
+  >
+    <div class="shrink-0">
+      <h1 class="text-2xl font-bold text-text-heading leading-tight">Dashboard</h1>
+      <p class="text-sm text-text-muted">Visão geral do sistema de monitoramento</p>
     </div>
 
-    <!-- Cards de resumo -->
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-      <BaseCard v-for="card in summaryCards" :key="card.key" compact hoverable>
-        <div class="flex flex-col items-center text-center gap-2">
-          <div :class="['flex h-10 w-10 items-center justify-center rounded-lg', card.bg]">
-            <component :is="card.icon" :class="['h-5 w-5', card.color]" />
-          </div>
-          <span class="text-2xl font-bold text-text-heading">
-            {{ store.summary?.[card.key as keyof typeof store.summary] ?? '—' }}
-          </span>
-          <span class="text-xs text-text-muted">{{ card.label }}</span>
-        </div>
-      </BaseCard>
-    </div>
-
-    <!-- Grid Lado a Lado (Gráfico + Mapa) -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <!-- Gráfico de consumo -->
-      <BaseCard title="Consumo Diário (últimos 30 dias)" class="min-w-0 flex flex-col">
-        <div class="flex-1 h-full w-full">
+    <!-- Layout 2x2: Gráfico | Mapa // Status | Alertas -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-3 gap-4 flex-1 min-h-0">
+      <!-- Top Left: Gráfico -->
+      <BaseCard
+        title="Consumo Diário (últimos 30 dias)"
+        class="flex flex-col lg:row-span-2 min-h-0"
+      >
+        <div class="flex-1 w-full min-h-0">
           <ConsumptionChart v-if="store.consumption.length" :data="store.consumption" />
-          <p v-else class="text-sm text-text-muted text-center py-12">Carregando dados...</p>
+          <p v-else class="text-sm text-text-muted text-center py-8">Carregando dados...</p>
         </div>
       </BaseCard>
 
-      <!-- Preview do mapa -->
-      <BaseCard title="Mapa de Hidrômetros" class="flex flex-col">
-        <div class="flex-1 h-full w-full">
+      <!-- Top Right: Mapa -->
+      <BaseCard title="Mapa de Hidrômetros" class="flex flex-col lg:row-span-2 min-h-0">
+        <!-- Data Ribbon HUD -->
+        <div class="flex w-full bg-surface/40 rounded-lg border border-border/50 py-2.5 mb-3">
+          <div
+            v-for="(card, index) in summaryCards"
+            :key="card.key"
+            class="flex flex-1 flex-col items-center justify-center relative min-w-0"
+            :class="{ 'border-l border-border/50': index > 0 }"
+          >
+            <div class="flex items-center gap-1.5 mb-1 w-full justify-center px-1">
+              <component :is="card.icon" :class="['h-3.5 w-3.5 shrink-0', card.color]" />
+              <span class="text-[10px] font-medium text-text-muted truncate">{{ card.label }}</span>
+            </div>
+            <span class="text-base font-bold text-text-heading leading-none">
+              {{ store.summary?.[card.key as keyof typeof store.summary] ?? '—' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="flex-1 w-full min-h-0">
           <MapView :hydrometers="store.mapHydrometers" />
         </div>
+      </BaseCard>
+
+      <!-- Bottom Left: Donut Chart -->
+      <BaseCard title="Distribuição por Status" class="flex flex-col lg:row-span-1 min-h-0">
+        <StatusDonutChart v-if="store.summary" :summary="store.summary" class="flex-1 min-h-0" />
+        <p v-else class="text-sm text-text-muted text-center py-4">Carregando...</p>
+      </BaseCard>
+
+      <!-- Bottom Right: Últimos Alertas -->
+      <BaseCard title="Últimos Alertas" class="flex flex-col lg:row-span-1 min-h-0">
+        <RecentAlerts :alerts="store.recentAlerts" />
       </BaseCard>
     </div>
   </div>

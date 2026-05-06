@@ -60,7 +60,7 @@ function createIcon(color: string, status: string): L.DivIcon {
     className: 'custom-marker bg-transparent border-0',
     html: `
       <div class="relative flex items-center justify-center" style="width: 16px; height: 16px;">
-        ${isAlert ? `<span class="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" style="background: ${color};"></span>` : ''}
+        ${isAlert ? `<span class="absolute inline-flex h-full w-full rounded-full opacity-50" style="background: ${color}; animation: soft-ping 2s ease-in-out infinite;"></span>` : ''}
         <span class="relative inline-flex rounded-full border-2 border-white" style="width: 14px; height: 14px; background: ${color}; box-shadow: 0 2px 4px rgba(0,0,0,0.4);"></span>
       </div>
     `,
@@ -171,6 +171,6 @@ watch(() => props.hydrometers, renderMarkers, { deep: true })
 <template>
   <div
     ref="mapContainer"
-    class="relative z-0 isolate w-full h-full min-h-[300px] lg:min-h-[350px] rounded-xl overflow-hidden shadow-lg"
+    class="relative z-0 isolate w-full h-full min-h-0 rounded-xl overflow-hidden shadow-lg"
   />
 </template>
