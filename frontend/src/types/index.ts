@@ -45,6 +45,7 @@ export interface Reading {
 export interface Alert {
   id: number
   hydrometer_id: number
+  hydrometer?: Hydrometer
   type: 'high_consumption' | 'zero_reading' | 'offline'
   message: string
   resolved: boolean
