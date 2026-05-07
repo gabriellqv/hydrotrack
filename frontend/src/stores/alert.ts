@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { api } from '@/services/api'
 import type { Alert } from '@/types'
+import { useToastStore } from '@/stores/toast'
 
 /**
  * Store de alertas — gerencia listagem, filtragem e resolução de alertas.
@@ -31,8 +32,14 @@ export const useAlertStore = defineStore('alert', () => {
   }
 
   async function resolveAlert(id: number) {
-    await api.patch(`/alerts/${id}/resolve`)
-    await fetchAlerts()
+    const toast = useToastStore()
+    try {
+      await api.patch(`/alerts/${id}/resolve`)
+      toast.success('Alerta resolvido e arquivado com sucesso.')
+      await fetchAlerts()
+    } catch {
+      toast.error('Erro ao tentar resolver o alerta.')
+    }
   }
 
   return { alerts, loading, filters, fetchAlerts, resolveAlert }

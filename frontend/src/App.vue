@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useTheme } from '@/composables/useTheme'
 import AppSidebar from '@/components/AppSidebar.vue'
 import ScrollToTop from '@/components/ScrollToTop.vue'
+import ToastContainer from '@/components/ToastContainer.vue'
 import { Menu } from 'lucide-vue-next'
 
 const route = useRoute()
@@ -56,4 +57,6 @@ onMounted(async () => {
       <ScrollToTop />
     </div>
   </template>
+
+  <ToastContainer />
 </template>

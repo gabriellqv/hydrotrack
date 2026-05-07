@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useToastStore } from '@/stores/toast'
 import { api, ApiError } from '@/services/api'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
@@ -53,6 +54,9 @@ async function handleLogin() {
 
     const redirect = (route.query.redirect as string) || '/'
     router.push(redirect)
+
+    const toast = useToastStore()
+    toast.success('Bem-vindo(a) de volta!')
   } catch (e) {
     if (e instanceof ApiError) {
       if (e.errors) {
