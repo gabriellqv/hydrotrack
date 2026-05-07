@@ -14,8 +14,34 @@ O HydroTrack e uma plataforma de monitoramento de telemetria hidrica IoT que sim
 
 ## Preview
 
+### Dashboard e Análise Global
 <div align="center">
-  <i>Screenshots serao adicionados conforme o desenvolvimento das telas.</i>
+  <img src="frontend/public/screenshots/dashboard.png" alt="Dashboard" width="100%">
+  <p><em>Visão geral do consumo de água, status da rede de sensores e últimos alertas gerados em tempo real.</em></p>
+</div>
+
+<br>
+
+### Central de Alertas e Manutenção
+<div align="center">
+  <img src="frontend/public/screenshots/alerts.png" alt="Alertas" width="100%">
+  <p><em>Gestão de anomalias (consumo excessivo, leitura zerada, queda de comunicação) com resolução por administradores.</em></p>
+</div>
+
+<br>
+
+### Monitoramento Geoespacial (IoT)
+<div align="center">
+  <img src="frontend/public/screenshots/map.png" alt="Mapa" width="100%">
+  <p><em>Mapeamento interativo de todos os hidrômetros da malha, destacando dispositivos em alerta ou offline.</em></p>
+</div>
+
+<br>
+
+### Gestão de Ativos (Hidrômetros)
+<div align="center">
+  <img src="frontend/public/screenshots/hydrometers.png" alt="Hidrômetros" width="100%">
+  <p><em>Cadastro e listagem de medidores com paginação, filtros e ações de gerenciamento (CRUD).</em></p>
 </div>
 
 ## Resultados e impacto
