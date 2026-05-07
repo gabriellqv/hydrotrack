@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { onMounted, onUnmounted } from 'vue'
 import { useDashboardStore } from '@/stores/dashboard'
 import BaseCard from '@/components/ui/BaseCard.vue'
@@ -20,6 +21,28 @@ import { useTheme } from '@/composables/useTheme'
 
 const store = useDashboardStore()
 const { isDark } = useTheme()
+
+/** Labels para os botões do seletor de período */
+const periodOptions: { days: 7 | 30 | 90; label: string }[] = [
+  { days: 7, label: '7d' },
+  { days: 30, label: '30d' },
+  { days: 90, label: '90d' },
+]
+
+/** Título dinâmico baseado no período selecionado */
+const chartTitle = computed(() => {
+  const labels: Record<number, string> = {
+    7: 'Consumo Diário (últimos 7 dias)',
+    30: 'Consumo Diário (últimos 30 dias)',
+    90: 'Consumo Diário (últimos 90 dias)',
+  }
+  return labels[store.selectedDays] || 'Consumo Diário'
+})
+
+/** Altera o período e recarrega os dados de consumo */
+async function changePeriod(days: 7 | 30 | 90) {
+  await store.fetchConsumption(days)
+}
 
 /** Intervalo de polling em milissegundos */
 const POLLING_INTERVAL = 5_000
@@ -121,9 +144,26 @@ const summaryCards = [
         >
           <!-- Top Left: Gráfico -->
           <div class="flex flex-col lg:row-span-2 min-h-[300px] lg:min-h-0">
-            <h3 class="text-sm font-bold text-text-heading mb-3 uppercase tracking-wider shrink-0">
-              Consumo Diário (últimos 30 dias)
-            </h3>
+            <div class="flex items-center justify-between mb-3 shrink-0">
+              <h3 class="text-sm font-bold text-text-heading uppercase tracking-wider">
+                {{ chartTitle }}
+              </h3>
+              <div class="flex gap-1">
+                <button
+                  v-for="opt in periodOptions"
+                  :key="opt.days"
+                  @click="changePeriod(opt.days)"
+                  :class="[
+                    'px-3 py-1 rounded-full text-xs font-semibold transition-all duration-200',
+                    store.selectedDays === opt.days
+                      ? 'bg-primary-600 text-white shadow-lg shadow-primary-900/20'
+                      : 'bg-surface-card border border-border text-text-muted hover:text-text-heading hover:border-primary-500/30',
+                  ]"
+                >
+                  {{ opt.label }}
+                </button>
+              </div>
+            </div>
             <div class="flex-1 w-full min-h-0">
               <ConsumptionChart v-if="store.consumption.length" :data="store.consumption" />
               <p v-else class="text-sm text-text-muted text-center py-8">Carregando dados...</p>

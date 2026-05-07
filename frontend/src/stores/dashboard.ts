@@ -13,6 +13,9 @@ export const useDashboardStore = defineStore('dashboard', () => {
   const recentAlerts = ref<Alert[]>([])
   const loading = ref(false)
 
+  /** Período selecionado para o gráfico de consumo (em dias) */
+  const selectedDays = ref<7 | 30 | 90>(30)
+
   async function fetchSummary() {
     loading.value = true
     try {
@@ -23,8 +26,13 @@ export const useDashboardStore = defineStore('dashboard', () => {
     }
   }
 
-  async function fetchConsumption() {
-    const { data } = await api.get<ConsumptionPoint[]>('/dashboard/consumption')
+  async function fetchConsumption(days?: 7 | 30 | 90) {
+    if (days !== undefined) {
+      selectedDays.value = days
+    }
+    const { data } = await api.get<ConsumptionPoint[]>(
+      `/dashboard/consumption?days=${selectedDays.value}`,
+    )
     consumption.value = data
   }
 
@@ -44,6 +52,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     mapHydrometers,
     recentAlerts,
     loading,
+    selectedDays,
     fetchSummary,
     fetchConsumption,
     fetchMap,
