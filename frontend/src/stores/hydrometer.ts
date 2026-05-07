@@ -13,6 +13,9 @@ export const useHydrometerStore = defineStore('hydrometer', () => {
   /** Lista de hidrômetros carregados */
   const hydrometers = ref<Hydrometer[]>([])
 
+  /** Hidrômetro carregado individualmente (página de detalhe) */
+  const currentHydrometer = ref<Hydrometer | null>(null)
+
   /** Indicador de carregamento */
   const loading = ref(false)
 
@@ -43,6 +46,37 @@ export const useHydrometerStore = defineStore('hydrometer', () => {
       }
     } finally {
       loading.value = false
+    }
+  }
+
+  /** Período selecionado para leituras na página de detalhe */
+  const detailDays = ref<7 | 30 | 90>(30)
+
+  /** Indicador de carregamento para refresh das leituras do detalhe */
+  const detailLoading = ref(false)
+
+  /**
+   * Busca os detalhes de um hidrômetro individual com leituras e alertas.
+   *
+   * @param {number} id - ID do hidrômetro
+   * @param {7 | 30 | 90} days - Período das leituras em dias
+   */
+  async function fetchHydrometer(id: number, days?: 7 | 30 | 90) {
+    if (days !== undefined) {
+      detailDays.value = days
+      detailLoading.value = true // Apenas o gráfico ficará com "loading"
+    } else {
+      loading.value = true // Primeira vez carregando a tela inteira
+    }
+
+    try {
+      const { data } = await api.get<{ data: Hydrometer }>(
+        `/hydrometers/${id}?days=${detailDays.value}`,
+      )
+      currentHydrometer.value = data.data
+    } finally {
+      loading.value = false
+      detailLoading.value = false
     }
   }
 
@@ -81,13 +115,38 @@ export const useHydrometerStore = defineStore('hydrometer', () => {
     await fetchHydrometers(pagination.value.currentPage)
   }
 
+  /**
+   * Exporta as leituras do hidrômetro em formato CSV via download.
+   *
+   * @param {number} id - ID do hidrômetro
+   * @param {string} code - Código do hidrômetro (para nome do arquivo)
+   */
+  async function exportReadings(id: number, code: string) {
+    const response = await api.get(`/hydrometers/${id}/readings/export`, {
+      responseType: 'blob',
+    })
+    const url = window.URL.createObjectURL(new Blob([response.data as BlobPart]))
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `${code}_leituras.csv`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+  }
+
   return {
     hydrometers,
+    currentHydrometer,
     loading,
     pagination,
+    detailDays,
+    detailLoading,
     fetchHydrometers,
+    fetchHydrometer,
     createHydrometer,
     updateHydrometer,
     deleteHydrometer,
+    exportReadings,
   }
 })

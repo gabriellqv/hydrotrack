@@ -19,6 +19,8 @@ export interface Hydrometer {
   last_reading_at: string | null
   created_at: string
   readings?: Reading[]
+  chart_data?: { date: string; total_m3: number }[]
+  alerts?: Alert[]
 }
 
 /**

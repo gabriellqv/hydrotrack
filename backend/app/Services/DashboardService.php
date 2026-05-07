@@ -88,7 +88,8 @@ class DashboardService
     {
         return Cache::remember('dashboard:map', self::CACHE_TTL_MAP, function () {
             return Hydrometer::select('id', 'code', 'latitude', 'longitude', 'address', 'neighborhood', 'type', 'status', 'last_reading_at')
-                ->get();
+                ->get()
+                ->toArray();
         });
     }
 

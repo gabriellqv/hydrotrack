@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import type { Hydrometer } from '@/types'
@@ -22,6 +23,7 @@ const emit = defineEmits<{
   'marker-click': [hydrometer: Hydrometer]
 }>()
 
+const router = useRouter()
 const { isDark } = useTheme()
 
 /** Referência ao container DOM do mapa */
@@ -87,7 +89,7 @@ function renderMarkers() {
   }
 
   props.hydrometers.forEach((h) => {
-    const marker = L.marker([h.latitude, h.longitude], {
+    const marker = L.marker([Number(h.latitude), Number(h.longitude)], {
       icon: createIcon(getMarkerColor(h.status), h.status),
     })
 
@@ -97,12 +99,26 @@ function renderMarkers() {
       alert: 'Em Alerta',
     }
 
-    marker.bindPopup(`
-      <strong>${h.code}</strong><br>
+    const popupContent = document.createElement('div')
+    popupContent.innerHTML = `
+      <a href="#" class="font-bold !text-primary-500 hover:!text-primary-400 hover:underline transition-colors block text-base mb-1 popup-link">
+        ${h.code}
+      </a>
       ${h.address}<br>
-      <em>${h.neighborhood}</em><br>
-      Status: <strong>${(statusMap[h.status] || h.status).toUpperCase()}</strong>
-    `)
+      <em class="text-xs opacity-75">${h.neighborhood}</em><br>
+      Status: <strong style="color: ${getMarkerColor(h.status)};">${(statusMap[h.status] || h.status).toUpperCase()}</strong>
+    `
+
+    // Ocultar o outline padrão e adicionar a ação do Vue Router no clique
+    const linkEl = popupContent.querySelector('.popup-link')
+    if (linkEl) {
+      linkEl.addEventListener('click', (e) => {
+        e.preventDefault()
+        router.push({ name: 'hydrometer-detail', params: { id: h.id } })
+      })
+    }
+
+    marker.bindPopup(popupContent)
 
     marker.on('click', () => emit('marker-click', h))
     markersLayer!.addLayer(marker)
@@ -115,11 +131,13 @@ onMounted(() => {
   map = L.map(mapContainer.value, {
     center: BOCAIUVA_CENTER,
     zoom: DEFAULT_ZOOM,
-    minZoom: 4, // Bloqueia zoom out excessivo
+    minZoom: 13, // Não permite afastar quase nada
+    maxZoom: 18, // Limite de aproximação
     maxBounds: [
-      [-90, -180],
-      [90, 180],
-    ], // Trava o mapa dentro dos limites do mundo real
+      [-17.15, -43.86], // Sudoeste (Extremo da mancha urbana)
+      [-17.06, -43.77], // Nordeste (Extremo da mancha urbana)
+    ], // Caixa super restrita englobando os pinos gerados pela Factory
+    maxBoundsViscosity: 1.0, // Impede "rebote" para fora da área permitida
   })
 
   const lightMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -167,17 +185,38 @@ onMounted(() => {
   renderMarkers()
 
   let resizeObserver: ResizeObserver | null = null
+  let resizeTimeout: ReturnType<typeof setTimeout> | null = null
 
   if (mapContainer.value) {
     resizeObserver = new ResizeObserver(() => {
-      map?.invalidateSize()
+      if (resizeTimeout) clearTimeout(resizeTimeout)
+      resizeTimeout = setTimeout(() => {
+        requestAnimationFrame(() => {
+          if (map) {
+            map.invalidateSize()
+            // As vezes Leaflet esconde markers em bounds incorretos durante o resize
+            renderMarkers()
+          }
+        })
+      }, 100)
     })
     resizeObserver.observe(mapContainer.value)
   }
 
+  // Garantir que o mapa seja dimensionado corretamente após a primeira renderização
+  setTimeout(() => {
+    if (map) {
+      map.invalidateSize()
+      renderMarkers() // Força o re-desenho após o Leaflet calcular a área visível correta
+    }
+  }, 200)
+
   onUnmounted(() => {
+    if (resizeTimeout) clearTimeout(resizeTimeout)
     resizeObserver?.disconnect()
     map?.remove()
+    map = null
+    markersLayer = null
   })
 })
 
