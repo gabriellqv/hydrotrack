@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'ingest' => [
+        'api_key' => env('INGEST_API_KEY'),
+    ],
+
 ];

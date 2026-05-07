@@ -1,0 +1,220 @@
+@import 'tailwindcss';
+
+/* ----------------------------------------------------------------
+ * Tokens de Design — HydroTrack
+ * Paleta corporativa inspirada em tons aquáticos (água/telemetria)
+ * Suporte a tema claro e escuro via CSS custom properties.
+ * ---------------------------------------------------------------- */
+
+/* === Tema Escuro (padrão) === */
+:root {
+  --color-surface: #0f172a;
+  --color-surface-card: #1e293b;
+  --color-surface-hover: #334155;
+  --color-text-heading: #f1f5f9;
+  --color-text-body: #cbd5e1;
+  --color-text-muted: #64748b;
+  --color-border: rgba(51, 65, 85, 0.5);
+  --color-border-hover: rgba(71, 85, 105, 0.6);
+  --sidebar-from: rgba(30, 41, 59, 0.7);
+  --sidebar-to: rgba(15, 23, 42, 0.7);
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --shadow-card: 0 0.25rem 1.5rem rgba(0, 0, 0, 0.25);
+  --color-glass: rgba(30, 41, 59, 0.6); /* Dark Glass */
+
+  /* Espaçamentos e layout */
+  --sidebar-width: 16rem;
+  --layout-padding: 2rem;
+}
+
+/* === Tema Claro === */
+.light {
+  --color-surface: #f1f5f9;
+  --color-surface-card: #ffffff;
+  --color-surface-hover: #e2e8f0;
+  --color-text-heading: #0f172a;
+  --color-text-body: #334155;
+  --color-text-muted: #64748b;
+  --color-border: rgba(203, 213, 225, 0.6);
+  --color-border-hover: rgba(148, 163, 184, 0.5);
+  --sidebar-from: rgba(255, 255, 255, 0.85);
+  --sidebar-to: rgba(241, 245, 249, 0.85);
+  --sidebar-border: rgba(203, 213, 225, 0.5);
+  --shadow-card: 0 0.25rem 1.5rem rgba(0, 0, 0, 0.06);
+  --color-glass: rgba(255, 255, 255, 0.6); /* Light Glass */
+}
+
+@theme {
+  /* Cores primárias */
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+
+  /* Cores do Tema Dinâmico */
+  --color-surface: var(--color-surface);
+  --color-surface-card: var(--color-surface-card);
+  --color-surface-hover: var(--color-surface-hover);
+  --color-text-heading: var(--color-text-heading);
+  --color-text-body: var(--color-text-body);
+  --color-text-muted: var(--color-text-muted);
+  --color-border: var(--color-border);
+  --color-border-hover: var(--color-border-hover);
+
+  /* Cores de status */
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-muted: #94a3b8;
+
+  /* Background do layout (referência às variáveis dinâmicas) */
+  --color-surface: var(--color-surface);
+  --color-surface-card: var(--color-surface-card);
+  --color-surface-hover: var(--color-surface-hover);
+
+  /* Tipografia semântica */
+  --color-text-heading: var(--color-text-heading);
+  --color-text-body: var(--color-text-body);
+  --color-text-muted: var(--color-text-muted);
+
+  /* Bordas */
+  --color-border: var(--color-border);
+  --color-border-hover: var(--color-border-hover);
+
+  /* Fontes */
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Sombras */
+  --shadow-card: var(--shadow-card);
+}
+
+/* Reset e base */
+body {
+  @apply bg-surface font-sans antialiased;
+  color: var(--color-text-body);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+/* Garante cursor pointer em todos os elementos clicáveis */
+button,
+[role='button'],
+a,
+select {
+  cursor: pointer;
+}
+
+/* Scrollbar customizada (Webkit) */
+::-webkit-scrollbar {
+  width: 0.375rem;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-surface-hover);
+  border-radius: 0.1875rem;
+}
+
+/* Animação de fade-in para transições de página */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+/* Pulso suave para marcadores de alerta no mapa (mais discreto que animate-ping) */
+@keyframes soft-ping {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+/*
+ * Transição suave seletiva para troca de tema.
+ * Aplicada apenas em elementos que mudam visualmente com o tema,
+ * evitando repaints desnecessários em SVGs, canvas, tiles do mapa, etc.
+ */
+body,
+aside,
+main,
+.bg-surface-card,
+[class*='border-border'],
+[class*='text-text-'] {
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    color 0.2s ease,
+    box-shadow 0.3s ease;
+}
+
+/* ----------------------------------------------------------------
+ * Layout com scroll interno.
+ *
+ * Aplica-se em views onde o conteúdo (lista, tabela) deve rolar
+ * dentro do próprio card, sem gerar barra de rolagem na página.
+ * O header e filtros ficam fixos no topo.
+ * ---------------------------------------------------------------- */
+.view-scroll-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  height: calc(100dvh - var(--layout-padding) * 2);
+  overflow: hidden;
+}
+
+/* Faz o card expandir para ocupar todo o espaço restante */
+.view-scroll-card {
+  display: flex !important;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Área de conteúdo que de fato rola */
+.view-scroll-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Compensa o header mobile quando presente */
+@media (max-width: 1023px) {
+  .view-scroll-layout {
+    /* padding mobile (1rem) + header mobile (~3.25rem) */
+    height: calc(100dvh - 2rem - 3.25rem);
+  }
+
+  /* Esconde a scrollbar no mobile — scroll por toque continua funcionando */
+  .view-scroll-content {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+  }
+  .view-scroll-content::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+}

@@ -1,0 +1,79 @@
+<script setup lang="ts">
+import { RouterLink } from 'vue-router'
+import BaseBadge from './ui/BaseBadge.vue'
+import BaseButton from './ui/BaseButton.vue'
+import type { Alert } from '@/types'
+import { useIsAdmin } from '@/composables/useIsAdmin'
+
+/**
+ * Card de alerta individual com ação de resolução.
+ *
+ * Exibe o tipo do alerta, a mensagem, o timestamp, o código do
+ * hidrômetro associado e um botão para marcar como resolvido
+ * (visível apenas para admins).
+ *
+ * @prop {Alert} alert - Dados do alerta
+ * @emits resolve - Emitido quando o admin clica em "Resolver"
+ */
+defineProps<{
+  alert: Alert
+}>()
+
+const emit = defineEmits<{
+  resolve: [id: number]
+}>()
+
+const { isAdmin } = useIsAdmin()
+
+const typeMap: Record<string, { variant: 'danger' | 'warning' | 'muted'; label: string }> = {
+  high_consumption: { variant: 'danger', label: 'Consumo Alto' },
+  zero_reading: { variant: 'warning', label: 'Leitura Zero' },
+  offline: { variant: 'muted', label: 'Sem Comunicação' },
+}
+</script>
+
+<template>
+  <div
+    :class="[
+      'flex items-start gap-4 rounded-lg border p-4 transition-colors',
+      alert.resolved
+        ? 'border-border/60 bg-surface opacity-60'
+        : 'border-border bg-surface-card hover:border-border-hover',
+    ]"
+  >
+    <!-- Conteúdo -->
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center gap-2 mb-1">
+        <BaseBadge :variant="typeMap[alert.type]?.variant ?? 'muted'">
+          {{ typeMap[alert.type]?.label ?? alert.type }}
+        </BaseBadge>
+        <span v-if="alert.resolved" class="text-xs text-green-400">Resolvido</span>
+      </div>
+
+      <p class="text-sm text-text-body truncate">{{ alert.message }}</p>
+
+      <div class="flex items-center gap-3 mt-1">
+        <p class="text-xs text-text-muted">
+          {{ new Date(alert.created_at).toLocaleString('pt-BR') }}
+        </p>
+        <RouterLink
+          v-if="alert.hydrometer"
+          :to="{ name: 'hydrometers' }"
+          class="text-xs text-primary-400 hover:text-primary-300 font-mono transition-colors"
+        >
+          {{ alert.hydrometer.code }}
+        </RouterLink>
+      </div>
+    </div>
+
+    <!-- Ação -->
+    <BaseButton
+      v-if="isAdmin && !alert.resolved"
+      variant="ghost"
+      size="sm"
+      @click="emit('resolve', alert.id)"
+    >
+      Resolver
+    </BaseButton>
+  </div>
+</template>

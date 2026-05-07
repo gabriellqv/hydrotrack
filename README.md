@@ -14,8 +14,34 @@ O HydroTrack e uma plataforma de monitoramento de telemetria hidrica IoT que sim
 
 ## Preview
 
+### Dashboard e Análise Global
 <div align="center">
-  <i>Screenshots serao adicionados conforme o desenvolvimento das telas.</i>
+  <img src="frontend/public/screenshots/dashboard.png" alt="Dashboard" width="100%">
+  <p><em>Visão geral do consumo de água, status da rede de sensores e últimos alertas gerados em tempo real.</em></p>
+</div>
+
+<br>
+
+### Central de Alertas e Manutenção
+<div align="center">
+  <img src="frontend/public/screenshots/alerts.png" alt="Alertas" width="100%">
+  <p><em>Gestão de anomalias (consumo excessivo, leitura zerada, queda de comunicação) com resolução por administradores.</em></p>
+</div>
+
+<br>
+
+### Monitoramento Geoespacial (IoT)
+<div align="center">
+  <img src="frontend/public/screenshots/map.png" alt="Mapa" width="100%">
+  <p><em>Mapeamento interativo de todos os hidrômetros da malha, destacando dispositivos em alerta ou offline.</em></p>
+</div>
+
+<br>
+
+### Gestão de Ativos (Hidrômetros)
+<div align="center">
+  <img src="frontend/public/screenshots/hydrometers.png" alt="Hidrômetros" width="100%">
+  <p><em>Cadastro e listagem de medidores com paginação, filtros e ações de gerenciamento (CRUD).</em></p>
 </div>
 
 ## Resultados e impacto
@@ -218,7 +244,13 @@ cd frontend && npm run test:unit
 
 ## Status do projeto
 
-1. Estrutura do monorepo configurada com ferramentas de qualidade profissional.
-2. Pipeline de linting automatico via pre-commit hooks (Husky + lint-staged).
-3. Padronizacao de commits ativa via Commitlint (Conventional Commits).
-4. Backend e frontend scaffoldados e prontos para desenvolvimento das features.
+**✅ Projeto Concluído (Versão 1.0.0)**
+
+A arquitetura fundamental e todas as funcionalidades obrigatórias do HydroTrack foram entregues com sucesso, operando em estabilidade total. O sistema conta com:
+- Integração perfeita entre o Laravel (Backend) e Vue.js (Frontend)
+- Simulação autônoma de sensores IoT com registro em tempo real
+- Mapeamento geográfico interativo de alta precisão via Leaflet
+- Identificação proativa de anomalias hídricas via CRON/Watchdog
+- Tipagem rigorosa, arquitetura limpa (Services) e sistema reativo blindado.
+
+O projeto está pronto para a simulação de um ambiente de produção ou auditoria técnica externa.
