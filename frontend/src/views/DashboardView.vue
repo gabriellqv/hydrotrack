@@ -44,8 +44,8 @@ async function changePeriod(days: 7 | 30 | 90) {
   await store.fetchConsumption(days)
 }
 
-/** Intervalo de polling em milissegundos */
-const POLLING_INTERVAL = 5_000
+/** Intervalo de polling em milissegundos (15s: equilíbrio entre tempo real e tráfego) */
+const POLLING_INTERVAL = 15_000
 
 let pollingTimer: ReturnType<typeof setInterval> | null = null
 

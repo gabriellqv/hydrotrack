@@ -44,11 +44,19 @@ class DashboardService
     public function getSummary(): array
     {
         return Cache::remember('dashboard:summary', self::CACHE_TTL_SHORT, function () {
+            // Agregação condicional: 1 query em vez de 4 para contagens de status
+            $stats = Hydrometer::selectRaw("
+                COUNT(*) as total_hydrometers,
+                SUM(CASE WHEN status = 'online' THEN 1 ELSE 0 END) as online,
+                SUM(CASE WHEN status = 'offline' THEN 1 ELSE 0 END) as offline,
+                SUM(CASE WHEN status = 'alert' THEN 1 ELSE 0 END) as alert
+            ")->first();
+
             return [
-                'total_hydrometers' => Hydrometer::count(),
-                'online' => Hydrometer::where('status', 'online')->count(),
-                'offline' => Hydrometer::where('status', 'offline')->count(),
-                'alert' => Hydrometer::where('status', 'alert')->count(),
+                'total_hydrometers' => (int) $stats->total_hydrometers,
+                'online' => (int) $stats->online,
+                'offline' => (int) $stats->offline,
+                'alert' => (int) $stats->alert,
                 'total_readings_today' => Reading::whereDate('reading_at', Carbon::today())->count(),
                 'pending_alerts' => Alert::where('resolved', false)->count(),
             ];
