@@ -2,8 +2,17 @@
 import { useToastStore } from '@/stores/toast'
 import { CheckCircle, XCircle, AlertTriangle, Info, X } from 'lucide-vue-next'
 
+/**
+ * Container global de notificações flutuantes (Toasts).
+ *
+ * Renderiza a fila de mensagens gerenciada pelo useToastStore no canto
+ * inferior direito da aplicação, com animações de entrada e saída
+ * via TransitionGroup. Deve ser montado uma única vez no App.vue.
+ */
+
 const store = useToastStore()
 
+/** Mapeamento de tipo de toast para o componente de ícone correspondente */
 const icons = {
   success: CheckCircle,
   error: XCircle,
@@ -11,6 +20,7 @@ const icons = {
   info: Info,
 }
 
+/** Mapeamento de tipo de toast para as classes CSS de cor (light + dark) */
 const colors = {
   success:
     'bg-green-50 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800',

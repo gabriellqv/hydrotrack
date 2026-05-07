@@ -82,11 +82,7 @@ function renderMarkers() {
 
   markersLayer.clearLayers()
 
-  if (!Array.isArray(props.hydrometers)) {
-    // eslint-disable-next-line no-console
-    console.error('MapView: hydrometers is not an array', props.hydrometers)
-    return
-  }
+  if (!Array.isArray(props.hydrometers)) return
 
   props.hydrometers.forEach((h) => {
     const marker = L.marker([Number(h.latitude), Number(h.longitude)], {
@@ -220,7 +216,7 @@ onMounted(() => {
   })
 })
 
-watch(() => props.hydrometers, renderMarkers, { deep: true })
+watch(() => props.hydrometers, renderMarkers)
 </script>
 
 <template>

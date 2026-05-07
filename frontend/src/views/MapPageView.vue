@@ -14,7 +14,7 @@ import type { Hydrometer } from '@/types'
  * adicionando um painel lateral dinâmico para exibição de detalhes de telemetria
  * quando um pino é clicado.
  *
- * Implementa polling a cada 10 segundos para refletir mudanças de status
+ * Implementa polling a cada 5 segundos para refletir mudanças de status
  * dos hidrômetros enquanto o simulador IoT está rodando.
  */
 
@@ -22,7 +22,7 @@ const store = useDashboardStore()
 const selectedHydrometer = ref<Hydrometer | null>(null)
 const activeFilter = ref<'all' | 'online' | 'offline' | 'alert'>('all')
 
-/** Intervalo de polling em milissegundos */
+/** Intervalo de polling em milissegundos (5s) */
 const POLLING_INTERVAL = 5_000
 let pollingTimer: ReturnType<typeof setInterval> | null = null
 

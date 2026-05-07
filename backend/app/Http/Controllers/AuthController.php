@@ -68,6 +68,8 @@ class AuthController extends Controller
             ]);
         }
 
+        // Revoga tokens anteriores para evitar acumulação na tabela personal_access_tokens
+        $user->tokens()->delete();
         $token = $user->createToken('auth-token')->plainTextToken;
 
         return response()->json([

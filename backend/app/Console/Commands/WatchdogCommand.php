@@ -66,18 +66,23 @@ class WatchdogCommand extends Command
 
         $count = 0;
 
-        foreach ($staleHydrometers as $hydrometer) {
-            $hydrometer->update(['status' => 'offline']);
+        // Bulk update: 1 query em vez de N queries individuais
+        $ids = $staleHydrometers->pluck('id');
+        Hydrometer::whereIn('id', $ids)->update(['status' => 'offline']);
 
-            Alert::create([
-                'hydrometer_id' => $hydrometer->id,
-                'type' => 'offline',
-                'message' => "Hidrômetro {$hydrometer->code} ({$hydrometer->neighborhood}) "
-                    ."não envia dados há mais de {$thresholdHours} horas.",
-            ]);
+        // Batch insert: 1 query em vez de N queries individuais
+        $alertsData = $staleHydrometers->map(fn ($h) => [
+            'hydrometer_id' => $h->id,
+            'type' => 'offline',
+            'message' => "Hidrômetro {$h->code} ({$h->neighborhood}) "
+                ."não envia dados há mais de {$thresholdHours} horas.",
+            'resolved' => false,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ])->toArray();
 
-            $count++;
-        }
+        Alert::insert($alertsData);
+        $count = $ids->count();
 
         DashboardService::invalidateCache();
 
