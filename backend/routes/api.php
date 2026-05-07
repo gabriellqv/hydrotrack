@@ -36,6 +36,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Leituras de um hidrômetro específico
     Route::get('/hydrometers/{hydrometer}/readings', [HydrometerController::class, 'readings']);
+    Route::get('/hydrometers/{hydrometer}/readings/export', [HydrometerController::class, 'readingsExport']);
 
     // Dashboard
     Route::prefix('dashboard')->group(function () {

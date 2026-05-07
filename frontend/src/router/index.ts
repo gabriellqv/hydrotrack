@@ -23,6 +23,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/hydrometers/:id',
+      name: 'hydrometer-detail',
+      component: () => import('@/views/HydrometerDetailView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/map',
       name: 'map',
       component: () => import('@/views/MapPageView.vue'),

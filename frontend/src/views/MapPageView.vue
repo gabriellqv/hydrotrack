@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, computed } from 'vue'
+import { RouterLink } from 'vue-router'
 import { useDashboardStore } from '@/stores/dashboard'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import MapView from '@/components/MapView.vue'
@@ -137,8 +138,25 @@ function handleMarkerClick(hydrometer: Hydrometer) {
 
       <!-- Painel lateral -->
       <div>
-        <BaseCard :title="selectedHydrometer ? selectedHydrometer.code : 'Selecione um pino'">
+        <BaseCard :title="!selectedHydrometer ? 'Selecione um pino' : undefined">
           <template v-if="selectedHydrometer">
+            <div class="flex items-center justify-between mb-4 pb-4 border-b border-border/50">
+              <h2 class="text-lg font-bold text-text-heading">
+                <RouterLink
+                  :to="{ name: 'hydrometer-detail', params: { id: selectedHydrometer.id } }"
+                  class="hover:text-primary-400 transition-colors"
+                >
+                  {{ selectedHydrometer.code }}
+                </RouterLink>
+              </h2>
+              <RouterLink
+                :to="{ name: 'hydrometer-detail', params: { id: selectedHydrometer.id } }"
+                class="text-xs text-primary-400 hover:text-primary-300 font-medium transition-colors"
+              >
+                Ver detalhes &rarr;
+              </RouterLink>
+            </div>
+
             <div class="space-y-3 text-sm">
               <div class="flex justify-between">
                 <span class="text-text-muted">Status</span>

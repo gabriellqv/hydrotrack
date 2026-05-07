@@ -11,6 +11,7 @@ use App\Services\HydrometerService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Controller de hidrômetros.
@@ -46,13 +47,27 @@ class HydrometerController extends Controller
     /**
      * Exibe os detalhes de um hidrômetro específico.
      *
+     * @param  Request  $request  Query params: days (7, 30, 90)
      * @param  Hydrometer  $hydrometer  Resolvido automaticamente via Route Model Binding
      */
-    public function show(Hydrometer $hydrometer): HydrometerResource
+    public function show(Request $request, Hydrometer $hydrometer): HydrometerResource
     {
-        return new HydrometerResource($hydrometer->load(['readings' => function ($q) {
-            $q->latest('reading_at')->limit(10);
-        }]));
+        $days = (int) $request->query('days', 30);
+
+        $hydrometer->load([
+            'alerts' => function ($q) {
+                $q->latest()->limit(10);
+            },
+        ]);
+
+        $hydrometer->chart_data = $hydrometer->readings()
+            ->selectRaw('DATE(reading_at) as date, SUM(value_m3) as total_m3')
+            ->where('reading_at', '>=', now()->subDays($days))
+            ->groupByRaw('DATE(reading_at)')
+            ->orderByRaw('DATE(reading_at)')
+            ->get();
+
+        return new HydrometerResource($hydrometer);
     }
 
     /**
@@ -109,5 +124,40 @@ class HydrometerController extends Controller
             ->paginate(20);
 
         return ReadingResource::collection($readings);
+    }
+
+    /**
+     * Exporta as leituras de um hidrômetro em formato CSV.
+     *
+     * @param  Hydrometer  $hydrometer  Resolvido via Route Model Binding
+     * @return StreamedResponse Download do arquivo CSV
+     */
+    public function readingsExport(Hydrometer $hydrometer): StreamedResponse
+    {
+        $filename = "{$hydrometer->code}_leituras.csv";
+
+        return response()->streamDownload(function () use ($hydrometer) {
+            $handle = fopen('php://output', 'w');
+
+            // Adiciona BOM (Byte Order Mark) para o Excel forçar a leitura em UTF-8
+            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+
+            fputcsv($handle, ['Data', 'Consumo (m³)'], ';');
+
+            $hydrometer->readings()
+                ->orderBy('reading_at')
+                ->chunk(500, function ($readings) use ($handle) {
+                    foreach ($readings as $reading) {
+                        fputcsv($handle, [
+                            $reading->reading_at->format('d/m/Y H:i:s'),
+                            number_format($reading->value_m3, 3, ',', ''), // Sem separador de milhar para facilitar cálculo
+                        ], ';');
+                    }
+                });
+
+            fclose($handle);
+        }, $filename, [
+            'Content-Type' => 'text/csv',
+        ]);
     }
 }

@@ -31,6 +31,7 @@ class HydrometerResource extends JsonResource
             'type' => $this->type,
             'last_reading_at' => $this->last_reading_at?->toISOString(),
             'readings' => ReadingResource::collection($this->whenLoaded('readings')),
+            'chart_data' => $this->when(isset($this->chart_data), $this->chart_data),
             'alerts' => AlertResource::collection($this->whenLoaded('alerts')),
             'created_at' => $this->created_at->toISOString(),
         ];

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useHydrometerStore } from '@/stores/hydrometer'
 import { useIsAdmin } from '@/composables/useIsAdmin'
 import BaseCard from '@/components/ui/BaseCard.vue'
@@ -20,6 +21,7 @@ import { ApiError } from '@/services/api'
  */
 
 const store = useHydrometerStore()
+const router = useRouter()
 const { isAdmin } = useIsAdmin()
 
 const search = ref('')
@@ -244,7 +246,14 @@ async function confirmDelete() {
               :key="h.id"
               class="border-b border-border/60 hover:bg-surface-hover transition-colors"
             >
-              <td class="py-3 px-4 font-mono font-medium text-primary-400">{{ h.code }}</td>
+              <td class="py-3 px-4 font-mono font-medium">
+                <button
+                  @click="router.push({ name: 'hydrometer-detail', params: { id: h.id } })"
+                  class="text-primary-400 hover:text-primary-300 hover:underline transition-colors"
+                >
+                  {{ h.code }}
+                </button>
+              </td>
               <td class="py-3 px-4 text-text-body">{{ h.address }}</td>
               <td class="py-3 px-4 text-text-muted">{{ h.neighborhood }}</td>
               <td class="py-3 px-4 text-text-muted">{{ typeMap[h.type] || h.type }}</td>
