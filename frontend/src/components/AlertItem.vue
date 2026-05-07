@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RouterLink } from 'vue-router'
 import BaseBadge from './ui/BaseBadge.vue'
 import BaseButton from './ui/BaseButton.vue'
 import type { Alert } from '@/types'
@@ -7,8 +8,9 @@ import { useIsAdmin } from '@/composables/useIsAdmin'
 /**
  * Card de alerta individual com ação de resolução.
  *
- * Exibe o tipo do alerta, a mensagem, o timestamp e um botão
- * para marcar como resolvido (visível apenas para admins).
+ * Exibe o tipo do alerta, a mensagem, o timestamp, o código do
+ * hidrômetro associado e um botão para marcar como resolvido
+ * (visível apenas para admins).
  *
  * @prop {Alert} alert - Dados do alerta
  * @emits resolve - Emitido quando o admin clica em "Resolver"
@@ -45,14 +47,23 @@ const typeMap: Record<string, { variant: 'danger' | 'warning' | 'muted'; label: 
         <BaseBadge :variant="typeMap[alert.type]?.variant ?? 'muted'">
           {{ typeMap[alert.type]?.label ?? alert.type }}
         </BaseBadge>
-        <span v-if="alert.resolved" class="text-xs text-green-400">✓ Resolvido</span>
+        <span v-if="alert.resolved" class="text-xs text-green-400">Resolvido</span>
       </div>
 
       <p class="text-sm text-text-body truncate">{{ alert.message }}</p>
 
-      <p class="text-xs text-text-muted mt-1">
-        {{ new Date(alert.created_at).toLocaleString('pt-BR') }}
-      </p>
+      <div class="flex items-center gap-3 mt-1">
+        <p class="text-xs text-text-muted">
+          {{ new Date(alert.created_at).toLocaleString('pt-BR') }}
+        </p>
+        <RouterLink
+          v-if="alert.hydrometer"
+          :to="{ name: 'hydrometers' }"
+          class="text-xs text-primary-400 hover:text-primary-300 font-mono transition-colors"
+        >
+          {{ alert.hydrometer.code }}
+        </RouterLink>
+      </div>
     </div>
 
     <!-- Ação -->

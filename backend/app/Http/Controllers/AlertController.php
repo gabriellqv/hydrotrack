@@ -6,6 +6,7 @@ use App\Http\Resources\AlertResource;
 use App\Models\Alert;
 use App\Services\DashboardService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 /**
@@ -16,17 +17,24 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 class AlertController extends Controller
 {
     /**
-     * Lista todos os alertas com paginação, incluindo dados do hidrômetro.
+     * Lista todos os alertas com paginação, filtros e dados do hidrômetro.
      *
+     * @param  Request  $request  Query params: type, resolved
      * @return AnonymousResourceCollection Coleção paginada de AlertResource
      */
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
-        $alerts = Alert::with('hydrometer')
-            ->latest()
-            ->paginate(20);
+        $query = Alert::with('hydrometer')->latest();
 
-        return AlertResource::collection($alerts);
+        if ($request->filled('type')) {
+            $query->where('type', $request->query('type'));
+        }
+
+        if ($request->filled('resolved')) {
+            $query->where('resolved', $request->query('resolved') === 'true');
+        }
+
+        return AlertResource::collection($query->paginate(20));
     }
 
     /**
