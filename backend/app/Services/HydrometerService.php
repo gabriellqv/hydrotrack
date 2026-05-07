@@ -20,6 +20,7 @@ class HydrometerService
      *   neighborhood?: string,
      *   status?: string,
      *   type?: string,
+     *   search?: string,
      *   per_page?: int
      * } $filters Filtros opcionais para a consulta
      * @return LengthAwarePaginator Resultado paginado de hidrômetros
@@ -38,6 +39,14 @@ class HydrometerService
 
         if (isset($filters['type'])) {
             $query->where('type', $filters['type']);
+        }
+
+        if (isset($filters['search']) && $filters['search'] !== '') {
+            $term = '%'.$filters['search'].'%';
+            $query->where(function ($q) use ($term) {
+                $q->where('code', 'like', $term)
+                    ->orWhere('address', 'like', $term);
+            });
         }
 
         $perPage = $filters['per_page'] ?? 15;
