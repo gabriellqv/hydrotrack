@@ -84,9 +84,9 @@ async function handleCreate() {
 </script>
 
 <template>
-  <div class="animate-fade-in space-y-6">
+  <div class="animate-fade-in view-scroll-layout">
     <!-- Header -->
-    <div class="flex items-center justify-between">
+    <div class="flex items-center justify-between shrink-0">
       <div>
         <h1 class="text-2xl font-bold text-text-heading">Hidrômetros</h1>
         <p class="text-sm text-text-muted mt-1">
@@ -99,7 +99,7 @@ async function handleCreate() {
     </div>
 
     <!-- Filtros -->
-    <BaseCard compact>
+    <BaseCard compact class="shrink-0">
       <div class="flex flex-wrap gap-3">
         <div class="flex-1 min-w-[12.5rem]">
           <BaseInput
@@ -126,10 +126,10 @@ async function handleCreate() {
     </BaseCard>
 
     <!-- Tabela -->
-    <BaseCard compact>
-      <div class="overflow-x-auto">
+    <BaseCard compact class="view-scroll-card">
+      <div class="view-scroll-content overflow-x-auto">
         <table class="w-full text-sm">
-          <thead>
+          <thead class="sticky top-0 z-10 bg-surface-card">
             <tr class="border-b border-border">
               <th class="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase">
                 Código
@@ -171,7 +171,7 @@ async function handleCreate() {
       </div>
 
       <!-- Paginação -->
-      <div class="flex items-center justify-between border-t border-border pt-4 mt-4">
+      <div class="flex items-center justify-between border-t border-border pt-4 mt-4 shrink-0">
         <p class="text-xs text-text-muted">
           Página {{ store.pagination.currentPage }} de {{ store.pagination.lastPage }}
         </p>

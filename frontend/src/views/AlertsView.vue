@@ -17,13 +17,13 @@ onMounted(() => store.fetchAlerts())
 </script>
 
 <template>
-  <div class="animate-fade-in space-y-6">
-    <div>
+  <div class="animate-fade-in view-scroll-layout">
+    <div class="shrink-0">
       <h1 class="text-2xl font-bold text-text-heading">Alertas</h1>
       <p class="text-sm text-text-muted mt-1">Notificações de anomalias no sistema</p>
     </div>
 
-    <BaseCard>
+    <BaseCard class="view-scroll-card">
       <div v-if="store.loading" class="text-center py-12 text-text-muted">
         Carregando alertas...
       </div>
@@ -32,7 +32,7 @@ onMounted(() => store.fetchAlerts())
         Nenhum alerta registrado. ✓
       </div>
 
-      <div v-else class="space-y-3">
+      <div v-else class="view-scroll-content space-y-3">
         <AlertItem
           v-for="alert in store.alerts"
           :key="alert.id"

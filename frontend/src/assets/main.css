@@ -170,3 +170,51 @@ main,
     color 0.2s ease,
     box-shadow 0.3s ease;
 }
+
+/* ----------------------------------------------------------------
+ * Layout com scroll interno.
+ *
+ * Aplica-se em views onde o conteúdo (lista, tabela) deve rolar
+ * dentro do próprio card, sem gerar barra de rolagem na página.
+ * O header e filtros ficam fixos no topo.
+ * ---------------------------------------------------------------- */
+.view-scroll-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  height: calc(100dvh - var(--layout-padding) * 2);
+  overflow: hidden;
+}
+
+/* Faz o card expandir para ocupar todo o espaço restante */
+.view-scroll-card {
+  display: flex !important;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Área de conteúdo que de fato rola */
+.view-scroll-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Compensa o header mobile quando presente */
+@media (max-width: 1023px) {
+  .view-scroll-layout {
+    /* padding mobile (1rem) + header mobile (~3.25rem) */
+    height: calc(100dvh - 2rem - 3.25rem);
+  }
+
+  /* Esconde a scrollbar no mobile — scroll por toque continua funcionando */
+  .view-scroll-content {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+  }
+  .view-scroll-content::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+}

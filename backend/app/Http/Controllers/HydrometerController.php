@@ -37,7 +37,7 @@ class HydrometerController extends Controller
     public function index(Request $request): AnonymousResourceCollection
     {
         $hydrometers = $this->service->list($request->only([
-            'neighborhood', 'status', 'type', 'per_page',
+            'neighborhood', 'status', 'type', 'per_page', 'search',
         ]));
 
         return HydrometerResource::collection($hydrometers);
