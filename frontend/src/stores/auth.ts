@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import type { User } from '@/types'
 import { api } from '@/services/api'
 import router from '@/router'
+import { useToastStore } from '@/stores/toast'
 
 /**
  * Store de autenticação (Pinia).
@@ -34,6 +35,9 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = null
     localStorage.removeItem('auth_token')
     router.push({ name: 'login' })
+
+    const toast = useToastStore()
+    toast.info('Sessão encerrada de forma segura.')
   }
 
   async function fetchUser() {

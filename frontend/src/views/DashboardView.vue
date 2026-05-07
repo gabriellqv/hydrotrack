@@ -198,7 +198,7 @@ const summaryCards = [
             </div>
 
             <div
-              class="flex-1 w-full min-h-[350px] lg:min-h-0 relative rounded-lg overflow-hidden border border-border/30 flex"
+              class="flex-1 w-full min-h-[500px] lg:min-h-0 relative rounded-lg overflow-hidden border border-border/30 flex"
             >
               <MapView :hydrometers="store.mapHydrometers" class="flex-1" />
             </div>

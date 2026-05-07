@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { api } from '@/services/api'
 import type { Hydrometer, PaginatedResponse } from '@/types'
+import { useToastStore } from '@/stores/toast'
 
 /**
  * Store de hidrômetros — gerencia o estado global de dispositivos.
@@ -89,9 +90,16 @@ export const useHydrometerStore = defineStore('hydrometer', () => {
   async function createHydrometer(
     payload: Omit<Hydrometer, 'id' | 'created_at' | 'status' | 'last_reading_at'>,
   ): Promise<Hydrometer> {
-    const { data } = await api.post<{ data: Hydrometer }>('/hydrometers', payload)
-    await fetchHydrometers(pagination.value.currentPage)
-    return data.data
+    const toast = useToastStore()
+    try {
+      const { data } = await api.post<{ data: Hydrometer }>('/hydrometers', payload)
+      toast.success('Hidrômetro registrado com sucesso.')
+      await fetchHydrometers(pagination.value.currentPage)
+      return data.data
+    } catch (error) {
+      toast.error('Erro ao cadastrar hidrômetro. Verifique os dados.')
+      throw error
+    }
   }
 
   /**
@@ -101,8 +109,15 @@ export const useHydrometerStore = defineStore('hydrometer', () => {
    * @param {Partial<Hydrometer>} payload - Campos a atualizar
    */
   async function updateHydrometer(id: number, payload: Partial<Hydrometer>) {
-    await api.put(`/hydrometers/${id}`, payload)
-    await fetchHydrometers(pagination.value.currentPage)
+    const toast = useToastStore()
+    try {
+      await api.put(`/hydrometers/${id}`, payload)
+      toast.success('Hidrômetro atualizado com sucesso.')
+      await fetchHydrometers(pagination.value.currentPage)
+    } catch (error) {
+      toast.error('Falha ao atualizar informações do hidrômetro.')
+      throw error
+    }
   }
 
   /**
@@ -111,8 +126,14 @@ export const useHydrometerStore = defineStore('hydrometer', () => {
    * @param {number} id - ID do hidrômetro a remover
    */
   async function deleteHydrometer(id: number) {
-    await api.delete(`/hydrometers/${id}`)
-    await fetchHydrometers(pagination.value.currentPage)
+    const toast = useToastStore()
+    try {
+      await api.delete(`/hydrometers/${id}`)
+      toast.success('Hidrômetro removido com sucesso.')
+      await fetchHydrometers(pagination.value.currentPage)
+    } catch {
+      toast.error('Não foi possível remover o hidrômetro.')
+    }
   }
 
   /**
@@ -122,17 +143,24 @@ export const useHydrometerStore = defineStore('hydrometer', () => {
    * @param {string} code - Código do hidrômetro (para nome do arquivo)
    */
   async function exportReadings(id: number, code: string) {
-    const response = await api.get(`/hydrometers/${id}/readings/export`, {
-      responseType: 'blob',
-    })
-    const url = window.URL.createObjectURL(new Blob([response.data as BlobPart]))
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `${code}_leituras.csv`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    window.URL.revokeObjectURL(url)
+    const toast = useToastStore()
+    try {
+      const response = await api.get(`/hydrometers/${id}/readings/export`, {
+        responseType: 'blob',
+      })
+      const url = window.URL.createObjectURL(new Blob([response.data as BlobPart]))
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `${code}_leituras.csv`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+
+      toast.success('Download do arquivo CSV iniciado.')
+    } catch {
+      toast.error('Erro ao gerar o arquivo de exportação.')
+    }
   }
 
   return {
