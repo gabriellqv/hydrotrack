@@ -11,6 +11,7 @@ O HydroTrack e uma plataforma de monitoramento de telemetria hidrica IoT que sim
 1. **Stack principal:** PHP, Laravel, Eloquent, MySQL, Sanctum, Vue.js 3, Pinia, Tailwind CSS e Leaflet.js.
 2. **Diferenciais:** Simulacao realista de sensores IoT via comandos Artisan, mapa interativo com geolocalizacao dos hidrometros, sistema de alertas automaticos para consumo anormal e dispositivos offline, e dashboard analitico com graficos de consumo temporal.
 3. **Repositorio oficial:** [github.com/gabriellqv/hydrotrack](https://github.com/gabriellqv/hydrotrack)
+4. **Ambiente de Produção (Live):** [hydrotrack-telemetry.vercel.app](https://hydrotrack-telemetry.vercel.app)
 
 ## Preview
 
