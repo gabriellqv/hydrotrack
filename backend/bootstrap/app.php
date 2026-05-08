@@ -19,8 +19,6 @@ return Application::configure(basePath: dirname(__DIR__))
             'ingest.auth' => EnsureValidApiKey::class,
         ]);
 
-        $middleware->statefulApi();
-
         /** Configuração de CORS para permitir requisições do frontend Vue (porta 5173) */
         $middleware->validateCsrfTokens(except: [
             'api/*',

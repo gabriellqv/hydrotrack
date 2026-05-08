@@ -24,20 +24,24 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Cria o usuário administrador padrão
-        User::factory()->create([
-            'name' => 'Admin HydroTrack',
-            'email' => 'admin@hydrotrack.com',
-            'password' => Hash::make('admin123'),
-            'role' => 'admin',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'admin@hydrotrack.com'],
+            [
+                'name' => 'Admin HydroTrack',
+                'password' => Hash::make('admin123'),
+                'role' => 'admin',
+            ]
+        );
 
         // Cria um operador de exemplo
-        User::factory()->create([
-            'name' => 'Operador Demo',
-            'email' => 'operador@hydrotrack.com',
-            'password' => Hash::make('operador123'),
-            'role' => 'operator',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'operador@hydrotrack.com'],
+            [
+                'name' => 'Operador Demo',
+                'password' => Hash::make('operador123'),
+                'role' => 'operator',
+            ]
+        );
 
         // Popula hidrômetros com leituras históricas
         $this->call(HydrometerSeeder::class);

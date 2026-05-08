@@ -19,11 +19,11 @@
     <script>
       ;(function () {
         try {
-          if (localStorage.getItem('theme') === 'light') {
-            document.documentElement.classList.add('light')
-          } else {
-            // O padrão do sistema é escuro, então mantemos a cor escura
+          if (localStorage.getItem('theme') === 'dark') {
             document.documentElement.classList.remove('light')
+          } else {
+            // O padrão do sistema é claro
+            document.documentElement.classList.add('light')
           }
         } catch (e) {}
       })()

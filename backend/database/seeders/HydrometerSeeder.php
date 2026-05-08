@@ -4,8 +4,10 @@ namespace Database\Seeders;
 
 use App\Models\Hydrometer;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Popula o banco com hidrômetros realistas distribuídos na mancha urbana de Bocaiúva-MG.
@@ -34,6 +36,12 @@ class HydrometerSeeder extends Seeder
      */
     public function run(): void
     {
+        if (Hydrometer::count() > 0) {
+            Log::info('HydrometerSeeder: dados já existem, pulando.');
+
+            return;
+        }
+
         DB::transaction(function () {
             $now = Carbon::now();
             $hydrometers = [];
@@ -41,14 +49,17 @@ class HydrometerSeeder extends Seeder
             for ($i = 1; $i <= 200; $i++) {
                 [$lat, $lng] = $this->generateCoordinatesInRadius();
 
+                $statuses = ['online', 'online', 'online', 'offline', 'alert'];
+                $types = ['residential', 'residential', 'commercial', 'industrial'];
+
                 $hydrometers[] = [
                     'code' => sprintf('HYD-%03d', $i),
                     'latitude' => $lat,
                     'longitude' => $lng,
-                    'address' => fake('pt_BR')->streetAddress(),
-                    'neighborhood' => fake()->randomElement(self::NEIGHBORHOODS),
-                    'status' => fake()->randomElement(['online', 'online', 'online', 'offline', 'alert']),
-                    'type' => fake()->randomElement(['residential', 'residential', 'commercial', 'industrial']),
+                    'address' => 'Rua '.Arr::random(self::NEIGHBORHOODS).', '.rand(1, 999),
+                    'neighborhood' => Arr::random(self::NEIGHBORHOODS),
+                    'status' => Arr::random($statuses),
+                    'type' => Arr::random($types),
                     'last_reading_at' => $now->copy()->subMinutes(rand(1, 2880)),
                     'created_at' => $now,
                     'updated_at' => $now,
@@ -68,7 +79,7 @@ class HydrometerSeeder extends Seeder
                 for ($day = 30; $day >= 1; $day--) {
                     $allReadings[] = [
                         'hydrometer_id' => $hydrometer_id,
-                        'value_m3' => fake()->randomFloat(3, 0.1, 15.0),
+                        'value_m3' => round(0.1 + (mt_rand() / mt_getrandmax()) * 14.9, 3),
                         'reading_at' => $now->copy()->subDays($day)->setHour(rand(6, 22)),
                         'created_at' => $now,
                         'updated_at' => $now,
@@ -92,8 +103,8 @@ class HydrometerSeeder extends Seeder
             ];
 
             foreach ($alertHydrometers as $hydrometer_id) {
-                $type = fake()->randomElement($types);
-                $resolved = fake()->boolean(30); // 30% já resolvidos
+                $type = Arr::random($types);
+                $resolved = rand(1, 100) <= 30; // 30% já resolvidos
 
                 $alerts[] = [
                     'hydrometer_id' => $hydrometer_id,

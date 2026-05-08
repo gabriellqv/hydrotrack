@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import type { Hydrometer } from '@/types'
-import { useTheme } from '@/composables/useTheme'
+
 /**
  * Componente de mapa interativo que renderiza hidrômetros como pinos coloridos.
  *
@@ -24,7 +24,6 @@ const emit = defineEmits<{
 }>()
 
 const router = useRouter()
-const { isDark } = useTheme()
 
 /** Referência ao container DOM do mapa */
 const mapContainer = ref<HTMLElement | null>(null)
@@ -136,46 +135,10 @@ onMounted(() => {
     maxBoundsViscosity: 1.0, // Impede "rebote" para fora da área permitida
   })
 
-  const lightMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors',
     noWrap: true,
-  })
-
-  const darkMap = L.tileLayer(
-    'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png',
-    {
-      attribution:
-        '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a>',
-      noWrap: true,
-    },
-  )
-
-  // Sincroniza as camadas de tile com o tema global (Light/Dark Mode)
-  watch(
-    isDark,
-    (dark) => {
-      if (!map) return
-      if (dark) {
-        if (map.hasLayer(lightMap)) map.removeLayer(lightMap)
-        darkMap.addTo(map)
-      } else {
-        if (map.hasLayer(darkMap)) map.removeLayer(darkMap)
-        lightMap.addTo(map)
-      }
-    },
-    { immediate: true },
-  )
-
-  const baseMaps = {
-    'Modo Escuro': darkMap,
-    'Modo Claro': lightMap,
-  }
-
-  L.control.layers(baseMaps).addTo(map)
-
-  map.on('baselayerchange', (e: L.LayersControlEvent) => {
-    localStorage.setItem('mapTheme', e.name === 'Modo Claro' ? 'light' : 'dark')
-  })
+  }).addTo(map)
 
   markersLayer = L.layerGroup().addTo(map)
   renderMarkers()

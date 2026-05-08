@@ -7,7 +7,7 @@ import { ref } from 'vue'
  * a classe 'light' no elemento <html> para ativar as CSS variables
  * do tema claro.
  */
-const isDark = ref(true)
+const isDark = ref(false)
 
 /**
  * Inicializa o tema a partir do valor persistido no localStorage.
@@ -15,8 +15,8 @@ const isDark = ref(true)
  */
 function initTheme() {
   const saved = localStorage.getItem('theme')
-  if (saved === 'light') {
-    isDark.value = false
+  if (saved === 'dark') {
+    isDark.value = true
   }
   applyTheme()
 }

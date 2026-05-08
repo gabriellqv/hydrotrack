@@ -27,6 +27,7 @@ RUN apk add --no-cache \
         libzip-dev \
         icu-dev \
         oniguruma-dev \
+        ca-certificates \
     && docker-php-ext-install \
         pdo_mysql \
         mbstring \
@@ -49,15 +50,14 @@ RUN mkdir -p storage/logs \
              bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
-# Copiar .env.example como fallback (docker-compose sobrescreve via env vars)
-RUN cp .env.example .env
-
-# Gerar chave da aplicação
-RUN php artisan key:generate
+# Criar .env vazio (variáveis de produção vêm do Render Environment)
+RUN touch .env
 
 # Expor a porta do servidor embutido do PHP
 EXPOSE 8000
 
-# Entrypoint: roda migrations + seed e inicia o servidor
-CMD php artisan migrate --force --seed \
-    && php artisan serve --host=0.0.0.0 --port=8000
+# Entrypoint: exporta env vars do Render para .env, roda migrations e inicia o servidor
+CMD sh -c '\
+    env | grep -E "^(APP_|DB_|SESSION_|SANCTUM_|FRONTEND_|MYSQL_|PORT=|INGEST_)" > /var/www/html/.env && \
+    php artisan migrate --force && \
+    php artisan serve --host=0.0.0.0 --port=8000'
