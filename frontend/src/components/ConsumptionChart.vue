@@ -11,6 +11,8 @@ import {
   Tooltip,
   Filler,
   type TooltipItem,
+  type ChartOptions,
+  type ChartData,
 } from 'chart.js'
 import type { ConsumptionPoint } from '@/types'
 import { useTheme } from '@/composables/useTheme'
@@ -54,7 +56,7 @@ const fullChartData = computed(() => {
   }
 })
 
-const chartOptions = {
+const chartOptions: ChartOptions<'line'> = {
   responsive: true,
   maintainAspectRatio: false,
   animation: {
@@ -76,7 +78,7 @@ const chartOptions = {
   },
 }
 
-const displayedData = ref({
+const displayedData = ref<ChartData<'line'>>({
   labels: [],
   datasets: [
     {

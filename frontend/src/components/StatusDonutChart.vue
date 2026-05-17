@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
 import { Pie } from 'vue-chartjs'
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, type ChartOptions, type ChartData } from 'chart.js'
 import type { DashboardSummary } from '@/types'
 
 /**
@@ -70,7 +70,7 @@ const fullChartData = computed(() => ({
   ],
 }))
 
-const chartOptions = {
+const chartOptions: ChartOptions<'pie'> = {
   responsive: true,
   maintainAspectRatio: false,
   animation: {
@@ -96,7 +96,7 @@ const chartOptions = {
   },
 }
 
-const displayedData = ref({
+const displayedData = ref<ChartData<'pie'>>({
   labels: ['Online', 'Offline', 'Em Alerta'],
   datasets: [
     {
