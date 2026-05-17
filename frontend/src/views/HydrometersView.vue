@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useHydrometerStore } from '@/stores/hydrometer'
 import { useIsAdmin } from '@/composables/useIsAdmin'

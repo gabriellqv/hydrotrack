@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, computed } from 'vue'
+import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useHydrometerStore } from '@/stores/hydrometer'
 import { useAlertStore } from '@/stores/alert'

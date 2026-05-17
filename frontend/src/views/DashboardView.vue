@@ -17,10 +17,7 @@ import { Droplets, Wifi, WifiOff, AlertTriangle, BarChart3, Bell } from 'lucide-
  *
  * Implementa polling a cada 5 segundos para atualização em tempo real.
  */
-import { useTheme } from '@/composables/useTheme'
-
 const store = useDashboardStore()
-const { isDark } = useTheme()
 
 /** Labels para os botões do seletor de período */
 const periodOptions: { days: 7 | 30 | 90; label: string }[] = [

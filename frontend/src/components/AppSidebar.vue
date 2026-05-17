@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch, onUnmounted } from 'vue'
+import { watch, onUnmounted, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useTheme } from '@/composables/useTheme'
@@ -66,7 +66,6 @@ function handleResize() {
   }
 }
 
-import { onMounted } from 'vue'
 onMounted(() => {
   window.addEventListener('resize', handleResize)
 })
