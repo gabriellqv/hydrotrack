@@ -30,7 +30,7 @@ function filterByResolved(resolved: string) {
   store.fetchAlerts()
 }
 
-onMounted(() => store.fetchAlerts())
+await store.fetchAlerts()
 </script>
 
 <template>

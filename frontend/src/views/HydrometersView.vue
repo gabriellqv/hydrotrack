@@ -66,7 +66,7 @@ const editForm = ref({
 const formErrors = ref<Record<string, string>>({})
 const editFormErrors = ref<Record<string, string>>({})
 
-onMounted(() => store.fetchHydrometers())
+await store.fetchHydrometers()
 
 function applyFilters() {
   const filters: Record<string, string> = {}

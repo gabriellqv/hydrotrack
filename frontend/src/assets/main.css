@@ -40,7 +40,7 @@
   --sidebar-from: rgba(255, 255, 255, 0.85);
   --sidebar-to: rgba(241, 245, 249, 0.85);
   --sidebar-border: rgba(203, 213, 225, 0.5);
-  --shadow-card: 0 0.25rem 1.5rem rgba(0, 0, 0, 0.06);
+  --shadow-card: 0 0.5rem 2rem rgba(0, 0, 0, 0.12);
   --color-glass: rgba(255, 255, 255, 0.6); /* Light Glass */
 }
 
@@ -139,6 +139,11 @@ select {
 .animate-fade-in {
   animation: fade-in 0.3s ease-out;
 }
+
+.anim-delay-100 { animation-delay: 100ms; animation-fill-mode: both; }
+.anim-delay-200 { animation-delay: 200ms; animation-fill-mode: both; }
+.anim-delay-300 { animation-delay: 300ms; animation-fill-mode: both; }
+.anim-delay-400 { animation-delay: 400ms; animation-fill-mode: both; }
 
 /* Pulso suave para marcadores de alerta no mapa (mais discreto que animate-ping) */
 @keyframes soft-ping {

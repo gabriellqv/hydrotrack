@@ -59,9 +59,10 @@ async function refreshDashboard() {
   ])
 }
 
-onMounted(async () => {
-  await refreshDashboard()
+// Top level await to trigger Suspense
+await refreshDashboard()
 
+onMounted(() => {
   pollingTimer = setInterval(refreshDashboard, POLLING_INTERVAL)
 })
 
@@ -121,29 +122,14 @@ const summaryCards = [
       <p class="text-sm text-text-muted">Visão geral do sistema de monitoramento</p>
     </div>
 
-    <!-- Wrapper relativo para restringir o vazamento de luz apenas à área do Card -->
-    <div class="relative flex-1 flex flex-col z-0 lg:min-h-0">
-      <!-- Background Decorativo super intenso para o Glassmorphism brilhar (Apenas Dark Mode) -->
-      <div
-        class="absolute inset-0 overflow-hidden pointer-events-none -z-10 rounded-xl glass-blobs"
-        :class="{ hidden: !isDark }"
-      >
-        <div
-          class="absolute top-[-50px] left-[-50px] w-[500px] h-[500px] rounded-full bg-primary-500/40 blur-[100px]"
-        ></div>
-        <div
-          class="absolute bottom-[-50px] right-[-50px] w-[400px] h-[400px] rounded-full bg-blue-500/30 blur-[80px]"
-        ></div>
-      </div>
-
-      <!-- Unified Dashboard Wrapper -->
-      <BaseCard class="flex-1 flex flex-col !p-4 lg:!p-5 lg:min-h-0">
+    <!-- Unified Dashboard Wrapper -->
+    <div class="flex-1 flex flex-col z-0 lg:min-h-0">
         <!-- Layout 2x2: Gráfico | Mapa // Status | Alertas -->
         <div
           class="grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-3 gap-6 lg:gap-8 flex-1 lg:min-h-0"
         >
           <!-- Top Left: Gráfico -->
-          <div class="flex flex-col lg:row-span-2 min-h-[300px] lg:min-h-0">
+          <BaseCard class="flex flex-col lg:row-span-2 min-h-[300px] lg:min-h-0 animate-fade-in anim-delay-100 p-4 lg:p-5">
             <div class="flex items-center justify-between mb-3 shrink-0">
               <h3 class="text-sm font-bold text-text-heading uppercase tracking-wider">
                 {{ chartTitle }}
@@ -168,10 +154,10 @@ const summaryCards = [
               <ConsumptionChart v-if="store.consumption.length" :data="store.consumption" />
               <p v-else class="text-sm text-text-muted text-center py-8">Carregando dados...</p>
             </div>
-          </div>
+          </BaseCard>
 
           <!-- Top Right: Mapa -->
-          <div class="flex flex-col lg:row-span-2 min-h-0">
+          <BaseCard class="flex flex-col lg:row-span-2 min-h-0 animate-fade-in anim-delay-200 p-4 lg:p-5">
             <h3 class="text-sm font-bold text-text-heading mb-3 uppercase tracking-wider shrink-0">
               Mapa de Hidrômetros
             </h3>
@@ -202,10 +188,10 @@ const summaryCards = [
             >
               <MapView :hydrometers="store.mapHydrometers" class="flex-1" />
             </div>
-          </div>
+          </BaseCard>
 
           <!-- Bottom Left: Donut Chart -->
-          <div class="flex flex-col lg:row-span-1 min-h-[250px] lg:min-h-0">
+          <BaseCard class="flex flex-col lg:row-span-1 min-h-[250px] lg:min-h-0 animate-fade-in anim-delay-300 p-4 lg:p-5">
             <h3 class="text-sm font-bold text-text-heading mb-2 uppercase tracking-wider shrink-0">
               Distribuição por Status
             </h3>
@@ -215,19 +201,18 @@ const summaryCards = [
               class="flex-1 min-h-0"
             />
             <p v-else class="text-sm text-text-muted text-center py-4">Carregando...</p>
-          </div>
+          </BaseCard>
 
           <!-- Bottom Right: Últimos Alertas -->
-          <div class="flex flex-col lg:row-span-1 min-h-[300px] lg:min-h-0">
+          <BaseCard class="flex flex-col lg:row-span-1 min-h-[300px] lg:min-h-0 animate-fade-in anim-delay-400 p-4 lg:p-5">
             <h3 class="text-sm font-bold text-text-heading mb-2 uppercase tracking-wider shrink-0">
               Últimos Alertas
             </h3>
             <div class="flex-1 w-full min-h-0 overflow-y-auto pr-2">
               <RecentAlerts :alerts="store.recentAlerts" />
             </div>
-          </div>
+          </BaseCard>
         </div>
-      </BaseCard>
+      </div>
     </div>
-  </div>
 </template>

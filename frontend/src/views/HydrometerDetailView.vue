@@ -8,7 +8,7 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import ConsumptionChart from '@/components/ConsumptionChart.vue'
 import AlertItem from '@/components/AlertItem.vue'
-import { ArrowLeft, Download } from 'lucide-vue-next'
+import { ArrowLeft, Download, MapPin } from 'lucide-vue-next'
 
 /**
  * View de Detalhe do Hidrômetro.
@@ -29,14 +29,12 @@ const typeMap: Record<string, string> = {
   industrial: 'Industrial',
 }
 
-onMounted(() => {
-  const id = Number(route.params.id)
-  if (isNaN(id)) {
-    router.push({ name: 'hydrometers' })
-    return
-  }
-  store.fetchHydrometer(id)
-})
+const id = Number(route.params.id)
+if (isNaN(id)) {
+  router.push({ name: 'hydrometers' })
+} else {
+  await store.fetchHydrometer(id)
+}
 
 /** Mapeia leituras para o formato esperado pelo ConsumptionChart */
 function readingsToChartData() {
@@ -98,14 +96,24 @@ async function handleResolveAlert(alertId: number) {
           <p class="text-sm text-text-muted mt-0.5">Detalhes do hidrômetro</p>
         </div>
       </div>
-      <BaseButton
-        v-if="store.currentHydrometer"
-        variant="secondary"
-        @click="handleExport"
-        class="w-full sm:w-auto flex justify-center"
-      >
-        <Download class="h-4 w-4" /> Exportar CSV
-      </BaseButton>
+      <div class="flex items-center gap-2 w-full sm:w-auto">
+        <BaseButton
+          v-if="store.currentHydrometer"
+          variant="secondary"
+          @click="router.push({ name: 'map', query: { hydrometer_id: store.currentHydrometer.id } })"
+          class="flex-1 sm:flex-none justify-center"
+        >
+          <MapPin class="h-4 w-4" /> Ver no Mapa
+        </BaseButton>
+        <BaseButton
+          v-if="store.currentHydrometer"
+          variant="secondary"
+          @click="handleExport"
+          class="flex-1 sm:flex-none justify-center"
+        >
+          <Download class="h-4 w-4" /> Exportar CSV
+        </BaseButton>
+      </div>
     </div>
 
     <!-- Loading -->

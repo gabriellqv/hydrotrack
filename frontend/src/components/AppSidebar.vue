@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch } from 'vue'
+import { computed, watch, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useTheme } from '@/composables/useTheme'
@@ -15,7 +15,7 @@ import { LayoutDashboard, Map, Bell, LogOut, Sun, Moon, X, Droplets } from 'luci
  * @prop {boolean} open - Controla visibilidade no mobile
  * @emits close - Emitido quando o drawer deve ser fechado
  */
-defineProps<{
+const props = defineProps<{
   open: boolean
 }>()
 
@@ -34,13 +34,47 @@ const navItems = [
   { name: 'alerts', label: 'Alertas', icon: Bell, path: '/alerts' },
 ]
 
-const currentRoute = computed(() => route.name)
+function isActive(item: typeof navItems[0]) {
+  if (item.path === '/') {
+    return route.path === '/'
+  }
+  return route.path.startsWith(item.path)
+}
 
 /** Fecha o drawer ao navegar (mobile) */
 watch(
   () => route.path,
   () => emit('close'),
 )
+
+/** Previne scroll do body quando o menu mobile está aberto */
+watch(
+  () => props.open,
+  (isOpen) => {
+    if (isOpen) {
+      document.body.classList.add('overflow-hidden')
+    } else {
+      document.body.classList.remove('overflow-hidden')
+    }
+  }
+)
+
+/** Fecha o menu automaticamente se a tela for redimensionada para desktop */
+function handleResize() {
+  if (window.innerWidth >= 1024 && props.open) {
+    emit('close')
+  }
+}
+
+import { onMounted } from 'vue'
+onMounted(() => {
+  window.addEventListener('resize', handleResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+  document.body.classList.remove('overflow-hidden')
+})
 </script>
 
 <template>
@@ -56,13 +90,11 @@ watch(
   <!-- Sidebar -->
   <aside
     :class="[
-      'fixed top-0 left-0 z-50 h-dvh flex flex-col border-r backdrop-blur-2xl',
+      'fixed top-0 left-0 z-50 h-dvh w-full lg:w-[var(--sidebar-width)] flex flex-col border-r backdrop-blur-2xl',
       'transition-transform duration-300 ease-in-out',
-      'lg:translate-x-0',
-      open ? 'translate-x-0' : '-translate-x-full',
+      open ? 'translate-y-0' : '-translate-y-full lg:translate-y-0',
     ]"
     :style="{
-      width: 'var(--sidebar-width)',
       background: `linear-gradient(to bottom, var(--sidebar-from), var(--sidebar-to))`,
       borderColor: 'var(--sidebar-border)',
     }"
@@ -72,8 +104,17 @@ watch(
       <img src="/favicon.svg" alt="HydroTrack" class="h-8 w-8 drop-shadow-sm" />
       <div class="flex-1">
         <h1 class="text-lg font-bold text-text-heading">HydroTrack</h1>
-        <p class="text-xs text-text-muted">Monitoramento Hídrico</p>
+        <p class="text-xs text-text-muted">Monitoramento</p>
       </div>
+      <!-- Toggle de tema -->
+      <button
+        @click="toggleTheme"
+        class="rounded-lg p-1.5 text-text-muted hover:bg-surface-hover hover:text-text-heading transition-colors"
+        :title="isDark ? 'Mudar para tema claro' : 'Mudar para tema escuro'"
+      >
+        <Sun v-if="isDark" class="h-5 w-5" />
+        <Moon v-else class="h-5 w-5" />
+      </button>
       <button
         @click="emit('close')"
         class="lg:hidden rounded-lg p-1.5 text-text-muted hover:bg-surface-hover hover:text-text-heading transition-colors"
@@ -91,7 +132,7 @@ watch(
         :to="item.path"
         :class="[
           'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
-          currentRoute === item.name
+          isActive(item)
             ? 'bg-primary-600/20 text-primary-400 border-r-2 border-primary-400'
             : 'text-text-muted hover:bg-surface-hover hover:text-text-heading',
         ]"
@@ -101,19 +142,8 @@ watch(
       </RouterLink>
     </nav>
 
-    <!-- Rodapé com usuário, toggle de tema e logout -->
+    <!-- Rodapé com usuário e logout -->
     <div class="border-t border-border px-4 py-4 space-y-3">
-      <!-- Toggle de tema -->
-      <button
-        @click="toggleTheme"
-        class="flex items-center gap-3 w-full rounded-lg px-3 py-2 text-sm font-medium text-text-muted hover:bg-surface-hover hover:text-text-heading transition-colors"
-        :title="isDark ? 'Mudar para tema claro' : 'Mudar para tema escuro'"
-      >
-        <Sun v-if="isDark" class="h-4 w-4" />
-        <Moon v-else class="h-4 w-4" />
-        {{ isDark ? 'Tema Claro' : 'Tema Escuro' }}
-      </button>
-
       <!-- Usuário e logout -->
       <div class="flex items-center gap-3">
         <!-- Avatar -->
