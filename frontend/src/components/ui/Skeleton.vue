@@ -4,7 +4,7 @@
       'animate-pulse bg-surface-hover rounded-md',
       {
         'rounded-full': circle,
-      }
+      },
     ]"
   ></div>
 </template>

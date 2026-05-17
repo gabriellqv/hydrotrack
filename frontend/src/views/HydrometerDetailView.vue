@@ -100,7 +100,9 @@ async function handleResolveAlert(alertId: number) {
         <BaseButton
           v-if="store.currentHydrometer"
           variant="secondary"
-          @click="router.push({ name: 'map', query: { hydrometer_id: store.currentHydrometer.id } })"
+          @click="
+            router.push({ name: 'map', query: { hydrometer_id: store.currentHydrometer.id } })
+          "
           class="flex-1 sm:flex-none justify-center"
         >
           <MapPin class="h-4 w-4" /> Ver no Mapa

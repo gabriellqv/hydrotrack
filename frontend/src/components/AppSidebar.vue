@@ -34,7 +34,7 @@ const navItems = [
   { name: 'alerts', label: 'Alertas', icon: Bell, path: '/alerts' },
 ]
 
-function isActive(item: typeof navItems[0]) {
+function isActive(item: (typeof navItems)[0]) {
   if (item.path === '/') {
     return route.path === '/'
   }
@@ -56,7 +56,7 @@ watch(
     } else {
       document.body.classList.remove('overflow-hidden')
     }
-  }
+  },
 )
 
 /** Fecha o menu automaticamente se a tela for redimensionada para desktop */

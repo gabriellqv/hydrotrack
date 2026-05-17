@@ -140,10 +140,22 @@ select {
   animation: fade-in 0.3s ease-out;
 }
 
-.anim-delay-100 { animation-delay: 100ms; animation-fill-mode: both; }
-.anim-delay-200 { animation-delay: 200ms; animation-fill-mode: both; }
-.anim-delay-300 { animation-delay: 300ms; animation-fill-mode: both; }
-.anim-delay-400 { animation-delay: 400ms; animation-fill-mode: both; }
+.anim-delay-100 {
+  animation-delay: 100ms;
+  animation-fill-mode: both;
+}
+.anim-delay-200 {
+  animation-delay: 200ms;
+  animation-fill-mode: both;
+}
+.anim-delay-300 {
+  animation-delay: 300ms;
+  animation-fill-mode: both;
+}
+.anim-delay-400 {
+  animation-delay: 400ms;
+  animation-fill-mode: both;
+}
 
 /* Pulso suave para marcadores de alerta no mapa (mais discreto que animate-ping) */
 @keyframes soft-ping {

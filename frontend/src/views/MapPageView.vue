@@ -148,7 +148,11 @@ function handleMarkerClick(hydrometer: Hydrometer) {
         </div>
 
         <BaseCard compact class="flex-1 min-h-[500px] lg:min-h-0 flex flex-col [&>*]:flex-1">
-          <MapView ref="mapViewRef" :hydrometers="filteredHydrometers" @marker-click="handleMarkerClick" />
+          <MapView
+            ref="mapViewRef"
+            :hydrometers="filteredHydrometers"
+            @marker-click="handleMarkerClick"
+          />
         </BaseCard>
       </div>
 
