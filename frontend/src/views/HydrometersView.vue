@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useHydrometerStore } from '@/stores/hydrometer'
 import { useIsAdmin } from '@/composables/useIsAdmin'
@@ -66,7 +66,7 @@ const editForm = ref({
 const formErrors = ref<Record<string, string>>({})
 const editFormErrors = ref<Record<string, string>>({})
 
-onMounted(() => store.fetchHydrometers())
+await store.fetchHydrometers()
 
 function applyFilters() {
   const filters: Record<string, string> = {}

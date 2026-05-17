@@ -1,0 +1,9 @@
+feat: redesenho da interface e integração do mapa
+
+Aprimora a experiência visual e a navegabilidade do sistema através da padronização em grade e carregamentos dinâmicos.
+
+* Introduz componentes visuais de esqueleto de carregamento baseados em Suspense.
+* Otimiza a entrada em tela dos gráficos com técnica de atraso sincronizada ao tempo de montagem.
+* Restaura a estabilidade da navegação principal em resoluções menores e ajusta a seleção visual de rotas filhas.
+* Implementa redirecionamento automatizado para o painel geográfico com abertura instantânea do balão de detalhes.
+* Refina o balanceamento de contraste e sombras entre os modos claro e escuro.
