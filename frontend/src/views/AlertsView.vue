@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, computed } from 'vue'
+import { computed } from 'vue'
 import { useAlertStore } from '@/stores/alert'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import AlertItem from '@/components/AlertItem.vue'
@@ -30,7 +30,7 @@ function filterByResolved(resolved: string) {
   store.fetchAlerts()
 }
 
-onMounted(() => store.fetchAlerts())
+await store.fetchAlerts()
 </script>
 
 <template>

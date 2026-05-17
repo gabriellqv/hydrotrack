@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { Line } from 'vue-chartjs'
 import {
   Chart as ChartJS,
@@ -11,6 +11,8 @@ import {
   Tooltip,
   Filler,
   type TooltipItem,
+  type ChartOptions,
+  type ChartData,
 } from 'chart.js'
 import type { ConsumptionPoint } from '@/types'
 import { useTheme } from '@/composables/useTheme'
@@ -30,7 +32,7 @@ const { isDark } = useTheme()
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler)
 
-const chartData = computed(() => {
+const fullChartData = computed(() => {
   const style = getComputedStyle(document.documentElement)
   const primaryColor = style.getPropertyValue('--color-primary-500').trim() || '#3b82f6'
 
@@ -54,9 +56,13 @@ const chartData = computed(() => {
   }
 })
 
-const chartOptions = {
+const chartOptions: ChartOptions<'line'> = {
   responsive: true,
   maintainAspectRatio: false,
+  animation: {
+    duration: 2000,
+    easing: 'easeOutQuart',
+  },
   plugins: {
     tooltip: {
       callbacks: {
@@ -71,10 +77,32 @@ const chartOptions = {
     },
   },
 }
+
+const displayedData = ref<ChartData<'line'>>({
+  labels: [],
+  datasets: [
+    {
+      label: 'Consumo (m³)',
+      data: [],
+      borderColor: '#3b82f6',
+      backgroundColor: '#3b82f61a',
+      fill: isDark.value,
+      tension: 0.4,
+      pointRadius: 3,
+      pointHoverRadius: 6,
+    },
+  ],
+})
+
+onMounted(() => {
+  setTimeout(() => {
+    displayedData.value = fullChartData.value
+  }, 400)
+})
 </script>
 
 <template>
   <div class="relative w-full h-full min-h-0">
-    <Line :data="chartData" :options="chartOptions" />
+    <Line :data="displayedData" :options="chartOptions" />
   </div>
 </template>

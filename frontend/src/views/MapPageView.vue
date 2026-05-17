@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, computed } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRoute } from 'vue-router'
 import { useDashboardStore } from '@/stores/dashboard'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import MapView from '@/components/MapView.vue'
@@ -19,8 +19,11 @@ import type { Hydrometer } from '@/types'
  */
 
 const store = useDashboardStore()
+const route = useRoute()
 const selectedHydrometer = ref<Hydrometer | null>(null)
 const activeFilter = ref<'all' | 'online' | 'offline' | 'alert'>('all')
+
+const mapViewRef = ref<InstanceType<typeof MapView> | null>(null)
 
 /** Intervalo de polling em milissegundos (5s) */
 const POLLING_INTERVAL = 5_000
@@ -44,9 +47,22 @@ const typeMap: Record<string, string> = {
   industrial: 'Industrial',
 }
 
+await store.fetchMap()
 onMounted(() => {
-  store.fetchMap()
   pollingTimer = setInterval(() => store.fetchMap(), POLLING_INTERVAL)
+
+  // Verifica se o usuário chegou do botão "Ver no Mapa" na view de Detalhes
+  const targetId = Number(route.query.hydrometer_id)
+  if (targetId) {
+    const target = store.mapHydrometers.find((h) => h.id === targetId)
+    if (target) {
+      selectedHydrometer.value = target
+      // Aguarda um pouco para o Leaflet renderizar antes de voar para o ponto
+      setTimeout(() => {
+        mapViewRef.value?.centerAndOpenPopup(target.id, target.latitude, target.longitude)
+      }, 500)
+    }
+  }
 })
 
 onUnmounted(() => {
@@ -132,7 +148,11 @@ function handleMarkerClick(hydrometer: Hydrometer) {
         </div>
 
         <BaseCard compact class="flex-1 min-h-[500px] lg:min-h-0 flex flex-col [&>*]:flex-1">
-          <MapView :hydrometers="filteredHydrometers" @marker-click="handleMarkerClick" />
+          <MapView
+            ref="mapViewRef"
+            :hydrometers="filteredHydrometers"
+            @marker-click="handleMarkerClick"
+          />
         </BaseCard>
       </div>
 

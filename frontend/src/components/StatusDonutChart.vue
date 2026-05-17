@@ -1,7 +1,14 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { Pie } from 'vue-chartjs'
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  type ChartOptions,
+  type ChartData,
+} from 'chart.js'
 import type { DashboardSummary } from '@/types'
 
 /**
@@ -45,7 +52,7 @@ const statusItems = computed(() => {
   ]
 })
 
-const chartData = computed(() => ({
+const fullChartData = computed(() => ({
   labels: ['Online', 'Offline', 'Em Alerta'],
   datasets: [
     {
@@ -70,9 +77,15 @@ const chartData = computed(() => ({
   ],
 }))
 
-const chartOptions = {
+const chartOptions: ChartOptions<'pie'> = {
   responsive: true,
   maintainAspectRatio: false,
+  animation: {
+    animateRotate: true,
+    animateScale: true,
+    duration: 1500,
+    easing: 'easeOutQuart',
+  },
   layout: {
     padding: 2,
   },
@@ -89,6 +102,28 @@ const chartOptions = {
     },
   },
 }
+
+const displayedData = ref<ChartData<'pie'>>({
+  labels: ['Online', 'Offline', 'Em Alerta'],
+  datasets: [
+    {
+      data: [0, 0, 0], // Inicia zerado para a animação "crescer"
+      backgroundColor: [
+        'rgba(34, 197, 94, 0.35)',
+        'rgba(148, 163, 184, 0.20)',
+        'rgba(239, 68, 68, 0.35)',
+      ],
+      borderColor: ['rgba(34, 197, 94, 0.8)', 'rgba(148, 163, 184, 0.4)', 'rgba(239, 68, 68, 0.8)'],
+      borderWidth: 2,
+    },
+  ],
+})
+
+onMounted(() => {
+  setTimeout(() => {
+    displayedData.value = fullChartData.value
+  }, 600)
+})
 </script>
 
 <template>
@@ -117,7 +152,7 @@ const chartOptions = {
     <div
       class="relative flex-1 w-full sm:w-auto h-full min-h-[150px] sm:min-h-0 flex items-center justify-center"
     >
-      <Pie :data="chartData" :options="chartOptions" />
+      <Pie :data="displayedData" :options="chartOptions" />
     </div>
   </div>
 </template>

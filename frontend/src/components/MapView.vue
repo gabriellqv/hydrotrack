@@ -29,6 +29,7 @@ const router = useRouter()
 const mapContainer = ref<HTMLElement | null>(null)
 let map: L.Map | null = null
 let markersLayer: L.LayerGroup | null = null
+const markersById = new Map<number, L.Marker>()
 
 /** Centro de Bocaiúva-MG (Praça Wandick Dumont) */
 const BOCAIUVA_CENTER: L.LatLngTuple = [-17.1085, -43.8143]
@@ -80,6 +81,7 @@ function renderMarkers() {
   if (!map || !markersLayer) return
 
   markersLayer.clearLayers()
+  markersById.clear()
 
   if (!Array.isArray(props.hydrometers)) return
 
@@ -117,6 +119,7 @@ function renderMarkers() {
 
     marker.on('click', () => emit('marker-click', h))
     markersLayer!.addLayer(marker)
+    markersById.set(h.id, marker)
   })
 }
 
@@ -180,6 +183,35 @@ onMounted(() => {
 })
 
 watch(() => props.hydrometers, renderMarkers)
+
+/**
+ * Permite que componentes pais centralizem o mapa em coordenadas específicas.
+ */
+function centerOn(lat: number, lng: number, zoomLevel = 17) {
+  if (map) {
+    map.flyTo([lat, lng], zoomLevel, { duration: 1.5 })
+  }
+}
+
+/**
+ * Voa até o hidrômetro e abre automaticamente seu popup de detalhes após a viagem.
+ */
+function centerAndOpenPopup(id: number, lat: number, lng: number, zoomLevel = 17) {
+  if (map) {
+    map.flyTo([lat, lng], zoomLevel, { duration: 1.5 })
+    map.once('moveend', () => {
+      const marker = markersById.get(id)
+      if (marker) {
+        marker.openPopup()
+      }
+    })
+  }
+}
+
+defineExpose({
+  centerOn,
+  centerAndOpenPopup,
+})
 </script>
 
 <template>

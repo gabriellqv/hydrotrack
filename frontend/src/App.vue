@@ -6,6 +6,8 @@ import { useTheme } from '@/composables/useTheme'
 import AppSidebar from '@/components/AppSidebar.vue'
 import ScrollToTop from '@/components/ScrollToTop.vue'
 import ToastContainer from '@/components/ToastContainer.vue'
+import PageSkeleton from '@/components/ui/PageSkeleton.vue'
+import DashboardSkeleton from '@/components/ui/DashboardSkeleton.vue'
 import { Menu } from 'lucide-vue-next'
 
 const route = useRoute()
@@ -50,7 +52,17 @@ onMounted(async () => {
 
         <!-- Conteúdo principal -->
         <main class="flex-1 p-4 lg:p-8">
-          <RouterView />
+          <RouterView v-slot="{ Component }">
+            <template v-if="Component">
+              <Suspense>
+                <component :is="Component" />
+                <template #fallback>
+                  <DashboardSkeleton v-if="route.name === 'dashboard'" />
+                  <PageSkeleton v-else />
+                </template>
+              </Suspense>
+            </template>
+          </RouterView>
         </main>
       </div>
 
