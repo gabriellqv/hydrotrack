@@ -72,24 +72,29 @@ class HydrometerSeeder extends Seeder
             }
 
             // Gera leituras em lote para cada hidrômetro
-            $allReadings = [];
             $hydrometerIds = Hydrometer::pluck('id');
+            $chunkSize = 500;
+            $readingsBuffer = [];
 
             foreach ($hydrometerIds as $hydrometer_id) {
                 for ($day = 30; $day >= 1; $day--) {
-                    $allReadings[] = [
+                    $readingsBuffer[] = [
                         'hydrometer_id' => $hydrometer_id,
                         'value_m3' => round(0.1 + (mt_rand() / mt_getrandmax()) * 14.9, 3),
                         'reading_at' => $now->copy()->subDays($day)->setHour(rand(6, 22)),
                         'created_at' => $now,
                         'updated_at' => $now,
                     ];
+
+                    if (count($readingsBuffer) >= $chunkSize) {
+                        DB::table('readings')->insert($readingsBuffer);
+                        $readingsBuffer = [];
+                    }
                 }
             }
 
-            // Insere leituras em lotes de 500
-            foreach (array_chunk($allReadings, 500) as $chunk) {
-                DB::table('readings')->insert($chunk);
+            if (! empty($readingsBuffer)) {
+                DB::table('readings')->insert($readingsBuffer);
             }
 
             // Gera alertas para hidrômetros com status 'alert'

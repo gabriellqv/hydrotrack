@@ -23,6 +23,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index(['hydrometer_id', 'reading_at']);
+            $table->index('reading_at');
         });
     }
 
