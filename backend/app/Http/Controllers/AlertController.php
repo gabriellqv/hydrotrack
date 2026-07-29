@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\AlertResource;
 use App\Models\Alert;
-use App\Services\DashboardService;
+use App\Services\AlertService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -12,29 +12,26 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 /**
  * Controller de alertas do sistema de monitoramento.
  *
- * Permite listar alertas pendentes e marcar alertas como resolvidos.
+ * Delega toda a logica de negocio ao AlertService.
  */
 class AlertController extends Controller
 {
     /**
-     * Lista todos os alertas com paginação, filtros e dados do hidrômetro.
+     * @param  AlertService  $service  Injetado automaticamente pelo container do Laravel
+     */
+    public function __construct(
+        private readonly AlertService $service
+    ) {}
+
+    /**
+     * Lista todos os alertas com paginacao, filtros e dados do hidrometro.
      *
      * @param  Request  $request  Query params: type, resolved
-     * @return AnonymousResourceCollection Coleção paginada de AlertResource
+     * @return AnonymousResourceCollection Colecao paginada de AlertResource
      */
     public function index(Request $request): AnonymousResourceCollection
     {
-        $query = Alert::with('hydrometer')->latest();
-
-        if ($request->filled('type')) {
-            $query->where('type', $request->query('type'));
-        }
-
-        if ($request->filled('resolved')) {
-            $query->where('resolved', $request->query('resolved') === 'true');
-        }
-
-        return AlertResource::collection($query->paginate(20));
+        return AlertResource::collection($this->service->list($request));
     }
 
     /**
@@ -45,19 +42,14 @@ class AlertController extends Controller
      */
     public function resolve(Alert $alert): JsonResponse
     {
-        if ($alert->resolved) {
+        try {
+            $updated = $this->service->resolve($alert);
+        } catch (\RuntimeException $e) {
             return response()->json([
-                'message' => 'Alerta ja resolvido.',
+                'message' => $e->getMessage(),
             ], 409);
         }
 
-        $alert->update([
-            'resolved' => true,
-            'resolved_at' => now(),
-        ]);
-
-        DashboardService::invalidateCache();
-
-        return response()->json(new AlertResource($alert->fresh('hydrometer')));
+        return response()->json(new AlertResource($updated));
     }
 }
