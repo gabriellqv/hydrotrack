@@ -45,6 +45,12 @@ class AlertController extends Controller
      */
     public function resolve(Alert $alert): JsonResponse
     {
+        if ($alert->resolved) {
+            return response()->json([
+                'message' => 'Alerta ja resolvido.',
+            ], 409);
+        }
+
         $alert->update([
             'resolved' => true,
             'resolved_at' => now(),
