@@ -48,9 +48,19 @@ function openEditModal(hydrometer: Hydrometer) {
   showEditModal.value = true
 }
 
+function closeEditModal() {
+  showEditModal.value = false
+  editingHydrometer.value = null
+}
+
 function openDeleteDialog(hydrometer: Hydrometer) {
   deletingHydrometer.value = hydrometer
   showDeleteDialog.value = true
+}
+
+function closeDeleteDialog() {
+  showDeleteDialog.value = false
+  deletingHydrometer.value = null
 }
 </script>
 
@@ -203,18 +213,12 @@ function openDeleteDialog(hydrometer: Hydrometer) {
     <EditHydrometerModal
       v-if="showEditModal && editingHydrometer"
       :hydrometer="editingHydrometer"
-      @close="
-        showEditModal = false
-        editingHydrometer = null
-      "
+      @close="closeEditModal"
     />
     <DeleteHydrometerDialog
       v-if="showDeleteDialog && deletingHydrometer"
       :hydrometer="deletingHydrometer"
-      @close="
-        showDeleteDialog = false
-        deletingHydrometer = null
-      "
+      @close="closeDeleteDialog"
     />
   </div>
 </template>
