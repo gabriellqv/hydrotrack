@@ -203,12 +203,18 @@ function openDeleteDialog(hydrometer: Hydrometer) {
     <EditHydrometerModal
       v-if="showEditModal && editingHydrometer"
       :hydrometer="editingHydrometer"
-      @close="showEditModal = false; editingHydrometer = null"
+      @close="
+        showEditModal = false
+        editingHydrometer = null
+      "
     />
     <DeleteHydrometerDialog
       v-if="showDeleteDialog && deletingHydrometer"
       :hydrometer="deletingHydrometer"
-      @close="showDeleteDialog = false; deletingHydrometer = null"
+      @close="
+        showDeleteDialog = false
+        deletingHydrometer = null
+      "
     />
   </div>
 </template>
