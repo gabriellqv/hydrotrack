@@ -53,7 +53,8 @@ async function handleLogin() {
     await authStore.fetchUser()
 
     const redirect = (route.query.redirect as string) || '/'
-    router.push(redirect)
+    const isInternalRedirect = redirect.startsWith('/') && !redirect.startsWith('//')
+    router.push(isInternalRedirect ? redirect : '/')
 
     const toast = useToastStore()
     toast.success('Bem-vindo(a) de volta!')
