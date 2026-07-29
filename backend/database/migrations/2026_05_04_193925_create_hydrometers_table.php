@@ -25,6 +25,10 @@ return new class extends Migration
             $table->enum('type', ['residential', 'commercial', 'industrial'])->default('residential');
             $table->timestamp('last_reading_at')->nullable()->comment('Última leitura recebida do sensor');
             $table->timestamps();
+
+            $table->index('neighborhood');
+            $table->index('status');
+            $table->index('type');
         });
     }
 
