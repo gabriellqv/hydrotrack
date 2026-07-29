@@ -2,14 +2,13 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { User } from '@/types'
 import { api } from '@/services/api'
-import router from '@/router'
 import { useToastStore } from '@/stores/toast'
 
 /**
- * Store de autenticação (Pinia).
+ * Store de autenticacao (Pinia).
  *
- * Gerencia o estado do usuário logado, o token Sanctum persistido
- * em localStorage e as funções de login/logout da API.
+ * Gerencia o estado do usuario logado, o token Sanctum persistido
+ * em localStorage e as funcoes de login/logout da API.
  */
 export const useAuthStore = defineStore('auth', () => {
   const token = ref<string | null>(localStorage.getItem('auth_token'))
@@ -34,10 +33,9 @@ export const useAuthStore = defineStore('auth', () => {
     token.value = null
     user.value = null
     localStorage.removeItem('auth_token')
-    router.push({ name: 'login' })
 
     const toast = useToastStore()
-    toast.info('Sessão encerrada de forma segura.')
+    toast.info('Sessao encerrada de forma segura.')
   }
 
   async function fetchUser() {
@@ -47,7 +45,7 @@ export const useAuthStore = defineStore('auth', () => {
       const { data } = await api.get<User>('/auth/me')
       user.value = data
     } catch {
-      logout()
+      await logout()
     } finally {
       loading.value = false
     }

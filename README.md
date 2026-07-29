@@ -236,6 +236,9 @@ cd backend && php artisan test
 
 # Frontend (Vitest)
 cd frontend && npm run test:unit
+
+# Frontend (Prettier)
+cd frontend && npm run format:check
 ```
 
 | Camada | Framework | Escopo |
