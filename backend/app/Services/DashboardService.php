@@ -26,6 +26,9 @@ class DashboardService
     /** TTL do cache de mapa em segundos */
     private const CACHE_TTL_MAP = 300;
 
+    /** Periodos disponiveis para o grafico de consumo */
+    private const CONSUMPTION_PERIODS = [7, 30, 90];
+
     /**
      * Retorna o resumo geral do sistema para os cards do dashboard.
      *
@@ -74,7 +77,9 @@ class DashboardService
      */
     public function getConsumptionChart(int $days = 30): array
     {
-        return Cache::remember("dashboard:consumption:{$days}", self::CACHE_TTL_SHORT, function () use ($days) {
+        $cacheKey = $this->getConsumptionCacheKey($days);
+
+        return Cache::remember($cacheKey, self::CACHE_TTL_SHORT, function () use ($days) {
             return Reading::query()
                 ->selectRaw('DATE(reading_at) as date, SUM(value_m3) as total_m3')
                 ->where('reading_at', '>=', Carbon::now()->subDays($days))
@@ -83,6 +88,14 @@ class DashboardService
                 ->get()
                 ->toArray();
         });
+    }
+
+    /**
+     * Retorna a chave de cache padronizada para o grafico de consumo.
+     */
+    public function getConsumptionCacheKey(int $days): string
+    {
+        return "dashboard:consumption:{$days}";
     }
 
     /**
@@ -110,9 +123,21 @@ class DashboardService
     public static function invalidateCache(): void
     {
         Cache::forget('dashboard:summary');
-        Cache::forget('dashboard:consumption:7');
-        Cache::forget('dashboard:consumption:30');
-        Cache::forget('dashboard:consumption:90');
+
+        foreach (self::CONSUMPTION_PERIODS as $days) {
+            Cache::forget("dashboard:consumption:{$days}");
+        }
+
         Cache::forget('dashboard:map');
+    }
+
+    /**
+     * Retorna os periodos de consumo suportados pelo cache.
+     *
+     * @return array<int>
+     */
+    public static function getConsumptionPeriods(): array
+    {
+        return self::CONSUMPTION_PERIODS;
     }
 }
