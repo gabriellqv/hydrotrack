@@ -3,6 +3,7 @@ import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import { HYDROMETER_STATUS_LABELS } from '@/constants'
 import type { Hydrometer } from '@/types'
 
 /**
@@ -90,12 +91,6 @@ function renderMarkers() {
       icon: createIcon(getMarkerColor(h.status), h.status),
     })
 
-    const statusMap: Record<string, string> = {
-      online: 'Online',
-      offline: 'Offline',
-      alert: 'Em Alerta',
-    }
-
     const popupContent = document.createElement('div')
     popupContent.innerHTML = `
       <a href="#" class="font-bold !text-primary-500 hover:!text-primary-400 hover:underline transition-colors block text-base mb-1 popup-link">
@@ -103,7 +98,7 @@ function renderMarkers() {
       </a>
       ${h.address}<br>
       <em class="text-xs opacity-75">${h.neighborhood}</em><br>
-      Status: <strong style="color: ${getMarkerColor(h.status)};">${(statusMap[h.status] || h.status).toUpperCase()}</strong>
+      Status: <strong style="color: ${getMarkerColor(h.status)};">${HYDROMETER_STATUS_LABELS[h.status].toUpperCase()}</strong>
     `
 
     // Ocultar o outline padrão e adicionar a ação do Vue Router no clique

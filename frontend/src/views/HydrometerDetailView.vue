@@ -9,6 +9,7 @@ import StatusBadge from '@/components/StatusBadge.vue'
 import ConsumptionChart from '@/components/ConsumptionChart.vue'
 import AlertItem from '@/components/AlertItem.vue'
 import { ArrowLeft, Download, MapPin } from 'lucide-vue-next'
+import { HYDROMETER_TYPE_LABELS, PERIOD_OPTIONS } from '@/constants'
 
 /**
  * View de Detalhe do Hidrômetro.
@@ -22,12 +23,6 @@ const route = useRoute()
 const router = useRouter()
 const store = useHydrometerStore()
 const alertStore = useAlertStore()
-
-const typeMap: Record<string, string> = {
-  residential: 'Residencial',
-  commercial: 'Comercial',
-  industrial: 'Industrial',
-}
 
 const id = Number(route.params.id)
 if (isNaN(id)) {
@@ -46,13 +41,6 @@ async function handleExport() {
   if (!store.currentHydrometer) return
   await store.exportReadings(store.currentHydrometer.id, store.currentHydrometer.code)
 }
-
-/** Opções do seletor de período */
-const periodOptions: { days: 7 | 30 | 90; label: string }[] = [
-  { days: 7, label: '7d' },
-  { days: 30, label: '30d' },
-  { days: 90, label: '90d' },
-]
 
 /** Título dinâmico do gráfico baseado no período */
 const chartTitle = computed(() => {
@@ -141,7 +129,7 @@ async function handleResolveAlert(alertId: number) {
             <div class="flex justify-between">
               <span class="text-text-muted">Tipo</span>
               <span class="text-text-body">{{
-                typeMap[store.currentHydrometer.type] || store.currentHydrometer.type
+                HYDROMETER_TYPE_LABELS[store.currentHydrometer.type]
               }}</span>
             </div>
             <div class="flex justify-between">
@@ -188,7 +176,7 @@ async function handleResolveAlert(alertId: number) {
             </h3>
             <div class="flex gap-1 overflow-x-auto pb-1 sm:pb-0 custom-scrollbar">
               <button
-                v-for="opt in periodOptions"
+                v-for="opt in PERIOD_OPTIONS"
                 :key="opt.days"
                 @click="changePeriod(opt.days)"
                 :class="[
