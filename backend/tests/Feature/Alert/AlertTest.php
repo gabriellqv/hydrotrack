@@ -45,6 +45,19 @@ it('marca um alerta como resolvido', function () {
     expect($alert->fresh()->resolved_at)->not->toBeNull();
 });
 
+it('rejeita resolucao de alerta ja resolvido com 409', function () {
+    $user = User::factory()->create();
+    $alert = Alert::factory()->create(['resolved' => true, 'resolved_at' => now()]);
+
+    $response = $this->actingAs($user)
+        ->patchJson("/api/alerts/{$alert->id}/resolve");
+
+    $response->assertStatus(409)
+        ->assertJsonPath('message', 'Alerta ja resolvido.');
+
+    expect($alert->fresh()->resolved_at)->not->toBeNull();
+});
+
 it('bloqueia listagem de alertas sem autenticação', function () {
     $response = $this->getJson('/api/alerts');
 
