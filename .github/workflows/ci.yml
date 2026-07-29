@@ -30,7 +30,7 @@ jobs:
       - name: Configurar PHP 8.4
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: "8.4"
           extensions: mbstring, sqlite3, pdo_sqlite
           coverage: none
 
@@ -73,18 +73,24 @@ jobs:
       - name: Configurar Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: 'npm'
+          node-version: "22"
+          cache: "npm"
           cache-dependency-path: frontend/package-lock.json
 
       - name: Instalar dependências
         run: npm ci
 
       - name: Verificar formatação (Prettier)
-        run: npx prettier --check "src/**/*.{vue,ts,js,css}"
+        run: npm run format:check
 
       - name: Verificar lint (ESLint)
-        run: npx eslint src --ext .vue,.ts,.js
+        run: npm run lint
 
       - name: Verificar tipos (TypeScript)
-        run: npx vue-tsc --build
+        run: npm run type-check
+
+      - name: Executar testes unitários
+        run: npm run test:unit -- --run
+
+      - name: Build de produção
+        run: npm run build
