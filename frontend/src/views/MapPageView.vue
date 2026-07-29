@@ -5,6 +5,7 @@ import { useDashboardStore } from '@/stores/dashboard'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import MapView from '@/components/MapView.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
+import { HYDROMETER_TYPE_LABELS } from '@/constants'
 import type { Hydrometer } from '@/types'
 
 /**
@@ -28,6 +29,7 @@ const mapViewRef = ref<InstanceType<typeof MapView> | null>(null)
 /** Intervalo de polling em milissegundos (5s) */
 const POLLING_INTERVAL = 5_000
 let pollingTimer: ReturnType<typeof setInterval> | null = null
+let focusTimeout: ReturnType<typeof setTimeout> | null = null
 
 const filteredHydrometers = computed(() => {
   if (activeFilter.value === 'all') return store.mapHydrometers
@@ -41,12 +43,6 @@ const filterCounts = computed(() => ({
   alert: store.mapHydrometers.filter((h) => h.status === 'alert').length,
 }))
 
-const typeMap: Record<string, string> = {
-  residential: 'Residencial',
-  commercial: 'Comercial',
-  industrial: 'Industrial',
-}
-
 await store.fetchMap()
 onMounted(() => {
   pollingTimer = setInterval(() => store.fetchMap(), POLLING_INTERVAL)
@@ -58,7 +54,7 @@ onMounted(() => {
     if (target) {
       selectedHydrometer.value = target
       // Aguarda um pouco para o Leaflet renderizar antes de voar para o ponto
-      setTimeout(() => {
+      focusTimeout = setTimeout(() => {
         mapViewRef.value?.centerAndOpenPopup(target.id, target.latitude, target.longitude)
       }, 500)
     }
@@ -69,6 +65,10 @@ onUnmounted(() => {
   if (pollingTimer) {
     clearInterval(pollingTimer)
     pollingTimer = null
+  }
+  if (focusTimeout) {
+    clearTimeout(focusTimeout)
+    focusTimeout = null
   }
 })
 
@@ -193,7 +193,7 @@ function handleMarkerClick(hydrometer: Hydrometer) {
               <div class="flex justify-between">
                 <span class="text-text-muted">Tipo</span>
                 <span class="text-text-body">{{
-                  typeMap[selectedHydrometer.type] || selectedHydrometer.type
+                  HYDROMETER_TYPE_LABELS[selectedHydrometer.type]
                 }}</span>
               </div>
               <div class="flex justify-between">

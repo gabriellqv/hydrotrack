@@ -8,6 +8,7 @@ import MapView from '@/components/MapView.vue'
 import StatusDonutChart from '@/components/StatusDonutChart.vue'
 import RecentAlerts from '@/components/RecentAlerts.vue'
 import { Droplets, Wifi, WifiOff, AlertTriangle, BarChart3, Bell } from 'lucide-vue-next'
+import { PERIOD_OPTIONS } from '@/constants'
 
 /**
  * View Principal do Dashboard.
@@ -18,13 +19,6 @@ import { Droplets, Wifi, WifiOff, AlertTriangle, BarChart3, Bell } from 'lucide-
  * Implementa polling a cada 5 segundos para atualização em tempo real.
  */
 const store = useDashboardStore()
-
-/** Labels para os botões do seletor de período */
-const periodOptions: { days: 7 | 30 | 90; label: string }[] = [
-  { days: 7, label: '7d' },
-  { days: 30, label: '30d' },
-  { days: 90, label: '90d' },
-]
 
 /** Título dinâmico baseado no período selecionado */
 const chartTitle = computed(() => {
@@ -133,7 +127,7 @@ const summaryCards = [
             </h3>
             <div class="flex gap-1">
               <button
-                v-for="opt in periodOptions"
+                v-for="opt in PERIOD_OPTIONS"
                 :key="opt.days"
                 @click="changePeriod(opt.days)"
                 :class="[
