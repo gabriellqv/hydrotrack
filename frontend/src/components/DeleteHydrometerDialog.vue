@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { useHydrometerStore } from '@/stores/hydrometer'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseModal from '@/components/ui/BaseModal.vue'
+import { useToastStore } from '@/stores/toast'
 import type { Hydrometer } from '@/types'
 
 /**
@@ -18,6 +19,7 @@ const props = defineProps<{
 const emit = defineEmits(['close'])
 
 const store = useHydrometerStore()
+const toast = useToastStore()
 const loading = ref(false)
 
 async function confirmDelete() {
@@ -25,9 +27,8 @@ async function confirmDelete() {
   try {
     await store.deleteHydrometer(props.hydrometer.id)
     emit('close')
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(error)
+  } catch {
+    toast.error('Erro inesperado ao excluir o hidrometro. Tente novamente.')
   } finally {
     loading.value = false
   }

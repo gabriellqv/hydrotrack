@@ -5,6 +5,7 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseModal from '@/components/ui/BaseModal.vue'
 import { ApiError } from '@/services/api'
+import { useToastStore } from '@/stores/toast'
 import type { Hydrometer } from '@/types'
 
 /**
@@ -20,6 +21,7 @@ const props = defineProps<{
 const emit = defineEmits(['close'])
 
 const store = useHydrometerStore()
+const toast = useToastStore()
 
 const editForm = ref({
   code: props.hydrometer.code,
@@ -67,8 +69,7 @@ async function handleEdit() {
         editFormErrors.value[field] = messages[0] || 'Erro de validacao'
       }
     } else {
-      // eslint-disable-next-line no-console
-      console.error(error)
+      toast.error('Erro inesperado ao atualizar o hidrometro. Tente novamente.')
     }
   } finally {
     loading.value = false

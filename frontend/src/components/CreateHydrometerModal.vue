@@ -5,6 +5,7 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseModal from '@/components/ui/BaseModal.vue'
 import { ApiError } from '@/services/api'
+import { useToastStore } from '@/stores/toast'
 import type { Hydrometer } from '@/types'
 
 /**
@@ -15,6 +16,7 @@ import type { Hydrometer } from '@/types'
 const emit = defineEmits(['close'])
 
 const store = useHydrometerStore()
+const toast = useToastStore()
 
 const form = ref({
   code: '',
@@ -47,8 +49,7 @@ async function handleCreate() {
         formErrors.value[field] = messages[0] || 'Erro de validacao'
       }
     } else {
-      // eslint-disable-next-line no-console
-      console.error(error)
+      toast.error('Erro inesperado ao criar o hidrometro. Tente novamente.')
     }
   } finally {
     loading.value = false

@@ -12,15 +12,18 @@ import { api } from '@/services/api'
 vi.mock('@/services/api')
 
 const localStorageMock = {
-  getItem: vi.fn(),
-  setItem: vi.fn(),
-  removeItem: vi.fn(),
-}
+  getItem: vi.fn<(key: string) => string | null>(),
+  setItem: vi.fn<(key: string, value: string) => void>(),
+  removeItem: vi.fn<(key: string) => void>(),
+  clear: vi.fn<() => void>(),
+  key: vi.fn<(index: number) => string | null>(),
+  length: 0,
+} as unknown as Storage
 
 beforeEach(() => {
   setActivePinia(createPinia())
   vi.clearAllMocks()
-  localStorageMock.getItem.mockReturnValue(null)
+  vi.mocked(localStorageMock.getItem).mockReturnValue(null)
   vi.stubGlobal('localStorage', localStorageMock)
 })
 
