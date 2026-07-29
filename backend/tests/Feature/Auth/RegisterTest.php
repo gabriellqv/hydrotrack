@@ -15,8 +15,8 @@ it('registra um novo usuário e retorna token', function () {
     $response = $this->postJson('/api/auth/register', [
         'name' => 'João Operador',
         'email' => 'joao@hydrotrack.com',
-        'password' => 'senha-segura-123',
-        'password_confirmation' => 'senha-segura-123',
+        'password' => 'SenhaSegura123',
+        'password_confirmation' => 'SenhaSegura123',
     ]);
 
     $response->assertStatus(201)
@@ -32,8 +32,8 @@ it('rejeita registro com email já existente', function () {
     $response = $this->postJson('/api/auth/register', [
         'name' => 'Outro Usuário',
         'email' => 'duplicado@hydrotrack.com',
-        'password' => 'senha-segura-123',
-        'password_confirmation' => 'senha-segura-123',
+        'password' => 'SenhaSegura123',
+        'password_confirmation' => 'SenhaSegura123',
     ]);
 
     $response->assertStatus(422)
