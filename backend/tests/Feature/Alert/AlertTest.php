@@ -4,6 +4,7 @@ use App\Models\Alert;
 use App\Models\Hydrometer;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 
 uses(RefreshDatabase::class);
 
@@ -75,4 +76,45 @@ it('bloqueia listagem de alertas sem autenticacao', function () {
     $response = $this->getJson('/api/alerts');
 
     $response->assertStatus(401);
+});
+
+it('filtra alertas por tipo e status resolvido', function () {
+    $user = User::factory()->create();
+    $hydrometer = Hydrometer::factory()->create();
+
+    Alert::factory()->create([
+        'hydrometer_id' => $hydrometer->id,
+        'type' => 'offline',
+        'resolved' => false,
+    ]);
+
+    Alert::factory()->create([
+        'hydrometer_id' => $hydrometer->id,
+        'type' => 'high_consumption',
+        'resolved' => true,
+    ]);
+
+    $response = $this->actingAs($user)
+        ->getJson('/api/alerts?type=offline&resolved=false');
+
+    $response->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.type', 'offline')
+        ->assertJsonPath('data.0.resolved', false);
+});
+
+it('invalida cache do dashboard ao resolver um alerta', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    $alert = Alert::factory()->create(['resolved' => false]);
+
+    Cache::spy();
+
+    $this->actingAs($admin)
+        ->patchJson("/api/alerts/{$alert->id}/resolve")
+        ->assertOk();
+
+    Cache::shouldHaveReceived('forget')
+        ->with('dashboard:summary');
+    Cache::shouldHaveReceived('forget')
+        ->with('dashboard:map');
 });

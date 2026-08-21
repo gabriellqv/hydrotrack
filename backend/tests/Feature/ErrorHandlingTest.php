@@ -34,7 +34,7 @@ it('retorna 403 padronizado para usuario sem permissao', function () {
     $response = $this->actingAs($operator)->deleteJson("/api/hydrometers/{$hydrometer->id}");
 
     $response->assertStatus(403)
-        ->assertJsonPath('message', 'Acesso negado. Apenas administradores podem realizar esta ação.');
+        ->assertJsonPath('message', 'Acesso negado. Apenas administradores podem realizar esta acao.');
 });
 
 it('retorna 422 padronizado com erros de validacao', function () {
