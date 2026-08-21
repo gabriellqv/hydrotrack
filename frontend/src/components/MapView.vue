@@ -43,7 +43,9 @@ const DEFAULT_ZOOM = 14
  * @returns {string} Código hexadecimal da cor
  */
 function getMarkerColor(status: string): string {
-  return HYDROMETER_STATUS_COLORS[status as Hydrometer['status']] || HYDROMETER_STATUS_COLORS.offline
+  return (
+    HYDROMETER_STATUS_COLORS[status as Hydrometer['status']] || HYDROMETER_STATUS_COLORS.offline
+  )
 }
 
 /**
@@ -55,7 +57,8 @@ function buildPopupContent(h: Hydrometer): HTMLElement {
 
   const link = document.createElement('a')
   link.href = '#'
-  link.className = 'font-bold !text-primary-500 hover:!text-primary-400 hover:underline transition-colors block text-base mb-1 popup-link'
+  link.className =
+    'font-bold !text-primary-500 hover:!text-primary-400 hover:underline transition-colors block text-base mb-1 popup-link'
   link.textContent = h.code
   link.addEventListener('click', (e) => {
     e.preventDefault()

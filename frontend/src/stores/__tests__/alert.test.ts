@@ -55,7 +55,9 @@ describe('useAlertStore', () => {
     store.filters = { type: 'offline', resolved: 'false' }
     await store.fetchAlerts()
 
-    expect(api.get).toHaveBeenCalledWith('/alerts?type=offline&resolved=false', { signal: undefined })
+    expect(api.get).toHaveBeenCalledWith('/alerts?type=offline&resolved=false', {
+      signal: undefined,
+    })
   })
 
   it('resolve um alerta e recarrega a lista', async () => {
