@@ -42,6 +42,8 @@ class AlertController extends Controller
      */
     public function resolve(Alert $alert): JsonResponse
     {
+        $this->authorize('resolve', $alert);
+
         try {
             $updated = $this->service->resolve($alert);
         } catch (\RuntimeException $e) {

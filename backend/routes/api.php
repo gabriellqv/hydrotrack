@@ -47,5 +47,5 @@ Route::middleware(['auth:sanctum', 'throttle:120,1'])->group(function () {
 
     // Alertas
     Route::get('/alerts', [AlertController::class, 'index']);
-    Route::patch('/alerts/{alert}/resolve', [AlertController::class, 'resolve']);
+    Route::patch('/alerts/{alert}/resolve', [AlertController::class, 'resolve'])->middleware('admin');
 });

@@ -7,6 +7,8 @@ use App\Models\Hydrometer;
 use App\Models\Reading;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Serviço de ingestão de leituras dos sensores IoT.
@@ -37,26 +39,34 @@ class ReadingService
      */
     public function ingest(array $payload): Reading
     {
-        $hydrometer = Hydrometer::where('code', $payload['hydrometer_code'])->firstOrFail();
+        return DB::transaction(function () use ($payload) {
+            $hydrometer = Hydrometer::where('code', $payload['hydrometer_code'])->firstOrFail();
 
-        $reading = Reading::create([
-            'hydrometer_id' => $hydrometer->id,
-            'value_m3' => $payload['value_m3'],
-            'reading_at' => Carbon::parse($payload['reading_at']),
-        ]);
+            $reading = Reading::create([
+                'hydrometer_id' => $hydrometer->id,
+                'value_m3' => $payload['value_m3'],
+                'reading_at' => Carbon::parse($payload['reading_at']),
+            ]);
 
-        $hydrometer->update([
-            'last_reading_at' => $reading->reading_at,
-            'status' => 'online',
-        ]);
+            $hydrometer->update([
+                'last_reading_at' => $reading->reading_at,
+                'status' => 'online',
+            ]);
 
-        if ($payload['value_m3'] > self::HIGH_CONSUMPTION_THRESHOLD) {
-            $this->createHighConsumptionAlert($hydrometer, $payload['value_m3']);
-        }
+            if ($payload['value_m3'] > self::HIGH_CONSUMPTION_THRESHOLD) {
+                $this->createHighConsumptionAlert($hydrometer, $payload['value_m3']);
+            }
 
-        DashboardService::invalidateCache();
+            DashboardService::invalidateCache();
 
-        return $reading;
+            Log::info('Leitura ingerida com sucesso', [
+                'hydrometer_id' => $hydrometer->id,
+                'reading_id' => $reading->id,
+                'value_m3' => $payload['value_m3'],
+            ]);
+
+            return $reading;
+        });
     }
 
     /**
@@ -72,11 +82,18 @@ class ReadingService
     {
         $hydrometer->update(['status' => 'alert']);
 
-        Alert::create([
+        $alert = Alert::create([
             'hydrometer_id' => $hydrometer->id,
             'type' => 'high_consumption',
             'message' => "Consumo de {$value} m³ detectado em {$hydrometer->code} "
                 ."({$hydrometer->neighborhood}). Limiar: ".self::HIGH_CONSUMPTION_THRESHOLD.' m³.',
+        ]);
+
+        Log::warning('Alerta de alto consumo gerado', [
+            'hydrometer_id' => $hydrometer->id,
+            'alert_id' => $alert->id,
+            'value_m3' => $value,
+            'threshold_m3' => self::HIGH_CONSUMPTION_THRESHOLD,
         ]);
     }
 }

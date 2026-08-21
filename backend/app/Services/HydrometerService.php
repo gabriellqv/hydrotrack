@@ -92,4 +92,30 @@ class HydrometerService
     {
         return $hydrometer->delete();
     }
+
+    /**
+     * Retorna os detalhes de um hidrômetro com alertas recentes e dados de consumo.
+     *
+     * @param  Hydrometer  $hydrometer  Instância do hidrômetro
+     * @param  int  $days  Período em dias para o gráfico de consumo
+     */
+    public function getDetails(Hydrometer $hydrometer, int $days): Hydrometer
+    {
+        $days = min(max($days, 1), 365);
+
+        $hydrometer->load([
+            'alerts' => function ($q) {
+                $q->latest()->limit(10);
+            },
+        ]);
+
+        $hydrometer->chart_data = $hydrometer->readings()
+            ->selectRaw('DATE(reading_at) as date, SUM(value_m3) as total_m3')
+            ->where('reading_at', '>=', now()->subDays($days))
+            ->groupByRaw('DATE(reading_at)')
+            ->orderByRaw('DATE(reading_at)')
+            ->get();
+
+        return $hydrometer;
+    }
 }
