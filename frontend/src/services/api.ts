@@ -1,4 +1,5 @@
 import axios, { type AxiosInstance, type AxiosError } from 'axios'
+import type { Router } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import router from '@/router'
 
@@ -51,35 +52,43 @@ function createApiClient(): AxiosInstance {
   // Interceptor de response: trata 401 (token expirado/invalido)
   client.interceptors.response.use(
     (response) => response,
-    (error: AxiosError<{ message: string; errors?: Record<string, string[]> }>) => {
-      if (error.response?.status === 401 && error.config?.url !== '/auth/logout') {
-        const authStore = useAuthStore()
-        authStore.logout()
-        router.push({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } })
-      }
-
-      const status = error.response?.status || 500
-      const errors = error.response?.data?.errors
-
-      /** Mensagens amigáveis por status — nunca expõe detalhes técnicos ao usuário */
-      const friendlyMessages: Record<number, string> = {
-        400: 'Requisição inválida. Verifique os dados informados.',
-        401: 'Credenciais inválidas. Verifique seu e-mail e senha.',
-        403: 'Você não tem permissão para realizar esta ação.',
-        404: 'Recurso não encontrado.',
-        422: error.response?.data?.message || 'Erro de validação. Verifique os campos.',
-        429: 'Muitas tentativas. Aguarde um momento e tente novamente.',
-      }
-
-      const message =
-        friendlyMessages[status] ||
-        'Erro inesperado na comunicação com o servidor. Tente novamente.'
-
-      throw new ApiError(message, status, errors)
-    },
+    createResponseErrorHandler(() => ({ authStore: useAuthStore(), router })),
   )
 
   return client
+}
+
+export function createResponseErrorHandler(
+  resolveDependencies: () => { authStore: ReturnType<typeof useAuthStore>; router: Router },
+) {
+  return (error: AxiosError<{ message: string; errors?: Record<string, string[]> }>) => {
+    if (error.response?.status === 401 && error.config?.url !== '/auth/logout') {
+      const { authStore, router } = resolveDependencies()
+      authStore.logout()
+      router.push({
+        name: 'login',
+        query: { redirect: router.currentRoute.value.fullPath },
+      })
+    }
+
+    const status = error.response?.status || 500
+    const errors = error.response?.data?.errors
+
+    /** Mensagens amigáveis por status — nunca expõe detalhes técnicos ao usuário */
+    const friendlyMessages: Record<number, string> = {
+      400: 'Requisição inválida. Verifique os dados informados.',
+      401: 'Credenciais inválidas. Verifique seu e-mail e senha.',
+      403: 'Você não tem permissão para realizar esta ação.',
+      404: 'Recurso não encontrado.',
+      422: error.response?.data?.message || 'Erro de validação. Verifique os campos.',
+      429: 'Muitas tentativas. Aguarde um momento e tente novamente.',
+    }
+
+    const message =
+      friendlyMessages[status] || 'Erro inesperado na comunicação com o servidor. Tente novamente.'
+
+    throw new ApiError(message, status, errors)
+  }
 }
 
 /** Instância global do cliente API */
