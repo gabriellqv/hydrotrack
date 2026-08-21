@@ -54,20 +54,7 @@ class HydrometerController extends Controller
     {
         $days = (int) $request->query('days', 30);
 
-        $hydrometer->load([
-            'alerts' => function ($q) {
-                $q->latest()->limit(10);
-            },
-        ]);
-
-        $hydrometer->chart_data = $hydrometer->readings()
-            ->selectRaw('DATE(reading_at) as date, SUM(value_m3) as total_m3')
-            ->where('reading_at', '>=', now()->subDays($days))
-            ->groupByRaw('DATE(reading_at)')
-            ->orderByRaw('DATE(reading_at)')
-            ->get();
-
-        return new HydrometerResource($hydrometer);
+        return new HydrometerResource($this->service->getDetails($hydrometer, $days));
     }
 
     /**

@@ -1,6 +1,6 @@
 # HydroTrack
 
-![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white) ![Vue.js](https://img.shields.io/badge/Vue.js-3-4FC08D?logo=vuedotjs&logoColor=white) ![Pinia](https://img.shields.io/badge/Pinia-3-ffd859?logo=vuedotjs&logoColor=white) ![MySQL](https://img.shields.io/badge/MySQL-8-4479A1?logo=mysql&logoColor=white) ![TypeScript](https://img.shields.io/badge/TypeScript-5-007ACC?logo=typescript&logoColor=white) ![PHP](https://img.shields.io/badge/PHP-8.5-777BB4?logo=php&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
+![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white) ![Vue.js](https://img.shields.io/badge/Vue.js-3-4FC08D?logo=vuedotjs&logoColor=white) ![Pinia](https://img.shields.io/badge/Pinia-3-ffd859?logo=vuedotjs&logoColor=white) ![MySQL](https://img.shields.io/badge/MySQL-8-4479A1?logo=mysql&logoColor=white) ![TypeScript](https://img.shields.io/badge/TypeScript-5-007ACC?logo=typescript&logoColor=white) ![PHP](https://img.shields.io/badge/PHP-8.4-777BB4?logo=php&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
@@ -155,7 +155,7 @@ hydrotrack/
 
 ### Pre-requisitos
 
-1. PHP 8.5 ou versao superior (com extensoes: pdo_mysql, mbstring, curl, zip).
+1. PHP 8.4 ou versao superior (com extensoes: pdo_mysql, mbstring, curl, zip).
 2. Composer 2.2 ou versao superior.
 3. Node.js 20 ou versao superior.
 4. Docker e utilitario Docker Compose (opcional).

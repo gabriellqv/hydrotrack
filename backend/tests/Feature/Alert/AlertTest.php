@@ -8,12 +8,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class);
 
 /**
- * Testes de integração para os endpoints de alertas.
+ * Testes de integracao para os endpoints de alertas.
  *
- * Validam listagem paginada, resolução de alertas e
- * proteção de rotas contra acesso não autenticado.
+ * Validam listagem paginada, resolucao de alertas e
+ * protecao de rotas contra acesso nao autenticado.
  */
-it('lista alertas paginados para usuário autenticado', function () {
+it('lista alertas paginados para usuario autenticado', function () {
     $user = User::factory()->create();
     $hydrometer = Hydrometer::factory()->create();
 
@@ -31,11 +31,11 @@ it('lista alertas paginados para usuário autenticado', function () {
         ->assertJsonCount(3, 'data');
 });
 
-it('marca um alerta como resolvido', function () {
-    $user = User::factory()->create();
+it('permite que um admin resolva um alerta', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
     $alert = Alert::factory()->create(['resolved' => false]);
 
-    $response = $this->actingAs($user)
+    $response = $this->actingAs($admin)
         ->patchJson("/api/alerts/{$alert->id}/resolve");
 
     $response->assertOk()
@@ -45,11 +45,24 @@ it('marca um alerta como resolvido', function () {
     expect($alert->fresh()->resolved_at)->not->toBeNull();
 });
 
+it('bloqueia operadores de resolverem alertas', function () {
+    $operator = User::factory()->create(['role' => 'operator']);
+    $alert = Alert::factory()->create(['resolved' => false]);
+
+    $response = $this->actingAs($operator)
+        ->patchJson("/api/alerts/{$alert->id}/resolve");
+
+    $response->assertStatus(403);
+
+    expect($alert->fresh()->resolved)->toBeFalse();
+    expect($alert->fresh()->resolved_at)->toBeNull();
+});
+
 it('rejeita resolucao de alerta ja resolvido com 409', function () {
-    $user = User::factory()->create();
+    $admin = User::factory()->create(['role' => 'admin']);
     $alert = Alert::factory()->create(['resolved' => true, 'resolved_at' => now()]);
 
-    $response = $this->actingAs($user)
+    $response = $this->actingAs($admin)
         ->patchJson("/api/alerts/{$alert->id}/resolve");
 
     $response->assertStatus(409)
@@ -58,7 +71,7 @@ it('rejeita resolucao de alerta ja resolvido com 409', function () {
     expect($alert->fresh()->resolved_at)->not->toBeNull();
 });
 
-it('bloqueia listagem de alertas sem autenticação', function () {
+it('bloqueia listagem de alertas sem autenticacao', function () {
     $response = $this->getJson('/api/alerts');
 
     $response->assertStatus(401);

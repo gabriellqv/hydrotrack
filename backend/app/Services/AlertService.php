@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Alert;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Servico responsavel pela logica de negocio de alertas.
@@ -54,6 +55,11 @@ class AlertService
         ]);
 
         DashboardService::invalidateCache();
+
+        Log::info('Alerta resolvido', [
+            'alert_id' => $alert->id,
+            'hydrometer_id' => $alert->hydrometer_id,
+        ]);
 
         return $alert->fresh('hydrometer');
     }

@@ -2,6 +2,11 @@
 # Dockerfile do Backend (Laravel 13 / PHP 8.4)
 #
 # Multi-stage build com imagem Alpine para manter o tamanho
+# final abaixo de 100MB. Inclui as extensoes obrigatorias
+# do Laravel e um entrypoint que executa migrations + seed
+# automaticamente na primeira inicializacao.
+# ============================================================
+# Multi-stage build com imagem Alpine para manter o tamanho
 # final abaixo de 100MB. Inclui as extensões obrigatórias
 # do Laravel e um entrypoint que executa migrations + seed
 # automaticamente na primeira inicialização.

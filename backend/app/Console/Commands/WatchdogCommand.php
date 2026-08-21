@@ -7,6 +7,7 @@ use App\Models\Hydrometer;
 use App\Services\DashboardService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Job de vigilância que detecta hidrômetros sem comunicação.
@@ -85,6 +86,12 @@ class WatchdogCommand extends Command
         $count = $ids->count();
 
         DashboardService::invalidateCache();
+
+        Log::info('Watchdog marcou hidrometros como offline', [
+            'count' => $count,
+            'threshold_hours' => $thresholdHours,
+            'hydrometer_ids' => $ids->toArray(),
+        ]);
 
         $this->warn("{$count} hidrômetro(s) marcado(s) como offline.");
 
