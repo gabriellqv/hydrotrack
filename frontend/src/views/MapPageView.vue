@@ -29,6 +29,7 @@ const mapViewRef = ref<InstanceType<typeof MapView> | null>(null)
 /** Intervalo de polling em milissegundos (5s) */
 const POLLING_INTERVAL = 5_000
 let pollingTimer: ReturnType<typeof setInterval> | null = null
+let abortController: AbortController | null = null
 let focusTimeout: ReturnType<typeof setTimeout> | null = null
 
 const filteredHydrometers = computed(() => {
@@ -36,18 +37,35 @@ const filteredHydrometers = computed(() => {
   return store.mapHydrometers.filter((h) => h.status === activeFilter.value)
 })
 
-const filterCounts = computed(() => ({
-  all: store.mapHydrometers.length,
-  online: store.mapHydrometers.filter((h) => h.status === 'online').length,
-  offline: store.mapHydrometers.filter((h) => h.status === 'offline').length,
-  alert: store.mapHydrometers.filter((h) => h.status === 'alert').length,
-}))
+const filterCounts = computed(() => {
+  const all = store.mapHydrometers.length
+  return {
+    all,
+    online: store.mapHydrometers.filter((h) => h.status === 'online').length,
+    offline: store.mapHydrometers.filter((h) => h.status === 'offline').length,
+    alert: store.mapHydrometers.filter((h) => h.status === 'alert').length,
+  }
+})
 
-await store.fetchMap()
+function createAbortController() {
+  abortController?.abort()
+  abortController = new AbortController()
+  return abortController
+}
+
+async function refreshMap() {
+  const controller = createAbortController()
+  await store.fetchMap(controller.signal).catch(() => {
+    // Erros ja sao tratados pela store
+  })
+}
+
+await refreshMap()
+
 onMounted(() => {
-  pollingTimer = setInterval(() => store.fetchMap(), POLLING_INTERVAL)
+  pollingTimer = setInterval(refreshMap, POLLING_INTERVAL)
 
-  // Verifica se o usuário chegou do botão "Ver no Mapa" na view de Detalhes
+  // Verifica se o usuario chegou do botao "Ver no Mapa" na view de Detalhes
   const targetId = Number(route.query.hydrometer_id)
   if (targetId) {
     const target = store.mapHydrometers.find((h) => h.id === targetId)
@@ -59,17 +77,33 @@ onMounted(() => {
       }, 500)
     }
   }
+
+  document.addEventListener('visibilitychange', handleVisibilityChange)
 })
 
-onUnmounted(() => {
+function stopPolling() {
   if (pollingTimer) {
     clearInterval(pollingTimer)
     pollingTimer = null
   }
+}
+
+function handleVisibilityChange() {
+  if (document.hidden) {
+    stopPolling()
+  } else if (!pollingTimer) {
+    pollingTimer = setInterval(refreshMap, POLLING_INTERVAL)
+  }
+}
+
+onUnmounted(() => {
+  stopPolling()
+  abortController?.abort()
   if (focusTimeout) {
     clearTimeout(focusTimeout)
     focusTimeout = null
   }
+  document.removeEventListener('visibilitychange', handleVisibilityChange)
 })
 
 function handleMarkerClick(hydrometer: Hydrometer) {

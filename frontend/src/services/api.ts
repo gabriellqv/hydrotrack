@@ -39,7 +39,7 @@ function createApiClient(): AxiosInstance {
     },
   })
 
-  // Interceptor de request: injeta o token de autenticação
+  // Interceptor de request: injeta o token de autenticacao
   client.interceptors.request.use((config) => {
     const authStore = useAuthStore()
     if (authStore.token) {
@@ -48,7 +48,7 @@ function createApiClient(): AxiosInstance {
     return config
   })
 
-  // Interceptor de response: trata 401 (token expirado/inválido)
+  // Interceptor de response: trata 401 (token expirado/invalido)
   client.interceptors.response.use(
     (response) => response,
     (error: AxiosError<{ message: string; errors?: Record<string, string[]> }>) => {

@@ -25,29 +25,31 @@ const props = defineProps<{
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
+import { HYDROMETER_STATUS_CONFIG } from '@/constants'
+
 const statusItems = computed(() => {
   const total = props.summary.online + props.summary.offline + props.summary.alert
   return [
     {
-      label: 'Online',
+      label: HYDROMETER_STATUS_CONFIG.online.label,
       value: props.summary.online,
       pct: total > 0 ? ((props.summary.online / total) * 100).toFixed(1) : '0',
-      color: '#22c55e',
-      dotClass: 'bg-green-500',
+      color: HYDROMETER_STATUS_CONFIG.online.color,
+      dotClass: HYDROMETER_STATUS_CONFIG.online.dotClass,
     },
     {
-      label: 'Offline',
+      label: HYDROMETER_STATUS_CONFIG.offline.label,
       value: props.summary.offline,
       pct: total > 0 ? ((props.summary.offline / total) * 100).toFixed(1) : '0',
-      color: '#64748b',
-      dotClass: 'bg-slate-500',
+      color: HYDROMETER_STATUS_CONFIG.offline.color,
+      dotClass: HYDROMETER_STATUS_CONFIG.offline.dotClass,
     },
     {
-      label: 'Em Alerta',
+      label: HYDROMETER_STATUS_CONFIG.alert.label,
       value: props.summary.alert,
       pct: total > 0 ? ((props.summary.alert / total) * 100).toFixed(1) : '0',
-      color: '#ef4444',
-      dotClass: 'bg-red-500',
+      color: HYDROMETER_STATUS_CONFIG.alert.color,
+      dotClass: HYDROMETER_STATUS_CONFIG.alert.dotClass,
     },
   ]
 })

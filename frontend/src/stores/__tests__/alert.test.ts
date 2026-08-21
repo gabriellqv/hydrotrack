@@ -45,7 +45,7 @@ describe('useAlertStore', () => {
 
     expect(store.alerts).toEqual(mockAlerts)
     expect(store.loading).toBe(false)
-    expect(api.get).toHaveBeenCalledWith('/alerts')
+    expect(api.get).toHaveBeenCalledWith('/alerts', { signal: undefined })
   })
 
   it('aplica filtros de tipo e resolucao na URL', async () => {
@@ -55,7 +55,9 @@ describe('useAlertStore', () => {
     store.filters = { type: 'offline', resolved: 'false' }
     await store.fetchAlerts()
 
-    expect(api.get).toHaveBeenCalledWith('/alerts?type=offline&resolved=false')
+    expect(api.get).toHaveBeenCalledWith('/alerts?type=offline&resolved=false', {
+      signal: undefined,
+    })
   })
 
   it('resolve um alerta e recarrega a lista', async () => {
@@ -66,6 +68,6 @@ describe('useAlertStore', () => {
     await store.resolveAlert(1)
 
     expect(api.patch).toHaveBeenCalledWith('/alerts/1/resolve')
-    expect(api.get).toHaveBeenCalledWith('/alerts')
+    expect(api.get).toHaveBeenCalledWith('/alerts', { signal: undefined })
   })
 })

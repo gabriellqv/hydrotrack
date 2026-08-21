@@ -3,7 +3,7 @@ import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import { HYDROMETER_STATUS_LABELS } from '@/constants'
+import { HYDROMETER_STATUS_LABELS, HYDROMETER_STATUS_COLORS } from '@/constants'
 import type { Hydrometer } from '@/types'
 
 /**
@@ -43,12 +43,48 @@ const DEFAULT_ZOOM = 14
  * @returns {string} Código hexadecimal da cor
  */
 function getMarkerColor(status: string): string {
-  const colors: Record<string, string> = {
-    online: '#22c55e', // Verde — funcionando normalmente
-    offline: '#94a3b8', // Cinza — sem comunicação
-    alert: '#ef4444', // Vermelho — consumo anormal
-  }
-  return colors[status] || '#94a3b8'
+  return (
+    HYDROMETER_STATUS_COLORS[status as Hydrometer['status']] || HYDROMETER_STATUS_COLORS.offline
+  )
+}
+
+/**
+ * Cria o conteudo seguro do popup usando text nodes,
+ * evitando XSS via dados dinamicos do backend.
+ */
+function buildPopupContent(h: Hydrometer): HTMLElement {
+  const container = document.createElement('div')
+
+  const link = document.createElement('a')
+  link.href = '#'
+  link.className =
+    'font-bold !text-primary-500 hover:!text-primary-400 hover:underline transition-colors block text-base mb-1 popup-link'
+  link.textContent = h.code
+  link.addEventListener('click', (e) => {
+    e.preventDefault()
+    router.push({ name: 'hydrometer-detail', params: { id: h.id } })
+  })
+  container.appendChild(link)
+
+  const address = document.createElement('div')
+  address.textContent = h.address
+  container.appendChild(address)
+
+  const neighborhood = document.createElement('em')
+  neighborhood.className = 'text-xs opacity-75'
+  neighborhood.textContent = h.neighborhood
+  container.appendChild(neighborhood)
+
+  const statusLine = document.createElement('div')
+  statusLine.textContent = 'Status: '
+
+  const statusStrong = document.createElement('strong')
+  statusStrong.style.color = getMarkerColor(h.status)
+  statusStrong.textContent = HYDROMETER_STATUS_LABELS[h.status].toUpperCase()
+  statusLine.appendChild(statusStrong)
+  container.appendChild(statusLine)
+
+  return container
 }
 
 /**
@@ -91,26 +127,7 @@ function renderMarkers() {
       icon: createIcon(getMarkerColor(h.status), h.status),
     })
 
-    const popupContent = document.createElement('div')
-    popupContent.innerHTML = `
-      <a href="#" class="font-bold !text-primary-500 hover:!text-primary-400 hover:underline transition-colors block text-base mb-1 popup-link">
-        ${h.code}
-      </a>
-      ${h.address}<br>
-      <em class="text-xs opacity-75">${h.neighborhood}</em><br>
-      Status: <strong style="color: ${getMarkerColor(h.status)};">${HYDROMETER_STATUS_LABELS[h.status].toUpperCase()}</strong>
-    `
-
-    // Ocultar o outline padrão e adicionar a ação do Vue Router no clique
-    const linkEl = popupContent.querySelector('.popup-link')
-    if (linkEl) {
-      linkEl.addEventListener('click', (e) => {
-        e.preventDefault()
-        router.push({ name: 'hydrometer-detail', params: { id: h.id } })
-      })
-    }
-
-    marker.bindPopup(popupContent)
+    marker.bindPopup(buildPopupContent(h))
 
     marker.on('click', () => emit('marker-click', h))
     markersLayer!.addLayer(marker)

@@ -55,7 +55,7 @@ describe('useDashboardStore', () => {
 
     expect(store.consumption).toEqual(mockConsumption)
     expect(store.selectedDays).toBe(30)
-    expect(api.get).toHaveBeenCalledWith('/dashboard/consumption?days=30')
+    expect(api.get).toHaveBeenCalledWith('/dashboard/consumption?days=30', { signal: undefined })
   })
 
   it('altera periodo ao carregar consumo', async () => {
@@ -65,7 +65,7 @@ describe('useDashboardStore', () => {
     await store.fetchConsumption(90)
 
     expect(store.selectedDays).toBe(90)
-    expect(api.get).toHaveBeenCalledWith('/dashboard/consumption?days=90')
+    expect(api.get).toHaveBeenCalledWith('/dashboard/consumption?days=90', { signal: undefined })
   })
 
   it('carrega hidrometros para o mapa', async () => {

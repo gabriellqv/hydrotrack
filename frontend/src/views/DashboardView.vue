@@ -30,38 +30,68 @@ const chartTitle = computed(() => {
   return labels[store.selectedDays] || 'Consumo Diário'
 })
 
-/** Altera o período e recarrega os dados de consumo */
+/** Altera o periodo e recarrega os dados de consumo */
 async function changePeriod(days: 7 | 30 | 90) {
   await store.fetchConsumption(days)
 }
 
-/** Intervalo de polling em milissegundos (15s: equilíbrio entre tempo real e tráfego) */
+/** Intervalo de polling em milissegundos (15s: equilibrio entre tempo real e trafego) */
 const POLLING_INTERVAL = 15_000
 
 let pollingTimer: ReturnType<typeof setInterval> | null = null
+let abortController: AbortController | null = null
+
+function createAbortController() {
+  abortController?.abort()
+  abortController = new AbortController()
+  return abortController
+}
 
 /** Busca todos os dados do dashboard */
 async function refreshDashboard() {
+  const controller = createAbortController()
   await Promise.all([
-    store.fetchSummary(),
-    store.fetchConsumption(),
-    store.fetchMap(),
-    store.fetchAlerts(),
-  ])
+    store.fetchSummary(controller.signal),
+    store.fetchConsumption(undefined, controller.signal),
+    store.fetchMap(controller.signal),
+    store.fetchAlerts(controller.signal),
+  ]).catch(() => {
+    // Erros ja sao tratados e notificados pelas stores
+  })
 }
 
 // Top level await to trigger Suspense
 await refreshDashboard()
 
-onMounted(() => {
+function startPolling() {
+  if (pollingTimer) return
   pollingTimer = setInterval(refreshDashboard, POLLING_INTERVAL)
-})
+}
 
-onUnmounted(() => {
+function stopPolling() {
   if (pollingTimer) {
     clearInterval(pollingTimer)
     pollingTimer = null
   }
+}
+
+function handleVisibilityChange() {
+  if (document.hidden) {
+    stopPolling()
+  } else {
+    startPolling()
+  }
+}
+
+onMounted(() => {
+  startPolling()
+  document.addEventListener('visibilitychange', handleVisibilityChange)
+})
+
+onUnmounted(() => {
+  stopPolling()
+  abortController?.abort()
+  document.removeEventListener('visibilitychange', handleVisibilityChange)
 })
 
 const summaryCards = [
