@@ -58,7 +58,7 @@ const typeMap: Record<string, { variant: 'danger' | 'warning' | 'muted'; label: 
         </p>
         <RouterLink
           v-if="alert.hydrometer"
-          :to="{ name: 'hydrometers' }"
+          :to="{ name: 'hydrometer-detail', params: { id: alert.hydrometer.id } }"
           class="text-xs text-primary-400 hover:text-primary-300 font-mono transition-colors"
         >
           {{ alert.hydrometer.code }}

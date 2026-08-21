@@ -13,10 +13,12 @@ const props = defineProps<{
   status: 'online' | 'offline' | 'alert'
 }>()
 
+import { HYDROMETER_STATUS_CONFIG } from '@/constants'
+
 const statusMap = {
-  online: { variant: 'success' as const, label: 'Online' },
-  offline: { variant: 'muted' as const, label: 'Offline' },
-  alert: { variant: 'danger' as const, label: 'Alerta' },
+  online: { variant: 'success' as const, label: HYDROMETER_STATUS_CONFIG.online.label },
+  offline: { variant: 'muted' as const, label: HYDROMETER_STATUS_CONFIG.offline.label },
+  alert: { variant: 'danger' as const, label: HYDROMETER_STATUS_CONFIG.alert.label },
 }
 </script>
 
