@@ -98,7 +98,6 @@ class HydrometerService
      *
      * @param  Hydrometer  $hydrometer  Instância do hidrômetro
      * @param  int  $days  Período em dias para o gráfico de consumo
-     * @return Hydrometer
      */
     public function getDetails(Hydrometer $hydrometer, int $days): Hydrometer
     {
