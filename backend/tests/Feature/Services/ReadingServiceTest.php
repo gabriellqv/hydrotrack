@@ -72,16 +72,54 @@ it('nao gera alerta quando value_m3 e exatamente 10', function () {
     $this->assertDatabaseCount('alerts', 0);
 });
 
-it('nao gera alerta quando value_m3 e menor que 10', function () {
+it('gera alerta de leitura zerada quando value_m3 e igual a 0', function () {
     $hydrometer = Hydrometer::factory()->create(['status' => 'online']);
 
     $this->service->ingest([
         'hydrometer_code' => $hydrometer->code,
-        'value_m3' => 9.999,
+        'value_m3' => 0.0,
+        'reading_at' => now()->toISOString(),
+    ]);
+
+    $hydrometer->refresh();
+    expect($hydrometer->status)->toBe('alert');
+
+    $this->assertDatabaseHas('alerts', [
+        'hydrometer_id' => $hydrometer->id,
+        'type' => 'zero_reading',
+        'resolved' => false,
+    ]);
+});
+
+it('prioriza alerta de leitura zerada sobre alto consumo quando value_m3 e 0', function () {
+    $hydrometer = Hydrometer::factory()->create(['status' => 'online']);
+
+    $this->service->ingest([
+        'hydrometer_code' => $hydrometer->code,
+        'value_m3' => 0.0,
+        'reading_at' => now()->toISOString(),
+    ]);
+
+    $this->assertDatabaseCount('alerts', 1);
+    $this->assertDatabaseMissing('alerts', [
+        'hydrometer_id' => $hydrometer->id,
+        'type' => 'high_consumption',
+    ]);
+});
+
+it('nao gera alerta de leitura zerada para valores proximos de zero', function () {
+    $hydrometer = Hydrometer::factory()->create(['status' => 'online']);
+
+    $this->service->ingest([
+        'hydrometer_code' => $hydrometer->code,
+        'value_m3' => 0.001,
         'reading_at' => now()->toISOString(),
     ]);
 
     $this->assertDatabaseCount('alerts', 0);
+
+    $hydrometer->refresh();
+    expect($hydrometer->status)->toBe('online');
 });
 
 it('lanca excecao quando codigo de hidrometro nao existe', function () {

@@ -29,7 +29,7 @@ class ReadingService
      * 1. Localiza o hidrômetro pelo código.
      * 2. Persiste a leitura no banco.
      * 3. Atualiza o timestamp e status do hidrômetro.
-     * 4. Verifica se o consumo ultrapassou o limiar de alerta.
+     * 4. Verifica se o consumo zerou ou ultrapassou o limiar de alerta.
      * 5. Invalida o cache do dashboard.
      *
      * @param  array{hydrometer_code: string, value_m3: float, reading_at: string}  $payload
@@ -53,7 +53,9 @@ class ReadingService
                 'status' => 'online',
             ]);
 
-            if ($payload['value_m3'] > self::HIGH_CONSUMPTION_THRESHOLD) {
+            if ($payload['value_m3'] == 0.0) {
+                $this->createZeroReadingAlert($hydrometer);
+            } elseif ($payload['value_m3'] > self::HIGH_CONSUMPTION_THRESHOLD) {
                 $this->createHighConsumptionAlert($hydrometer, $payload['value_m3']);
             }
 
@@ -67,6 +69,31 @@ class ReadingService
 
             return $reading;
         });
+    }
+
+    /**
+     * Gera um alerta de leitura zerada para o hidrômetro.
+     *
+     * Altera o status do dispositivo para 'alert' e persiste um registro
+     * na tabela de alertas para acompanhamento pelo operador.
+     *
+     * @param  Hydrometer  $hydrometer  Dispositivo que reportou leitura zerada
+     */
+    private function createZeroReadingAlert(Hydrometer $hydrometer): void
+    {
+        $hydrometer->update(['status' => 'alert']);
+
+        $alert = Alert::create([
+            'hydrometer_id' => $hydrometer->id,
+            'type' => 'zero_reading',
+            'message' => "Leitura zerada detectada em {$hydrometer->code} ({$hydrometer->neighborhood}). "
+                .'Possivel falha no sensor ou medidor travado.',
+        ]);
+
+        Log::warning('Alerta de leitura zerada gerado', [
+            'hydrometer_id' => $hydrometer->id,
+            'alert_id' => $alert->id,
+        ]);
     }
 
     /**
