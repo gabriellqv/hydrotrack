@@ -1,0 +1,49 @@
+# Pipeline de Deploy Contínuo — HydroTrack
+#
+# Disparada automaticamente a cada push na branch main.
+# Realiza o deploy do backend no Render via webhook e aguarda o
+# health check. O deploy do frontend é feito pela integração nativa
+# da Vercel com o GitHub, portanto não é necessário incluí-lo aqui.
+
+name: Deploy
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy-backend:
+    name: Deploy do backend no Render
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Disparar deploy no Render
+        run: curl -fsS -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+
+      - name: Aguardar deploy e verificar health check
+        run: |
+          set -e
+          echo "Aguardando 30 segundos para o deploy inicializar..."
+          sleep 30
+
+          for i in $(seq 1 30); do
+            status=$(curl -fsS -o /dev/null -w "%{http_code}" "${{ secrets.BACKEND_HEALTH_URL }}/up" || echo "000")
+            echo "Tentativa $i/30 - HTTP status: $status"
+
+            if [ "$status" = "200" ]; then
+              echo "Health check passou com sucesso."
+              exit 0
+            fi
+
+            sleep 10
+          done
+
+          echo "Health check falhou apos 5 minutos."
+          exit 1
