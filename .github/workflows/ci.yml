@@ -101,6 +101,10 @@ jobs:
       - name: Verificar code style (Pint)
         run: vendor/bin/pint --test
 
+      - name: Verificar vulnerabilidades em dependencias (Composer Audit)
+        run: composer audit --no-dev --locked
+        continue-on-error: true
+
       - name: Executar testes (Pest)
         run: vendor/bin/pest --colors=always
 
@@ -139,6 +143,10 @@ jobs:
 
       - name: Verificar tipos (TypeScript)
         run: npm run type-check
+
+      - name: Verificar vulnerabilidades em dependencias (npm audit)
+        run: npm audit --audit-level=high
+        continue-on-error: true
 
       - name: Executar testes unitários
         run: npm run test:unit -- --run
