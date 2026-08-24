@@ -6,7 +6,7 @@ import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseModal from '@/components/ui/BaseModal.vue'
 import { ApiError } from '@/services/api'
 import { useToastStore } from '@/stores/toast'
-import type { Hydrometer } from '@/types'
+import type { Hydrometer, UpdateHydrometerPayload } from '@/types'
 
 /**
  * Modal de edicao de hidrometro.
@@ -35,6 +35,31 @@ const editForm = ref({
 const editFormErrors = ref<Record<string, string>>({})
 const loading = ref(false)
 
+function parseCoordinate(value: string): number | null {
+  const trimmed = value.trim()
+  if (trimmed === '') return null
+  const parsed = Number(trimmed)
+  return Number.isFinite(parsed) ? parsed : null
+}
+
+function buildPayload(): UpdateHydrometerPayload | null {
+  const latitude = parseCoordinate(editForm.value.latitude)
+  const longitude = parseCoordinate(editForm.value.longitude)
+
+  if (latitude === null || longitude === null) {
+    return null
+  }
+
+  return {
+    code: editForm.value.code,
+    latitude,
+    longitude,
+    address: editForm.value.address,
+    neighborhood: editForm.value.neighborhood,
+    type: editForm.value.type,
+  }
+}
+
 watch(
   () => props.hydrometer,
   (h) => {
@@ -55,12 +80,15 @@ async function handleEdit() {
   editFormErrors.value = {}
   loading.value = true
 
+  const payload = buildPayload()
+  if (!payload) {
+    toast.error('Latitude e longitude devem ser numeros validos.')
+    loading.value = false
+    return
+  }
+
   try {
-    await store.updateHydrometer(props.hydrometer.id, {
-      ...editForm.value,
-      latitude: editForm.value.latitude === '' ? '' : Number(editForm.value.latitude),
-      longitude: editForm.value.longitude === '' ? '' : Number(editForm.value.longitude),
-    } as unknown as Partial<Hydrometer>)
+    await store.updateHydrometer(props.hydrometer.id, payload)
 
     emit('close')
   } catch (error) {

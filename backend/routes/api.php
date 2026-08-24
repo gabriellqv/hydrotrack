@@ -15,9 +15,9 @@ use Illuminate\Support\Facades\Route;
 */
 Route::get('/health', [HealthController::class, 'check']);
 
-Route::prefix('auth')->group(function () {
-    Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
-    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
+Route::prefix('auth')->middleware('throttle:auth')->group(function () {
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
 });
 
 // Endpoint de ingestão M2M (autenticado via API key no header X-API-Key)
