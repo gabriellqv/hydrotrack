@@ -6,6 +6,13 @@
 
 name: CI
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches: [develop, main]
@@ -19,6 +26,7 @@ jobs:
   backend:
     name: Backend (Pint + Pest)
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     defaults:
       run:
         working-directory: backend
@@ -62,6 +70,7 @@ jobs:
   frontend:
     name: Frontend (Lint + Type Check)
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     defaults:
       run:
         working-directory: frontend
@@ -94,3 +103,9 @@ jobs:
 
       - name: Build de produção
         run: npm run build
+
+      - name: Upload do artifact do build
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist
