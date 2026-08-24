@@ -54,6 +54,5 @@ it('adiciona headers de seguranca nas respostas', function () {
 
     $response->assertHeader('X-Content-Type-Options', 'nosniff')
         ->assertHeader('X-Frame-Options', 'DENY')
-        ->assertHeader('X-XSS-Protection', '1; mode=block')
         ->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
 });

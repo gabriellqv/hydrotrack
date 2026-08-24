@@ -33,7 +33,7 @@ class IngestReadingRequest extends FormRequest
         return [
             'hydrometer_code' => ['required', 'string', 'exists:hydrometers,code'],
             'value_m3' => ['required', 'numeric', 'min:0'],
-            'reading_at' => ['required', 'date'],
+            'reading_at' => ['required', 'date', 'before_or_equal:now', 'after_or_equal:'.now()->subDay()->toDateString()],
         ];
     }
 

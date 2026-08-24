@@ -6,7 +6,6 @@ use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 /**
  * Seeder principal do banco de dados.
@@ -27,8 +26,7 @@ class DatabaseSeeder extends Seeder
         // Cria o usuário administrador padrão
         $adminPassword = env('ADMIN_SEED_PASSWORD');
         if (! $adminPassword) {
-            $adminPassword = Str::random(16);
-            $this->command->warn("ADMIN_SEED_PASSWORD nao definida. Admin criado com senha temporaria: {$adminPassword}");
+            throw new \RuntimeException('A variavel de ambiente ADMIN_SEED_PASSWORD deve ser definida para executar o seeder.');
         }
 
         User::firstOrCreate(
@@ -43,8 +41,7 @@ class DatabaseSeeder extends Seeder
         // Cria um operador de exemplo
         $operatorPassword = env('OPERATOR_SEED_PASSWORD');
         if (! $operatorPassword) {
-            $operatorPassword = Str::random(16);
-            $this->command->warn("OPERATOR_SEED_PASSWORD nao definida. Operador criado com senha temporaria: {$operatorPassword}");
+            throw new \RuntimeException('A variavel de ambiente OPERATOR_SEED_PASSWORD deve ser definida para executar o seeder.');
         }
 
         User::firstOrCreate(

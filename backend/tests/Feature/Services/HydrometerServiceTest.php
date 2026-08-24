@@ -2,8 +2,10 @@
 
 use App\Models\Hydrometer;
 use App\Models\Reading;
+use App\Services\DashboardService;
 use App\Services\HydrometerService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 
 uses(RefreshDatabase::class);
 
@@ -81,4 +83,26 @@ it('exclui um hidrômetro e suas leituras em cascata', function () {
 
     expect(Hydrometer::count())->toBe(0);
     expect(Reading::count())->toBe(0);
+});
+
+it('invalida o cache do dashboard ao excluir um hidrômetro', function () {
+    // Arrange: cria hidrômetro e popula cache do dashboard
+    $hydrometer = Hydrometer::factory()->create();
+
+    foreach (DashboardService::getConsumptionPeriods() as $days) {
+        Cache::put("dashboard:consumption:{$days}", ['cached' => true], 60);
+    }
+    Cache::put('dashboard:summary', ['cached' => true], 60);
+    Cache::put('dashboard:map', ['cached' => true], 300);
+
+    // Act: exclui o hidrômetro
+    $this->service->delete($hydrometer);
+
+    // Assert: nenhuma chave do dashboard deve existir no cache
+    expect(Cache::get('dashboard:summary'))->toBeNull();
+    expect(Cache::get('dashboard:map'))->toBeNull();
+
+    foreach (DashboardService::getConsumptionPeriods() as $days) {
+        expect(Cache::get("dashboard:consumption:{$days}"))->toBeNull();
+    }
 });
