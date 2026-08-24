@@ -52,14 +52,13 @@ class WatchdogCommand extends Command
         $thresholdHours = (int) $this->option('threshold');
         $cutoff = Carbon::now()->subHours($thresholdHours);
 
-        $staleHydrometers = Hydrometer::where('status', '!=', 'offline')
+        $staleQuery = Hydrometer::where('status', '!=', 'offline')
             ->where(function ($query) use ($cutoff) {
                 $query->where('last_reading_at', '<', $cutoff)
                     ->orWhereNull('last_reading_at');
-            })
-            ->get();
+            });
 
-        if ($staleHydrometers->isEmpty()) {
+        if ($staleQuery->count() === 0) {
             $this->info('Todos os hidrômetros estão comunicando normalmente.');
 
             return self::SUCCESS;
@@ -67,30 +66,30 @@ class WatchdogCommand extends Command
 
         $count = 0;
 
-        // Bulk update: 1 query em vez de N queries individuais
-        $ids = $staleHydrometers->pluck('id');
-        Hydrometer::whereIn('id', $ids)->update(['status' => 'offline']);
+        $staleQuery->chunkById(500, function ($staleHydrometers) use ($thresholdHours, &$count) {
+            $ids = $staleHydrometers->pluck('id');
 
-        // Batch insert: 1 query em vez de N queries individuais
-        $alertsData = $staleHydrometers->map(fn ($h) => [
-            'hydrometer_id' => $h->id,
-            'type' => 'offline',
-            'message' => "Hidrômetro {$h->code} ({$h->neighborhood}) "
-                ."não envia dados há mais de {$thresholdHours} horas.",
-            'resolved' => false,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ])->toArray();
+            Hydrometer::whereIn('id', $ids)->update(['status' => 'offline']);
 
-        Alert::insert($alertsData);
-        $count = $ids->count();
+            $alertsData = $staleHydrometers->map(fn ($h) => [
+                'hydrometer_id' => $h->id,
+                'type' => 'offline',
+                'message' => "Hidrômetro {$h->code} ({$h->neighborhood}) "
+                    ."não envia dados há mais de {$thresholdHours} horas.",
+                'resolved' => false,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ])->toArray();
+
+            Alert::insert($alertsData);
+            $count += $ids->count();
+        });
 
         DashboardService::invalidateCache();
 
         Log::info('Watchdog marcou hidrometros como offline', [
             'count' => $count,
             'threshold_hours' => $thresholdHours,
-            'hydrometer_ids' => $ids->toArray(),
         ]);
 
         $this->warn("{$count} hidrômetro(s) marcado(s) como offline.");

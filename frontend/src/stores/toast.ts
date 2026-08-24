@@ -30,6 +30,9 @@ export const useToastStore = defineStore('toast', () => {
   /** Fila reativa de notificações ativas na tela */
   const toasts = ref<Toast[]>([])
 
+  /** Numero maximo de toasts visiveis simultaneamente */
+  const MAX_VISIBLE_TOASTS = 5
+
   /**
    * Adiciona uma notificação à fila com remoção automática.
    *
@@ -37,6 +40,11 @@ export const useToastStore = defineStore('toast', () => {
    */
   function add(toast: Omit<Toast, 'id'>) {
     const id = Math.random().toString(36).substring(2, 9)
+
+    if (toasts.value.length >= MAX_VISIBLE_TOASTS) {
+      toasts.value.shift()
+    }
+
     toasts.value.push({ ...toast, id })
 
     const duration = toast.duration ?? 4000
