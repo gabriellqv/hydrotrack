@@ -16,10 +16,48 @@ concurrency:
 on:
   push:
     branches: [develop, main]
+    paths:
+      - "backend/**"
+      - "frontend/**"
+      - ".github/workflows/ci.yml"
+      - "docker-compose.yml"
   pull_request:
     branches: [develop, main]
+    paths:
+      - "backend/**"
+      - "frontend/**"
+      - ".github/workflows/ci.yml"
+      - "docker-compose.yml"
 
 jobs:
+  # ─────────────────────────────────────────────
+  # Detecção de arquivos modificados
+  # ─────────────────────────────────────────────
+  changes:
+    name: Detectar mudanças
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Filtrar paths modificados
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - "backend/**"
+              - ".github/workflows/ci.yml"
+              - "docker-compose.yml"
+            frontend:
+              - "frontend/**"
+              - ".github/workflows/ci.yml"
+
   # ─────────────────────────────────────────────
   # Backend: lint (Pint) + testes (Pest)
   # ─────────────────────────────────────────────
@@ -27,6 +65,8 @@ jobs:
     name: Backend (Pint + Pest)
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    needs: changes
+    if: ${{ needs.changes.outputs.backend == 'true' }}
     defaults:
       run:
         working-directory: backend
@@ -71,6 +111,8 @@ jobs:
     name: Frontend (Lint + Type Check)
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' }}
     defaults:
       run:
         working-directory: frontend
