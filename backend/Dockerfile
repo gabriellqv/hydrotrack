@@ -52,12 +52,13 @@ COPY --from=vendor --chown=www-data:www-data /app/vendor ./vendor
 # Criar .env vazio (variáveis de produção vêm do Render Environment ou env_file)
 RUN touch .env
 
-# Copiar configuração nginx e entrypoint
+# Copiar configuração nginx, supervisor e entrypoint
 COPY --chown=root:root nginx.conf /etc/nginx/nginx.conf
+COPY --chown=root:root supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY --chown=root:root docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# Garantir permissões do storage e bootstrap/cache do Laravel
+# Garantir permissões do storage e bootstrap/cache do Laravel como root
 RUN mkdir -p storage/logs \
              storage/framework/cache \
              storage/framework/sessions \
@@ -66,14 +67,12 @@ RUN mkdir -p storage/logs \
     && chown -R www-data:www-data /var/www/html \
     && chmod -R 775 storage bootstrap/cache
 
-# Criar diretórios necessários para nginx/php-fpm e ajustar permissões
-RUN mkdir -p /var/lib/nginx/logs /run/nginx /var/log/supervisor \
-    && chown -R www-data:www-data /var/lib/nginx /run/nginx /var/log/supervisor
+# Criar diretórios necessários para nginx/php-fpm/supervisor e ajustar permissões
+RUN mkdir -p /var/lib/nginx/logs /run/nginx /var/log/supervisor /tmp/nginx \
+    && chown -R www-data:www-data /var/lib/nginx /run/nginx /var/log/supervisor /tmp/nginx \
+    && ln -sf /tmp/nginx/access.log /var/log/nginx/access.log \
+    && ln -sf /tmp/nginx/error.log /var/log/nginx/error.log
 
-# Expor a porta do nginx
-EXPOSE 8000
-
-# Trocar para usuário não-root
-USER www-data
-
+# O container inicia como root para que o supervisor possa spawnar processos.
+# Os serviços php-fpm e nginx rodam como usuário www-data.
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
