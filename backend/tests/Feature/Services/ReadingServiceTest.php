@@ -171,3 +171,125 @@ it('garante atomicidade: falha no alerta nao persiste leitura parcial', function
     $hydrometer->refresh();
     expect($hydrometer->status)->toBe('offline');
 });
+
+it('nao duplica alerta de leitura zerada para o mesmo hidrometro', function () {
+    $hydrometer = Hydrometer::factory()->create(['status' => 'online']);
+
+    foreach ([0.0, 0.0] as $value) {
+        $this->service->ingest([
+            'hydrometer_code' => $hydrometer->code,
+            'value_m3' => $value,
+            'reading_at' => now()->toISOString(),
+        ]);
+    }
+
+    $this->assertDatabaseCount('alerts', 1);
+    $this->assertDatabaseHas('alerts', [
+        'hydrometer_id' => $hydrometer->id,
+        'type' => 'zero_reading',
+        'resolved' => false,
+    ]);
+});
+
+it('nao duplica alerta de alto consumo para o mesmo hidrometro', function () {
+    $hydrometer = Hydrometer::factory()->create(['status' => 'online']);
+
+    foreach ([15.5, 20.0] as $value) {
+        $this->service->ingest([
+            'hydrometer_code' => $hydrometer->code,
+            'value_m3' => $value,
+            'reading_at' => now()->toISOString(),
+        ]);
+    }
+
+    $this->assertDatabaseCount('alerts', 1);
+    $this->assertDatabaseHas('alerts', [
+        'hydrometer_id' => $hydrometer->id,
+        'type' => 'high_consumption',
+        'resolved' => false,
+    ]);
+});
+
+it('cria novo alerta zerado apos resolver o anterior', function () {
+    $hydrometer = Hydrometer::factory()->create(['status' => 'online']);
+
+    $this->service->ingest([
+        'hydrometer_code' => $hydrometer->code,
+        'value_m3' => 0.0,
+        'reading_at' => now()->toISOString(),
+    ]);
+
+    $firstAlert = Alert::where('hydrometer_id', $hydrometer->id)
+        ->where('type', 'zero_reading')
+        ->first();
+
+    $firstAlert->update(['resolved' => true, 'resolved_at' => now()]);
+
+    $this->service->ingest([
+        'hydrometer_code' => $hydrometer->code,
+        'value_m3' => 0.0,
+        'reading_at' => now()->toISOString(),
+    ]);
+
+    $this->assertDatabaseCount('alerts', 2);
+    $this->assertDatabaseHas('alerts', [
+        'hydrometer_id' => $hydrometer->id,
+        'type' => 'zero_reading',
+        'resolved' => false,
+    ]);
+});
+
+it('cria novo alerta de alto consumo apos resolver o anterior', function () {
+    $hydrometer = Hydrometer::factory()->create(['status' => 'online']);
+
+    $this->service->ingest([
+        'hydrometer_code' => $hydrometer->code,
+        'value_m3' => 15.5,
+        'reading_at' => now()->toISOString(),
+    ]);
+
+    $firstAlert = Alert::where('hydrometer_id', $hydrometer->id)
+        ->where('type', 'high_consumption')
+        ->first();
+
+    $firstAlert->update(['resolved' => true, 'resolved_at' => now()]);
+
+    $this->service->ingest([
+        'hydrometer_code' => $hydrometer->code,
+        'value_m3' => 20.0,
+        'reading_at' => now()->toISOString(),
+    ]);
+
+    $this->assertDatabaseCount('alerts', 2);
+    $this->assertDatabaseHas('alerts', [
+        'hydrometer_id' => $hydrometer->id,
+        'type' => 'high_consumption',
+        'resolved' => false,
+    ]);
+});
+
+it('gera dois alertas distintos para leitura zerada e alto consumo', function () {
+    $hydrometer = Hydrometer::factory()->create(['status' => 'online']);
+
+    $this->service->ingest([
+        'hydrometer_code' => $hydrometer->code,
+        'value_m3' => 0.0,
+        'reading_at' => now()->toISOString(),
+    ]);
+
+    $this->service->ingest([
+        'hydrometer_code' => $hydrometer->code,
+        'value_m3' => 15.5,
+        'reading_at' => now()->toISOString(),
+    ]);
+
+    $this->assertDatabaseCount('alerts', 2);
+    $this->assertDatabaseHas('alerts', [
+        'hydrometer_id' => $hydrometer->id,
+        'type' => 'zero_reading',
+    ]);
+    $this->assertDatabaseHas('alerts', [
+        'hydrometer_id' => $hydrometer->id,
+        'type' => 'high_consumption',
+    ]);
+});

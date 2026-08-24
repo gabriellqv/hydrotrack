@@ -90,7 +90,11 @@ class HydrometerService
      */
     public function delete(Hydrometer $hydrometer): bool
     {
-        return $hydrometer->delete();
+        $deleted = $hydrometer->delete();
+
+        DashboardService::invalidateCache();
+
+        return $deleted;
     }
 
     /**

@@ -75,13 +75,19 @@ class ReadingService
      * Gera um alerta de leitura zerada para o hidrômetro.
      *
      * Altera o status do dispositivo para 'alert' e persiste um registro
-     * na tabela de alertas para acompanhamento pelo operador.
+     * na tabela de alertas para acompanhamento pelo operador. Se já existir
+     * um alerta do mesmo tipo para o mesmo hidrômetro sem resolução,
+     * nenhum novo alerta é criado.
      *
      * @param  Hydrometer  $hydrometer  Dispositivo que reportou leitura zerada
      */
     private function createZeroReadingAlert(Hydrometer $hydrometer): void
     {
         $hydrometer->update(['status' => 'alert']);
+
+        if ($this->unresolvedAlertExists($hydrometer->id, 'zero_reading')) {
+            return;
+        }
 
         $alert = Alert::create([
             'hydrometer_id' => $hydrometer->id,
@@ -100,7 +106,9 @@ class ReadingService
      * Gera um alerta de alto consumo para o hidrômetro.
      *
      * Altera o status do dispositivo para 'alert' e persiste um registro
-     * na tabela de alertas para acompanhamento pelo operador.
+     * na tabela de alertas para acompanhamento pelo operador. Se já existir
+     * um alerta do mesmo tipo para o mesmo hidrômetro sem resolução,
+     * nenhum novo alerta é criado.
      *
      * @param  Hydrometer  $hydrometer  Dispositivo que reportou consumo alto
      * @param  float  $value  Valor do consumo em m³
@@ -108,6 +116,10 @@ class ReadingService
     private function createHighConsumptionAlert(Hydrometer $hydrometer, float $value): void
     {
         $hydrometer->update(['status' => 'alert']);
+
+        if ($this->unresolvedAlertExists($hydrometer->id, 'high_consumption')) {
+            return;
+        }
 
         $alert = Alert::create([
             'hydrometer_id' => $hydrometer->id,
@@ -122,5 +134,20 @@ class ReadingService
             'value_m3' => $value,
             'threshold_m3' => self::HIGH_CONSUMPTION_THRESHOLD,
         ]);
+    }
+
+    /**
+     * Verifica se já existe um alerta não resolvido para o hidrômetro.
+     *
+     * @param  int  $hydrometerId  Identificador do hidrômetro
+     * @param  string  $type  Tipo do alerta
+     * @return bool Verdadeiro se houver alerta ativo do mesmo tipo
+     */
+    private function unresolvedAlertExists(int $hydrometerId, string $type): bool
+    {
+        return Alert::where('hydrometer_id', $hydrometerId)
+            ->where('type', $type)
+            ->where('resolved', false)
+            ->exists();
     }
 }

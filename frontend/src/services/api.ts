@@ -1,6 +1,7 @@
 import axios, { type AxiosInstance, type AxiosError } from 'axios'
 import type { Router } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useToastStore } from '@/stores/toast'
 import router from '@/router'
 
 /**
@@ -49,21 +50,36 @@ function createApiClient(): AxiosInstance {
     return config
   })
 
-  // Interceptor de response: trata 401 (token expirado/invalido)
+  // Interceptor de response: trata erros de rede e 401 (token expirado/invalido)
   client.interceptors.response.use(
     (response) => response,
-    createResponseErrorHandler(() => ({ authStore: useAuthStore(), router })),
+    createResponseErrorHandler(() => ({
+      authStore: useAuthStore(),
+      router,
+      toastStore: useToastStore(),
+    })),
   )
 
   return client
 }
 
 export function createResponseErrorHandler(
-  resolveDependencies: () => { authStore: ReturnType<typeof useAuthStore>; router: Router },
+  resolveDependencies: () => {
+    authStore: ReturnType<typeof useAuthStore>
+    router: Router
+    toastStore: ReturnType<typeof useToastStore>
+  },
 ) {
   return (error: AxiosError<{ message: string; errors?: Record<string, string[]> }>) => {
-    if (error.response?.status === 401 && error.config?.url !== '/auth/logout') {
-      const { authStore, router } = resolveDependencies()
+    const { authStore, router, toastStore } = resolveDependencies()
+
+    if (error.code === 'ERR_NETWORK' || !error.response) {
+      const message = 'Servidor indisponível. Verifique sua conexão.'
+      toastStore.error(message)
+      throw new ApiError(message, 0)
+    }
+
+    if (error.response.status === 401 && error.config?.url !== '/auth/logout') {
       authStore.logout()
       router.push({
         name: 'login',
@@ -71,8 +87,8 @@ export function createResponseErrorHandler(
       })
     }
 
-    const status = error.response?.status || 500
-    const errors = error.response?.data?.errors
+    const status = error.response.status
+    const errors = error.response.data?.errors
 
     /** Mensagens amigáveis por status — nunca expõe detalhes técnicos ao usuário */
     const friendlyMessages: Record<number, string> = {
@@ -80,12 +96,22 @@ export function createResponseErrorHandler(
       401: 'Credenciais inválidas. Verifique seu e-mail e senha.',
       403: 'Você não tem permissão para realizar esta ação.',
       404: 'Recurso não encontrado.',
-      422: error.response?.data?.message || 'Erro de validação. Verifique os campos.',
+      422: error.response.data?.message || 'Erro de validação. Verifique os campos.',
       429: 'Muitas tentativas. Aguarde um momento e tente novamente.',
+      500: 'Erro no servidor. Tente novamente mais tarde.',
+      502: 'Erro no servidor. Tente novamente mais tarde.',
+      503: 'Erro no servidor. Tente novamente mais tarde.',
+      504: 'Erro no servidor. Tente novamente mais tarde.',
     }
 
     const message =
-      friendlyMessages[status] || 'Erro inesperado na comunicação com o servidor. Tente novamente.'
+      friendlyMessages[status] ||
+      error.response.data?.message ||
+      'Erro inesperado na comunicação com o servidor. Tente novamente.'
+
+    if (status >= 500) {
+      toastStore.error(message)
+    }
 
     throw new ApiError(message, status, errors)
   }

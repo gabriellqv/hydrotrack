@@ -20,7 +20,7 @@ it('registra leitura com API key válida', function () {
     $response = $this->postJson('/api/ingest', [
         'hydrometer_code' => 'HYD-INGEST-001',
         'value_m3' => 5.75,
-        'reading_at' => '2026-05-05 12:00:00',
+        'reading_at' => now()->toDateTimeString(),
     ], [
         'X-API-Key' => 'test-api-key-123',
     ]);
@@ -41,7 +41,7 @@ it('rejeita ingestão sem header X-API-Key', function () {
     $response = $this->postJson('/api/ingest', [
         'hydrometer_code' => $hydrometer->code,
         'value_m3' => 3.0,
-        'reading_at' => '2026-05-05 12:00:00',
+        'reading_at' => now()->toDateTimeString(),
     ]);
 
     $response->assertStatus(401)
@@ -54,7 +54,7 @@ it('rejeita ingestão com API key inválida', function () {
     $response = $this->postJson('/api/ingest', [
         'hydrometer_code' => 'HYD-001',
         'value_m3' => 3.0,
-        'reading_at' => '2026-05-05 12:00:00',
+        'reading_at' => now()->toDateTimeString(),
     ], [
         'X-API-Key' => 'chave-errada',
     ]);
@@ -68,7 +68,7 @@ it('rejeita ingestão com código de hidrômetro inexistente', function () {
     $response = $this->postJson('/api/ingest', [
         'hydrometer_code' => 'HYD-FANTASMA',
         'value_m3' => 3.0,
-        'reading_at' => '2026-05-05 12:00:00',
+        'reading_at' => now()->toDateTimeString(),
     ], [
         'X-API-Key' => 'test-api-key-123',
     ]);
@@ -85,11 +85,45 @@ it('rejeita ingestão com valor de consumo negativo', function () {
     $response = $this->postJson('/api/ingest', [
         'hydrometer_code' => $hydrometer->code,
         'value_m3' => -5.0,
-        'reading_at' => '2026-05-05 12:00:00',
+        'reading_at' => now()->toDateTimeString(),
     ], [
         'X-API-Key' => 'test-api-key-123',
     ]);
 
     $response->assertStatus(422)
         ->assertJsonValidationErrors('value_m3');
+});
+
+it('rejeita ingestão com reading_at no futuro', function () {
+    config(['services.ingest.api_key' => 'test-api-key-123']);
+
+    $hydrometer = Hydrometer::factory()->create();
+
+    $response = $this->postJson('/api/ingest', [
+        'hydrometer_code' => $hydrometer->code,
+        'value_m3' => 3.0,
+        'reading_at' => now()->addDay()->toDateTimeString(),
+    ], [
+        'X-API-Key' => 'test-api-key-123',
+    ]);
+
+    $response->assertStatus(422)
+        ->assertJsonValidationErrors('reading_at');
+});
+
+it('rejeita ingestão com reading_at muito antiga', function () {
+    config(['services.ingest.api_key' => 'test-api-key-123']);
+
+    $hydrometer = Hydrometer::factory()->create();
+
+    $response = $this->postJson('/api/ingest', [
+        'hydrometer_code' => $hydrometer->code,
+        'value_m3' => 3.0,
+        'reading_at' => now()->subDays(2)->toDateTimeString(),
+    ], [
+        'X-API-Key' => 'test-api-key-123',
+    ]);
+
+    $response->assertStatus(422)
+        ->assertJsonValidationErrors('reading_at');
 });

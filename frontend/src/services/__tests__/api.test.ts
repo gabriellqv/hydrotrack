@@ -1,9 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 import { createRouter, createWebHistory, type Router } from 'vue-router'
-import type { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
+import { AxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios'
 import { ApiError, createResponseErrorHandler } from '@/services/api'
 import { useAuthStore } from '@/stores/auth'
+import { useToastStore } from '@/stores/toast'
 
 /**
  * Testes do handler de erro do interceptor de response da API.
@@ -14,8 +15,10 @@ import { useAuthStore } from '@/stores/auth'
 describe('createResponseErrorHandler', () => {
   let router: Router
   let authStore: ReturnType<typeof useAuthStore>
+  let toastStore: ReturnType<typeof useToastStore>
   let handler: ReturnType<typeof createResponseErrorHandler>
   let routerPushSpy: ReturnType<typeof vi.spyOn>
+  let toastErrorSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
     setActivePinia(createPinia())
@@ -27,6 +30,9 @@ describe('createResponseErrorHandler', () => {
       authStore.user = null
       localStorage.removeItem('auth_token')
     })
+
+    toastStore = useToastStore()
+    toastErrorSpy = vi.spyOn(toastStore, 'error')
 
     router = createRouter({
       history: createWebHistory(),
@@ -40,7 +46,7 @@ describe('createResponseErrorHandler', () => {
     router.push('/dashboard')
     routerPushSpy = vi.spyOn(router, 'push').mockResolvedValue(undefined)
 
-    handler = createResponseErrorHandler(() => ({ authStore, router }))
+    handler = createResponseErrorHandler(() => ({ authStore, router, toastStore }))
   })
 
   afterEach(() => {
@@ -102,7 +108,8 @@ describe('createResponseErrorHandler', () => {
     const thrown = await expectApiError(() => handler(error))
 
     expect(thrown.status).toBe(500)
-    expect(thrown.message).toBe('Erro inesperado na comunicação com o servidor. Tente novamente.')
+    expect(thrown.message).toBe('Erro no servidor. Tente novamente mais tarde.')
+    expect(toastErrorSpy).toHaveBeenCalledWith('Erro no servidor. Tente novamente mais tarde.')
   })
 
   async function expectApiError(fn: () => unknown): Promise<ApiError> {
@@ -134,4 +141,19 @@ describe('createResponseErrorHandler', () => {
 
     return error
   }
+
+  it('exibe toast para erro de rede quando o servidor esta indisponivel', async () => {
+    const error = new AxiosError<{ message: string; errors?: Record<string, string[]> }>(
+      'Network Error',
+      'ERR_NETWORK',
+    )
+
+    const thrown = await expectApiError(() => handler(error))
+
+    expect(thrown.status).toBe(0)
+    expect(thrown.message).toBe('Servidor indisponível. Verifique sua conexão.')
+    expect(toastErrorSpy).toHaveBeenCalledWith('Servidor indisponível. Verifique sua conexão.')
+    expect(authStore.logout).not.toHaveBeenCalled()
+    expect(routerPushSpy).not.toHaveBeenCalled()
+  })
 })
