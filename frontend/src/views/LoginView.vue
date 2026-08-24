@@ -112,7 +112,7 @@ async function handleLogin() {
         </form>
 
         <p class="text-xs text-text-muted text-center mt-6">
-          Demo: admin@hydrotrack.com / admin123
+          Use as credenciais de teste geradas pelo seeder.
         </p>
       </div>
     </div>

@@ -86,7 +86,7 @@ sequenceDiagram
 | **Frontend** | Vue.js 3, TypeScript, Composition API, Tailwind CSS 4, Pinia, Vue Router |
 | **Mapas** | Leaflet.js (vue-leaflet) |
 | **Graficos** | Chart.js (vue-chartjs) |
-| **Backend** | Laravel 13, PHP 8.5, Eloquent ORM, Scribe |
+| **Backend** | Laravel 13, PHP 8.4, Eloquent ORM, Scribe |
 | **Banco** | MySQL 8 |
 | **Autenticacao** | Laravel Sanctum (Token SPA) |
 | **Testes Backend** | Pest PHP |
@@ -157,7 +157,7 @@ hydrotrack/
 
 1. PHP 8.4 ou versao superior (com extensoes: pdo_mysql, mbstring, curl, zip).
 2. Composer 2.2 ou versao superior.
-3. Node.js 20 ou versao superior.
+3. Node.js 22 ou versao superior.
 4. Docker e utilitario Docker Compose (opcional).
 
 ### Configuracao do ambiente
@@ -183,6 +183,14 @@ Variaveis do backend:
 | `FRONTEND_URL` | Origem autorizada para CORS | `http://localhost:5173` |
 
 ### Inicializacao via Docker
+
+Copie o arquivo de exemplo e ajuste as variaveis:
+
+```bash
+cp .env.example .env
+```
+
+Em seguida, suba os containers:
 
 ```bash
 docker-compose up --build -d
@@ -212,10 +220,17 @@ npm run dev
 
 ### Credenciais de teste
 
-| Campo | Valor |
+Execute o seeder para criar os usuarios de demonstracao. A senha do admin sera exibida no terminal (ou defina previamente a variavel `ADMIN_SEED_PASSWORD` no `.env`):
+
+```bash
+cd backend
+php artisan migrate --seed
+```
+
+| Usuario | E-mail |
 |---|---|
-| Email | `admin@hydrotrack.com` |
-| Senha | `admin123` |
+| Administrador | `admin@hydrotrack.com` |
+| Operador | `operador@hydrotrack.com` |
 
 ### Simulador IoT
 
