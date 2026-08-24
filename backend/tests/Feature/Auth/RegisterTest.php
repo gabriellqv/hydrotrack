@@ -51,3 +51,44 @@ it('rejeita registro com senha menor que 8 caracteres', function () {
     $response->assertStatus(422)
         ->assertJsonValidationErrors('password');
 });
+
+it('permite ate cinco tentativas de registro falhas por IP por minuto', function () {
+    $payload = [
+        'name' => 'Usuário Teste',
+        'email' => 'teste@hydrotrack.com',
+        'password' => 'curta',
+        'password_confirmation' => 'curta',
+    ];
+
+    for ($i = 0; $i < 5; $i++) {
+        $this->postJson('/api/auth/register', $payload)->assertStatus(422);
+    }
+
+    $this->postJson('/api/auth/register', $payload)->assertStatus(429)
+        ->assertJsonPath('message', 'Muitas tentativas de acesso. Aguarde um minuto e tente novamente.');
+});
+
+it('libera novas tentativas de registro apos expiracao do rate limit', function () {
+    $payload = [
+        'name' => 'Usuario Teste',
+        'email' => 'usuario@hydrotrack.com',
+        'password' => 'SenhaSegura123',
+        'password_confirmation' => 'SenhaSegura123',
+    ];
+
+    for ($i = 0; $i < 5; $i++) {
+        $this->postJson('/api/auth/register', [
+            'name' => 'Usuario Teste',
+            'email' => "usuario{$i}@hydrotrack.com",
+            'password' => 'curta',
+            'password_confirmation' => 'curta',
+        ])->assertStatus(422);
+    }
+
+    $this->postJson('/api/auth/register', $payload)->assertStatus(429);
+
+    $this->travel(1)->minutes();
+
+    $this->postJson('/api/auth/register', $payload)->assertStatus(201)
+        ->assertJsonPath('user.email', 'usuario@hydrotrack.com');
+});

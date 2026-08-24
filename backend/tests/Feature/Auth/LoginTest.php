@@ -65,3 +65,48 @@ it('retorna estrutura de resposta consistente com user e token', function () {
 
     expect($response->json('token'))->toBeString()->not->toBeEmpty();
 });
+
+it('permite ate cinco tentativas de login falhas por IP por minuto', function () {
+    $user = User::factory()->create([
+        'password' => bcrypt('senha-correta'),
+    ]);
+
+    for ($i = 0; $i < 5; $i++) {
+        $this->postJson('/api/auth/login', [
+            'email' => $user->email,
+            'password' => 'senha-errada',
+        ])->assertStatus(422);
+    }
+
+    $this->postJson('/api/auth/login', [
+        'email' => $user->email,
+        'password' => 'senha-errada',
+    ])->assertStatus(429)
+        ->assertJsonPath('message', 'Muitas tentativas de acesso. Aguarde um minuto e tente novamente.');
+});
+
+it('libera novas tentativas de login apos expiracao do rate limit', function () {
+    $user = User::factory()->create([
+        'password' => bcrypt('senha-correta'),
+    ]);
+
+    for ($i = 0; $i < 5; $i++) {
+        $this->postJson('/api/auth/login', [
+            'email' => $user->email,
+            'password' => 'senha-errada',
+        ])->assertStatus(422);
+    }
+
+    $this->postJson('/api/auth/login', [
+        'email' => $user->email,
+        'password' => 'senha-errada',
+    ])->assertStatus(429);
+
+    $this->travel(1)->minutes();
+
+    $this->postJson('/api/auth/login', [
+        'email' => $user->email,
+        'password' => 'senha-correta',
+    ])->assertOk()
+        ->assertJsonPath('user.email', $user->email);
+});

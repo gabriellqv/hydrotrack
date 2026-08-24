@@ -86,6 +86,23 @@ export interface User {
 }
 
 /**
+ * Payload para criação de um hidrômetro.
+ */
+export interface CreateHydrometerPayload {
+  code: string
+  latitude: number
+  longitude: number
+  address: string
+  neighborhood: string
+  type: 'residential' | 'commercial' | 'industrial'
+}
+
+/**
+ * Payload para atualização de um hidrômetro.
+ */
+export type UpdateHydrometerPayload = Partial<CreateHydrometerPayload>
+
+/**
  * Resposta paginada da API Laravel.
  */
 export interface PaginatedResponse<T> {

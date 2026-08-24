@@ -1,7 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { api } from '@/services/api'
-import type { Hydrometer, PaginatedResponse } from '@/types'
+import type {
+  CreateHydrometerPayload,
+  Hydrometer,
+  PaginatedResponse,
+  UpdateHydrometerPayload,
+} from '@/types'
 import { useToastStore } from '@/stores/toast'
 
 /**
@@ -84,12 +89,10 @@ export const useHydrometerStore = defineStore('hydrometer', () => {
   /**
    * Cria um novo hidrômetro via API.
    *
-   * @param {Omit<Hydrometer, 'id' | 'created_at' | 'status' | 'last_reading_at'>} payload
+   * @param {CreateHydrometerPayload} payload
    * @returns {Promise<Hydrometer>} O hidrômetro criado
    */
-  async function createHydrometer(
-    payload: Omit<Hydrometer, 'id' | 'created_at' | 'status' | 'last_reading_at'>,
-  ): Promise<Hydrometer> {
+  async function createHydrometer(payload: CreateHydrometerPayload): Promise<Hydrometer> {
     const toast = useToastStore()
     try {
       const { data } = await api.post<{ data: Hydrometer }>('/hydrometers', payload)
@@ -106,9 +109,9 @@ export const useHydrometerStore = defineStore('hydrometer', () => {
    * Atualiza um hidrômetro existente.
    *
    * @param {number} id - ID do hidrômetro
-   * @param {Partial<Hydrometer>} payload - Campos a atualizar
+   * @param {UpdateHydrometerPayload} payload - Campos a atualizar
    */
-  async function updateHydrometer(id: number, payload: Partial<Hydrometer>) {
+  async function updateHydrometer(id: number, payload: UpdateHydrometerPayload) {
     const toast = useToastStore()
     try {
       await api.put(`/hydrometers/${id}`, payload)

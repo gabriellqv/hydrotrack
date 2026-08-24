@@ -6,6 +6,12 @@ import { useHydrometerStore } from '@/stores/hydrometer'
 import { ApiError } from '@/services/api'
 import type { Hydrometer } from '@/types'
 
+const errorMock = vi.fn<(message?: string, duration?: number) => void>()
+
+vi.mock('@/stores/toast', () => ({
+  useToastStore: vi.fn<() => { error: typeof errorMock }>(() => ({ error: errorMock })),
+}))
+
 /**
  * Testes do componente CreateHydrometerModal.
  *
@@ -65,6 +71,13 @@ describe('CreateHydrometerModal', () => {
     const codeInput = wrapper.find('input[placeholder="HYD-201"]')
     await codeInput.setValue('HYD-TEST')
 
+    const latitudeInput = wrapper.find('input[placeholder="-17.1085"]')
+    await latitudeInput.setValue('-17.1085')
+
+    const longitudeInput = wrapper.find('input[placeholder="-43.8143"]')
+    expect(longitudeInput.exists()).toBe(true)
+    await longitudeInput.setValue('-43.8143')
+
     await wrapper.find('form').trigger('submit.prevent')
 
     expect(store.createHydrometer).toHaveBeenCalledOnce()
@@ -78,6 +91,13 @@ describe('CreateHydrometerModal', () => {
     vi.spyOn(store, 'createHydrometer').mockRejectedValue(
       new ApiError('Erro de validacao', 422, { code: ['Codigo ja existe.'] }),
     )
+
+    const latitudeInput = wrapper.find('input[placeholder="-17.1085"]')
+    await latitudeInput.setValue('-17.1085')
+
+    const longitudeInput = wrapper.find('input[placeholder="-43.8143"]')
+    expect(longitudeInput.exists()).toBe(true)
+    await longitudeInput.setValue('-43.8143')
 
     await wrapper.find('form').trigger('submit.prevent')
     await vi.waitFor(() => wrapper.text().includes('Codigo ja existe.'))

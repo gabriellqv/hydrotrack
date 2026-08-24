@@ -6,7 +6,7 @@ import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseModal from '@/components/ui/BaseModal.vue'
 import { ApiError } from '@/services/api'
 import { useToastStore } from '@/stores/toast'
-import type { Hydrometer } from '@/types'
+import type { CreateHydrometerPayload } from '@/types'
 
 /**
  * Modal de criacao de novo hidrometro.
@@ -30,16 +30,44 @@ const form = ref({
 const formErrors = ref<Record<string, string>>({})
 const loading = ref(false)
 
+function parseCoordinate(value: string): number | null {
+  const trimmed = value.trim()
+  if (trimmed === '') return null
+  const parsed = Number(trimmed)
+  return Number.isFinite(parsed) ? parsed : null
+}
+
+function buildPayload(): CreateHydrometerPayload | null {
+  const latitude = parseCoordinate(form.value.latitude)
+  const longitude = parseCoordinate(form.value.longitude)
+
+  if (latitude === null || longitude === null) {
+    return null
+  }
+
+  return {
+    code: form.value.code,
+    latitude,
+    longitude,
+    address: form.value.address,
+    neighborhood: form.value.neighborhood,
+    type: form.value.type,
+  }
+}
+
 async function handleCreate() {
   formErrors.value = {}
   loading.value = true
 
+  const payload = buildPayload()
+  if (!payload) {
+    toast.error('Latitude e longitude devem ser numeros validos.')
+    loading.value = false
+    return
+  }
+
   try {
-    await store.createHydrometer({
-      ...form.value,
-      latitude: form.value.latitude === '' ? '' : Number(form.value.latitude),
-      longitude: form.value.longitude === '' ? '' : Number(form.value.longitude),
-    } as unknown as Omit<Hydrometer, 'id' | 'created_at' | 'status' | 'last_reading_at'>)
+    await store.createHydrometer(payload)
 
     emit('close')
     resetForm()
