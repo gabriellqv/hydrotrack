@@ -7,10 +7,10 @@ import { useToastStore } from '@/stores/toast'
 import type { Hydrometer } from '@/types'
 
 /**
- * Dialog de confirmacao de exclusao de hidrometro.
+ * Dialog de confirmação de exclusão de hidrômetro.
  *
- * @prop {Hydrometer} hydrometer - Hidrometro a ser excluido
- * @emits close - Emitido quando o dialog deve ser fechado
+ * @prop {Hydrometer} hydrometer - Hidrômetro a ser excluído.
+ * @emits close - Emitido quando o dialog deve ser fechado.
  */
 const props = defineProps<{
   hydrometer: Hydrometer
@@ -22,13 +22,16 @@ const store = useHydrometerStore()
 const toast = useToastStore()
 const loading = ref(false)
 
+/**
+ * Confirma a exclusão do hidrômetro e fecha o dialog em caso de sucesso.
+ */
 async function confirmDelete() {
   loading.value = true
   try {
     await store.deleteHydrometer(props.hydrometer.id)
     emit('close')
   } catch {
-    toast.error('Erro inesperado ao excluir o hidrometro. Tente novamente.')
+    toast.error('Erro inesperado ao excluir o hidrômetro. Tente novamente.')
   } finally {
     loading.value = false
   }
@@ -36,16 +39,16 @@ async function confirmDelete() {
 </script>
 
 <template>
-  <BaseModal :open="true" title="Confirmar Exclusao" size="sm" @close="$emit('close')">
+  <BaseModal :open="true" title="Confirmar Exclusão" size="sm" @close="$emit('close')">
     <div class="text-sm text-text-body space-y-3">
       <p>
-        Tem certeza que deseja excluir o hidrometro
+        Tem certeza que deseja excluir o hidrômetro
         <strong class="text-text-heading">{{ hydrometer.code }}</strong>
         ?
       </p>
       <p class="text-text-muted">
-        Esta acao e irreversivel. Todas as leituras e alertas associados a este dispositivo tambem
-        serao removidos.
+        Esta ação é irreversível. Todas as leituras e alertas associados a este dispositivo também
+        serão removidos.
       </p>
     </div>
 

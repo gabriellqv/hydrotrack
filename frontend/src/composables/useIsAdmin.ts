@@ -2,22 +2,10 @@ import { computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 
 /**
- * Composable que verifica se o usuário autenticado possui role de administrador.
+ * Retorna um flag reativo que indica se o usuário autenticado possui role `admin`.
+ * Baseia-se no estado do `useAuthStore`.
  *
- * Uso: condicionar a renderização de botões de criação, edição e exclusão
- * para que apenas administradores os vejam.
- *
- * @returns {{ isAdmin: ComputedRef<boolean> }}
- *
- * @example
- * ```vue
- * <script setup>
- * const { isAdmin } = useIsAdmin()
- * </script>
- * <template>
- *   <BaseButton v-if="isAdmin" @click="openCreateModal">Novo Hidrômetro</BaseButton>
- * </template>
- * ```
+ * @returns Objeto com a propriedade reativa `isAdmin`.
  */
 export function useIsAdmin() {
   const authStore = useAuthStore()

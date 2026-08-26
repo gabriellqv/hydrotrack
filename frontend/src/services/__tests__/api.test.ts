@@ -9,8 +9,8 @@ import { useToastStore } from '@/stores/toast'
 /**
  * Testes do handler de erro do interceptor de response da API.
  *
- * Validam o redirecionamento automatico em 401 e as mensagens amigaveis
- * por status code, garantindo que o usuario nao veja detalhes tecnicos.
+ * Validam o redirecionamento automático em 401 e as mensagens amigáveis
+ * por status code, garantindo que o usuário não veja detalhes técnicos.
  */
 describe('createResponseErrorHandler', () => {
   let router: Router
@@ -54,7 +54,7 @@ describe('createResponseErrorHandler', () => {
     localStorage.clear()
   })
 
-  it('redireciona para login quando response e 401', async () => {
+  it('redireciona para login quando response é 401', async () => {
     const error = createAxiosError(401, '/alerts', 'Unauthenticated')
 
     await expectApiError(() => handler(error))
@@ -66,7 +66,7 @@ describe('createResponseErrorHandler', () => {
     })
   })
 
-  it('nao redireciona para login em 401 vindo do proprio endpoint de logout', async () => {
+  it('não redireciona para login em 401 vindo do próprio endpoint de logout', async () => {
     const error = createAxiosError(401, '/auth/logout', 'Unauthenticated')
 
     await expectApiError(() => handler(error))
@@ -75,7 +75,7 @@ describe('createResponseErrorHandler', () => {
     expect(routerPushSpy).not.toHaveBeenCalledWith({ name: 'login' })
   })
 
-  it('retorna mensagem amigavel para 403', async () => {
+  it('retorna mensagem amigável para 403', async () => {
     const error = createAxiosError(403, '/admin', 'Forbidden')
 
     const thrown = await expectApiError(() => handler(error))
@@ -84,7 +84,7 @@ describe('createResponseErrorHandler', () => {
     expect(thrown.message).toBe('Você não tem permissão para realizar esta ação.')
   })
 
-  it('retorna mensagem amigavel para 404', async () => {
+  it('retorna mensagem amigável para 404', async () => {
     const error = createAxiosError(404, '/missing', 'Not Found')
 
     const thrown = await expectApiError(() => handler(error))
@@ -93,7 +93,7 @@ describe('createResponseErrorHandler', () => {
     expect(thrown.message).toBe('Recurso não encontrado.')
   })
 
-  it('retorna mensagem amigavel para 429', async () => {
+  it('retorna mensagem amigável para 429', async () => {
     const error = createAxiosError(429, '/rate-limited', 'Too Many Requests')
 
     const thrown = await expectApiError(() => handler(error))
@@ -102,7 +102,7 @@ describe('createResponseErrorHandler', () => {
     expect(thrown.message).toBe('Muitas tentativas. Aguarde um momento e tente novamente.')
   })
 
-  it('retorna mensagem padrao para status desconhecido', async () => {
+  it('retorna mensagem padrão para status desconhecido', async () => {
     const error = createAxiosError(500, '/error', 'Internal Server Error')
 
     const thrown = await expectApiError(() => handler(error))
@@ -142,7 +142,7 @@ describe('createResponseErrorHandler', () => {
     return error
   }
 
-  it('exibe toast para erro de rede quando o servidor esta indisponivel', async () => {
+  it('exibe toast para erro de rede quando o servidor está indisponível', async () => {
     const error = new AxiosError<{ message: string; errors?: Record<string, string[]> }>(
       'Network Error',
       'ERR_NETWORK',

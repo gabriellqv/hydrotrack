@@ -21,7 +21,11 @@ const alertConfig: Record<string, { icon: typeof AlertTriangle; color: string }>
   zero_reading: { icon: AlertTriangle, color: 'text-amber-400 bg-amber-500/15' },
 }
 
-/** Formata timestamp para horário relativo legível */
+/**
+ * Retorna representação relativa do timestamp: 'agora', '{minutos}min', '{horas}h' ou '{dias}d'.
+ *
+ * @param dateStr - Timestamp ISO.
+ */
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime()
   const mins = Math.floor(diff / 60000)

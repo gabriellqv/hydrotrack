@@ -10,22 +10,15 @@ import type {
 import { useToastStore } from '@/stores/toast'
 
 /**
- * Store de hidrômetros — gerencia o estado global de dispositivos.
+ * Store de hidrômetros - gerencia o estado global de dispositivos.
  *
- * Segue o padrão de "setup store" do Pinia (Composition API style),
- * separando estado (refs), ações (funções) e getters (computed).
+ * Gerencia o estado de listagem, detalhamento, paginação, criação,
+ * atualização, exclusão e exportação de leituras dos hidrômetros.
  */
 export const useHydrometerStore = defineStore('hydrometer', () => {
-  /** Lista de hidrômetros carregados */
   const hydrometers = ref<Hydrometer[]>([])
-
-  /** Hidrômetro carregado individualmente (página de detalhe) */
   const currentHydrometer = ref<Hydrometer | null>(null)
-
-  /** Indicador de carregamento */
   const loading = ref(false)
-
-  /** Metadados de paginação */
   const pagination = ref({
     currentPage: 1,
     lastPage: 1,
@@ -33,10 +26,10 @@ export const useHydrometerStore = defineStore('hydrometer', () => {
   })
 
   /**
-   * Busca hidrômetros da API com paginação e filtros.
+   * Carrega hidrômetros paginados da API, aplicando filtros opcionais.
    *
-   * @param {number} page - Número da página (default: 1)
-   * @param {Record<string, string>} filters - Filtros opcionais (neighborhood, status, type)
+   * @param page - Número da página.
+   * @param filters - Filtros de busca (ex.: neighborhood, status, type).
    */
   async function fetchHydrometers(page = 1, filters: Record<string, string> = {}) {
     loading.value = true
@@ -62,15 +55,16 @@ export const useHydrometerStore = defineStore('hydrometer', () => {
   const detailLoading = ref(false)
 
   /**
-   * Busca os detalhes de um hidrômetro individual com leituras e alertas.
+   * Carrega os detalhes de um hidrômetro, incluindo leituras e alertas.
+   * Atualiza `detailDays` quando um novo período é fornecido.
    *
-   * @param {number} id - ID do hidrômetro
-   * @param {7 | 30 | 90} days - Período das leituras em dias
+   * @param id - Identificador do hidrômetro.
+   * @param days - Período das leituras; se omitido, mantém o atual.
    */
   async function fetchHydrometer(id: number, days?: 7 | 30 | 90) {
     if (days !== undefined) {
       detailDays.value = days
-      detailLoading.value = true // Apenas o gráfico ficará com "loading"
+      detailLoading.value = true // Apenas o gráfico exibe indicador de carregamento.
     } else {
       loading.value = true // Primeira vez carregando a tela inteira
     }
@@ -89,8 +83,8 @@ export const useHydrometerStore = defineStore('hydrometer', () => {
   /**
    * Cria um novo hidrômetro via API.
    *
-   * @param {CreateHydrometerPayload} payload
-   * @returns {Promise<Hydrometer>} O hidrômetro criado
+   * @param payload - Dados do novo hidrômetro.
+   * @returns Hidrômetro criado.
    */
   async function createHydrometer(payload: CreateHydrometerPayload): Promise<Hydrometer> {
     const toast = useToastStore()
@@ -108,8 +102,8 @@ export const useHydrometerStore = defineStore('hydrometer', () => {
   /**
    * Atualiza um hidrômetro existente.
    *
-   * @param {number} id - ID do hidrômetro
-   * @param {UpdateHydrometerPayload} payload - Campos a atualizar
+   * @param id - Identificador do hidrômetro.
+   * @param payload - Campos a atualizar.
    */
   async function updateHydrometer(id: number, payload: UpdateHydrometerPayload) {
     const toast = useToastStore()
@@ -126,7 +120,7 @@ export const useHydrometerStore = defineStore('hydrometer', () => {
   /**
    * Remove um hidrômetro do sistema.
    *
-   * @param {number} id - ID do hidrômetro a remover
+   * @param id - Identificador do hidrômetro a remover.
    */
   async function deleteHydrometer(id: number) {
     const toast = useToastStore()
@@ -142,8 +136,8 @@ export const useHydrometerStore = defineStore('hydrometer', () => {
   /**
    * Exporta as leituras do hidrômetro em formato CSV via download.
    *
-   * @param {number} id - ID do hidrômetro
-   * @param {string} code - Código do hidrômetro (para nome do arquivo)
+   * @param id - Identificador do hidrômetro.
+   * @param code - Código do hidrômetro (para nome do arquivo).
    */
   async function exportReadings(id: number, code: string) {
     const toast = useToastStore()

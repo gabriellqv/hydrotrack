@@ -8,8 +8,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * Formata a representação JSON de um hidrômetro para a API.
  *
- * Garante que o Model nunca é exposto diretamente na response,
- * controlando exatamente quais campos o frontend recebe.
+ * Garante que a instância do modelo Hydrometer nunca é exposta
+ * diretamente na response, controlando quais campos o frontend recebe.
  */
 class HydrometerResource extends JsonResource
 {

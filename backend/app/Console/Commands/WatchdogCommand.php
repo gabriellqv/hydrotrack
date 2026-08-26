@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Log;
  * Job de vigilância que detecta hidrômetros sem comunicação.
  *
  * Em sistemas de telemetria reais, o maior problema não é quando o sensor
- * envia dados errados — é quando ele PARA de enviar. Bateria acabou,
+ * envia dados errados; é quando ele PARA de enviar. Bateria acabou,
  * antena quebrou, firmware travou. Este comando detecta esse cenário.
  *
  * Agendado para rodar a cada 5 minutos via Laravel Scheduler.

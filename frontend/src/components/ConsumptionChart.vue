@@ -16,13 +16,14 @@ import {
 } from 'chart.js'
 import type { ConsumptionPoint } from '@/types'
 import { useTheme } from '@/composables/useTheme'
+
 /**
- * Gráfico de linha que exibe o consumo hídrico diário acumulado.
+ * Gráfico de linha de consumo de água.
  *
- * Usa a biblioteca Chart.js via vue-chartjs para renderizar
- * a evolução do consumo em m³ ao longo do período selecionado.
+ * Renderiza a evolução do consumo em m³ ao longo do período selecionado,
+ * respeitando tema claro/escuro e aplicando animação de entrada controlada.
  *
- * @prop {ConsumptionPoint[]} data - Array de pontos {date, total_m3}
+ * @prop {ConsumptionPoint[]} data - Array de pontos {date, total_m3}.
  */
 const props = defineProps<{
   data: ConsumptionPoint[]
@@ -78,6 +79,9 @@ const chartOptions: ChartOptions<'line'> = {
   },
 }
 
+/**
+ * Dados exibidos pelo gráfico. Inicia vazio para produzir animação de crescimento ao montar.
+ */
 const displayedData = ref<ChartData<'line'>>({
   labels: [],
   datasets: [
@@ -95,6 +99,7 @@ const displayedData = ref<ChartData<'line'>>({
 })
 
 onMounted(() => {
+  // Aplica os dados após pequeno delay para ativar a animação de entrada do Chart.js.
   setTimeout(() => {
     displayedData.value = fullChartData.value
   }, 400)

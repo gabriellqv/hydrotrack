@@ -14,17 +14,28 @@ import AlertItem from '@/components/AlertItem.vue'
 
 const store = useAlertStore()
 
-/** Contadores calculados a partir dos alertas carregados */
+/**
+ * Contadores derivados da lista de alertas exibidos, sem nova requisição.
+ */
 const pendingCount = computed(() => store.alerts.filter((a) => !a.resolved).length)
 const resolvedCount = computed(() => store.alerts.filter((a) => a.resolved).length)
 
-/** Altera o filtro de tipo e recarrega os alertas */
+/**
+ * Ativa ou remove o filtro de tipo e recarrega a listagem.
+ * Selecionar o mesmo valor limpa o filtro.
+ *
+ * @param type - Tipo de alerta.
+ */
 function filterByType(type: string) {
   store.filters.type = store.filters.type === type ? '' : type
   store.fetchAlerts()
 }
 
-/** Altera o filtro de status e recarrega os alertas */
+/**
+ * Ativa ou remove o filtro de status resolvido/pendente e recarrega a listagem.
+ *
+ * @param resolved - Status de resolução como string ('true' ou 'false').
+ */
 function filterByResolved(resolved: string) {
   store.filters.resolved = store.filters.resolved === resolved ? '' : resolved
   store.fetchAlerts()
@@ -48,10 +59,8 @@ await store.fetchAlerts()
       </p>
     </div>
 
-    <!-- Filtros -->
     <BaseCard compact class="shrink-0">
       <div class="flex flex-wrap gap-2">
-        <!-- Filtros por tipo -->
         <span class="text-xs text-text-muted self-center mr-1">Tipo:</span>
         <button
           v-for="opt in [
@@ -73,7 +82,6 @@ await store.fetchAlerts()
 
         <div class="w-px bg-border mx-1 self-stretch"></div>
 
-        <!-- Filtros por status -->
         <span class="text-xs text-text-muted self-center mr-1">Status:</span>
         <button
           @click="filterByResolved('false')"

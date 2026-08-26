@@ -7,14 +7,14 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Middleware que adiciona headers de seguranca em todas as respostas.
+ * Middleware que adiciona headers de segurança em todas as respostas.
  *
- * Inclui protecoes contra clickjacking, mime sniffing e forca HTTPS em producao.
+ * Inclui proteções contra clickjacking, mime sniffing e força HTTPS em produção.
  */
 class SecurityHeaders
 {
     /**
-     * Adiciona headers de seguranca na resposta.
+     * Adiciona headers de segurança na resposta.
      */
     public function handle(Request $request, Closure $next): Response
     {

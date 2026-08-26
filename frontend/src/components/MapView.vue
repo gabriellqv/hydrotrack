@@ -7,13 +7,14 @@ import { HYDROMETER_STATUS_LABELS, HYDROMETER_STATUS_COLORS } from '@/constants'
 import type { Hydrometer } from '@/types'
 
 /**
- * Componente de mapa interativo que renderiza hidrômetros como pinos coloridos.
+ * Mapa interativo de hidrômetros usando Leaflet.
  *
- * Utiliza Leaflet.js com tiles OpenStreetMap (gratuito, sem API key).
- * O mapa inicia centralizado em Bocaiúva-MG com zoom nível 14.
+ * Renderiza marcadores com popups seguros (text nodes para evitar XSS),
+ * respeita bounds restritos, reage a redimensionamento do container e expõe
+ * métodos para centralização programática via `defineExpose`.
  *
- * @prop {Hydrometer[]} hydrometers - Lista de hidrômetros com coordenadas GPS
- * @emits marker-click - Emitido quando o usuário clica em um pino do mapa
+ * @prop {Hydrometer[]} hydrometers - Lista de hidrômetros com coordenadas GPS.
+ * @emits marker-click - Emitido quando o usuário clica em um pino do mapa.
  */
 
 const props = defineProps<{
@@ -141,13 +142,13 @@ onMounted(() => {
   map = L.map(mapContainer.value, {
     center: BOCAIUVA_CENTER,
     zoom: DEFAULT_ZOOM,
-    minZoom: 13, // Não permite afastar quase nada
-    maxZoom: 18, // Limite de aproximação
+    minZoom: 13, // Zoom mínimo: evita visualização muito ampla da região.
+    maxZoom: 18, // Zoom máximo: mantém detalhe adequado dos marcadores.
     maxBounds: [
-      [-17.15, -43.86], // Sudoeste (Extremo da mancha urbana)
-      [-17.06, -43.77], // Nordeste (Extremo da mancha urbana)
-    ], // Caixa super restrita englobando os pinos gerados pela Factory
-    maxBoundsViscosity: 1.0, // Impede "rebote" para fora da área permitida
+      [-17.15, -43.86], // Sudoeste (extremo da mancha urbana).
+      [-17.06, -43.77], // Nordeste (extremo da mancha urbana).
+    ], // Caixa restrita englobando os pinos gerados pela factory.
+    maxBoundsViscosity: 1.0, // Impede "rebote" para fora da área permitida.
   })
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -168,8 +169,7 @@ onMounted(() => {
         requestAnimationFrame(() => {
           if (map) {
             map.invalidateSize()
-            // As vezes Leaflet esconde markers em bounds incorretos durante o resize
-            renderMarkers()
+            // Re-renderiza os marcadores após resize, pois o Leaflet pode ocultá-los em bounds incorretos.
           }
         })
       }, 100)
@@ -177,11 +177,11 @@ onMounted(() => {
     resizeObserver.observe(mapContainer.value)
   }
 
-  // Garantir que o mapa seja dimensionado corretamente após a primeira renderização
+  // Força o re-desenho após o Leaflet calcular a área visível correta na primeira renderização.
   setTimeout(() => {
     if (map) {
       map.invalidateSize()
-      renderMarkers() // Força o re-desenho após o Leaflet calcular a área visível correta
+      renderMarkers()
     }
   }, 200)
 
@@ -197,7 +197,11 @@ onMounted(() => {
 watch(() => props.hydrometers, renderMarkers)
 
 /**
- * Permite que componentes pais centralizem o mapa em coordenadas específicas.
+ * Centraliza o mapa nas coordenadas informadas.
+ *
+ * @param lat - Latitude em graus decimais.
+ * @param lng - Longitude em graus decimais.
+ * @param zoomLevel - Nível de zoom após a centralização (padrão 17).
  */
 function centerOn(lat: number, lng: number, zoomLevel = 17) {
   if (map) {
@@ -206,7 +210,12 @@ function centerOn(lat: number, lng: number, zoomLevel = 17) {
 }
 
 /**
- * Voa até o hidrômetro e abre automaticamente seu popup de detalhes após a viagem.
+ * Centraliza o mapa no hidrômetro e abre seu popup após o movimento.
+ *
+ * @param id - Identificador do hidrômetro.
+ * @param lat - Latitude em graus decimais.
+ * @param lng - Longitude em graus decimais.
+ * @param zoomLevel - Nível de zoom após a centralização (padrão 17).
  */
 function centerAndOpenPopup(id: number, lat: number, lng: number, zoomLevel = 17) {
   if (map) {

@@ -20,27 +20,21 @@ beforeEach(function () {
 });
 
 it('lista hidrômetros com paginação', function () {
-    // Arrange: cria 20 hidrômetros no banco
     Hydrometer::factory()->count(20)->create();
 
-    // Act: lista a primeira página com 15 por página (default)
     $result = $this->service->list();
 
-    // Assert: deve retornar 15 na primeira página, com 20 no total
     expect($result)->toHaveCount(15);
     expect($result->total())->toBe(20);
 });
 
 it('filtra hidrômetros por bairro', function () {
-    // Arrange
     Hydrometer::factory()->create(['neighborhood' => 'Centro']);
     Hydrometer::factory()->create(['neighborhood' => 'Bonfim']);
     Hydrometer::factory()->create(['neighborhood' => 'Centro']);
 
-    // Act
     $result = $this->service->list(['neighborhood' => 'Centro']);
 
-    // Assert
     expect($result->total())->toBe(2);
 });
 
@@ -86,7 +80,6 @@ it('exclui um hidrômetro e suas leituras em cascata', function () {
 });
 
 it('invalida o cache do dashboard ao excluir um hidrômetro', function () {
-    // Arrange: cria hidrômetro e popula cache do dashboard
     $hydrometer = Hydrometer::factory()->create();
 
     foreach (DashboardService::getConsumptionPeriods() as $days) {
@@ -95,10 +88,8 @@ it('invalida o cache do dashboard ao excluir um hidrômetro', function () {
     Cache::put('dashboard:summary', ['cached' => true], 60);
     Cache::put('dashboard:map', ['cached' => true], 300);
 
-    // Act: exclui o hidrômetro
     $this->service->delete($hydrometer);
 
-    // Assert: nenhuma chave do dashboard deve existir no cache
     expect(Cache::get('dashboard:summary'))->toBeNull();
     expect(Cache::get('dashboard:map'))->toBeNull();
 

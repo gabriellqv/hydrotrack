@@ -14,8 +14,8 @@ vi.mock('@/stores/toast', () => ({
 /**
  * Testes do componente EditHydrometerModal.
  *
- * Validam preenchimento inicial do formulario com os dados do hidrometro,
- * submissao bem-sucedida, chamada da store e emissao do evento close.
+ * Validam preenchimento inicial do formulário com os dados do hidrômetro,
+ * submissão bem-sucedida, chamada da store e emissão do evento close.
  */
 
 const mockHydrometer: Hydrometer = {
@@ -23,7 +23,7 @@ const mockHydrometer: Hydrometer = {
   code: 'HYD-002',
   latitude: -17.1085,
   longitude: -43.8143,
-  address: 'Rua das Aguas',
+  address: 'Rua das Águas',
   neighborhood: 'Centro',
   status: 'online',
   type: 'residential',
@@ -62,18 +62,18 @@ describe('EditHydrometerModal', () => {
     })
   }
 
-  it('renderiza titulo e preenche campos com dados do hidrometro', () => {
+  it('renderiza título e preenche campos com dados do hidrômetro', () => {
     const wrapper = mountComponent()
 
-    expect(wrapper.text()).toContain('Editar Hidrometro')
+    expect(wrapper.text()).toContain('Editar Hidrômetro')
 
     const codeInput = wrapper.find('input[placeholder="HYD-201"]')
     expect(codeInput.exists()).toBe(true)
     expect((codeInput.element as HTMLInputElement).value).toBe('HYD-002')
 
-    const addressInput = wrapper.find('input[placeholder="Rua das Aguas, 100"]')
+    const addressInput = wrapper.find('input[placeholder="Rua das Águas, 100"]')
     expect(addressInput.exists()).toBe(true)
-    expect((addressInput.element as HTMLInputElement).value).toBe('Rua das Aguas')
+    expect((addressInput.element as HTMLInputElement).value).toBe('Rua das Águas')
 
     const neighborhoodInput = wrapper.find('input[placeholder="Centro"]')
     expect(neighborhoodInput.exists()).toBe(true)
@@ -84,7 +84,7 @@ describe('EditHydrometerModal', () => {
     expect((select.element as HTMLSelectElement).value).toBe('residential')
   })
 
-  it('atualiza campo e chama store ao salvar alteracoes', async () => {
+  it('atualiza campo e chama store ao salvar alterações', async () => {
     const wrapper = mountComponent()
     const store = useHydrometerStore()
 
@@ -99,7 +99,7 @@ describe('EditHydrometerModal', () => {
       code: 'HYD-002-EDIT',
       latitude: -17.1085,
       longitude: -43.8143,
-      address: 'Rua das Aguas',
+      address: 'Rua das Águas',
       neighborhood: 'Centro',
       type: 'residential',
     })

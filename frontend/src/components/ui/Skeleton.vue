@@ -1,3 +1,6 @@
+/** * Componente base de skeleton loader. * * Renderiza um placeholder animado. A prop `circle`
+alterna entre * formato retangular e circular. */
+
 <template>
   <div
     :class="[

@@ -15,7 +15,8 @@ use Illuminate\Support\Facades\Cache;
  * Fornece métricas agregadas de consumo, contagens de dispositivos por status
  * e dados formatados para alimentar gráficos e o mapa interativo.
  *
- * Utiliza cache-aside pattern com invalidação event-driven via IngestController.
+ * Utiliza cache-aside pattern com invalidação disparada por ingestão,
+ * alterações em hidrômetros, resolução de alertas e execução do watchdog.
  * Em produção, o driver pode ser migrado de 'database' para Redis sem alteração de código.
  */
 class DashboardService
@@ -26,7 +27,7 @@ class DashboardService
     /** TTL do cache de mapa em segundos */
     private const CACHE_TTL_MAP = 300;
 
-    /** Periodos disponiveis para o grafico de consumo */
+    /** Períodos disponíveis para o gráfico de consumo */
     private const CONSUMPTION_PERIODS = [7, 30, 90];
 
     /**
@@ -91,7 +92,7 @@ class DashboardService
     }
 
     /**
-     * Retorna a chave de cache padronizada para o grafico de consumo.
+     * Retorna a chave de cache padronizada para o gráfico de consumo.
      */
     public function getConsumptionCacheKey(int $days): string
     {
@@ -101,7 +102,7 @@ class DashboardService
     /**
      * Retorna todos os hidrômetros com coordenadas e status para renderizar no mapa.
      *
-     * Cacheia por 5 minutos — dados de posicionamento mudam com pouca frequência.
+     * Cacheia por 5 minutos. Dados de posicionamento mudam com pouca frequência.
      *
      * @return Collection Coleção de hidrômetros com campos selecionados
      */
@@ -117,8 +118,8 @@ class DashboardService
     /**
      * Invalida todos os caches do dashboard.
      *
-     * Chamado pelo IngestController após registrar uma nova leitura,
-     * garantindo que os dados exibidos estejam sempre atualizados.
+     * Chamado após ingestão, alterações em hidrômetros, resolução de alertas
+     * e execução do watchdog, garantindo que os dados exibidos estejam atualizados.
      */
     public static function invalidateCache(): void
     {
@@ -132,7 +133,7 @@ class DashboardService
     }
 
     /**
-     * Retorna os periodos de consumo suportados pelo cache.
+     * Retorna os períodos de consumo suportados pelo cache.
      *
      * @return array<int>
      */

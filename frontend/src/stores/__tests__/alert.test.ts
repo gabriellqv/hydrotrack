@@ -5,9 +5,9 @@ import { api } from '@/services/api'
 import type { Alert } from '@/types'
 
 /**
- * Testes unitarios da store de alertas.
+ * Testes unitários da store de alertas.
  *
- * Validam listagem com filtros e resolucao de alertas.
+ * Validam listagem com filtros e resolução de alertas.
  */
 
 vi.mock('@/services/api')
@@ -18,7 +18,7 @@ beforeEach(() => {
 })
 
 describe('useAlertStore', () => {
-  it('inicia com lista vazia e filtros padrao', () => {
+  it('inicia com lista vazia e filtros padrão', () => {
     const store = useAlertStore()
 
     expect(store.alerts).toEqual([])
@@ -48,7 +48,7 @@ describe('useAlertStore', () => {
     expect(api.get).toHaveBeenCalledWith('/alerts', { signal: undefined })
   })
 
-  it('aplica filtros de tipo e resolucao na URL', async () => {
+  it('aplica filtros de tipo e resolução na URL', async () => {
     vi.mocked(api.get).mockResolvedValue({ data: { data: [] } })
 
     const store = useAlertStore()

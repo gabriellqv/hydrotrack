@@ -13,10 +13,8 @@ uses(RefreshDatabase::class);
  * incluindo cenários de erro (sem auth, dados inválidos, role insuficiente).
  */
 it('permite que um admin crie um hidrômetro', function () {
-    // Arrange: cria um usuário admin e autentica
     $admin = User::factory()->create(['role' => 'admin']);
 
-    // Act: faz POST autenticado
     $response = $this->actingAs($admin)->postJson('/api/hydrometers', [
         'code' => 'HYD-001',
         'latitude' => -17.1085,
@@ -26,7 +24,6 @@ it('permite que um admin crie um hidrômetro', function () {
         'type' => 'commercial',
     ]);
 
-    // Assert: 201 Created com os dados corretos
     $response->assertStatus(201)
         ->assertJsonPath('data.code', 'HYD-001')
         ->assertJsonPath('data.status', 'online');
@@ -60,10 +57,8 @@ it('rejeita criação sem autenticação', function () {
 it('rejeita criação com código duplicado', function () {
     $admin = User::factory()->create(['role' => 'admin']);
 
-    // Cria o primeiro
     Hydrometer::factory()->create(['code' => 'HYD-DUP']);
 
-    // Tenta criar com o mesmo código
     $response = $this->actingAs($admin)->postJson('/api/hydrometers', [
         'code' => 'HYD-DUP',
         'latitude' => -17.1,

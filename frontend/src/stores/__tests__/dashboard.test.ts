@@ -5,7 +5,7 @@ import { api } from '@/services/api'
 import type { DashboardSummary, ConsumptionPoint, Hydrometer, Alert } from '@/types'
 
 /**
- * Testes unitarios da store do dashboard.
+ * Testes unitários da store do dashboard.
  *
  * Validam carregamento de resumo, consumo, mapa e alertas recentes.
  */
@@ -18,7 +18,7 @@ beforeEach(() => {
 })
 
 describe('useDashboardStore', () => {
-  it('inicia com valores padrao', () => {
+  it('inicia com valores padrão', () => {
     const store = useDashboardStore()
 
     expect(store.summary).toBeNull()
@@ -46,7 +46,7 @@ describe('useDashboardStore', () => {
     expect(store.loading).toBe(false)
   })
 
-  it('carrega dados de consumo mantendo periodo padrao', async () => {
+  it('carrega dados de consumo mantendo período padrão', async () => {
     const mockConsumption: ConsumptionPoint[] = [{ date: '2026-07-01', total_m3: 100 }]
     vi.mocked(api.get).mockResolvedValue({ data: mockConsumption })
 
@@ -58,7 +58,7 @@ describe('useDashboardStore', () => {
     expect(api.get).toHaveBeenCalledWith('/dashboard/consumption?days=30', { signal: undefined })
   })
 
-  it('altera periodo ao carregar consumo', async () => {
+  it('altera período ao carregar consumo', async () => {
     vi.mocked(api.get).mockResolvedValue({ data: [] })
 
     const store = useDashboardStore()
@@ -68,7 +68,7 @@ describe('useDashboardStore', () => {
     expect(api.get).toHaveBeenCalledWith('/dashboard/consumption?days=90', { signal: undefined })
   })
 
-  it('carrega hidrometros para o mapa', async () => {
+  it('carrega hidrômetros para o mapa', async () => {
     const mockHydrometers: Hydrometer[] = [
       { id: 1, code: 'HYD-001', status: 'online', latitude: 0, longitude: 0 } as Hydrometer,
     ]
@@ -80,7 +80,7 @@ describe('useDashboardStore', () => {
     expect(store.mapHydrometers).toEqual(mockHydrometers)
   })
 
-  it('carrega ate 5 alertas recentes', async () => {
+  it('carrega até 5 alertas recentes', async () => {
     const mockAlerts: Alert[] = Array.from({ length: 7 }, (_, i) => ({
       id: i + 1,
       hydrometer_id: 1,

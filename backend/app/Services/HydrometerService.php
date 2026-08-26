@@ -101,7 +101,8 @@ class HydrometerService
      * Retorna os detalhes de um hidrômetro com alertas recentes e dados de consumo.
      *
      * @param  Hydrometer  $hydrometer  Instância do hidrômetro
-     * @param  int  $days  Período em dias para o gráfico de consumo
+     * @param  int  $days  Período em dias para o gráfico de consumo (limitado entre 1 e 365)
+     * @return Hydrometer Hidrômetro com alertas e dados de gráfico carregados
      */
     public function getDetails(Hydrometer $hydrometer, int $days): Hydrometer
     {

@@ -21,7 +21,7 @@ class EnsureIsAdmin
     {
         if ($request->user()?->role !== 'admin') {
             return response()->json([
-                'message' => 'Acesso negado. Apenas administradores podem realizar esta acao.',
+                'message' => 'Acesso negado. Apenas administradores podem realizar esta ação.',
             ], 403);
         }
 

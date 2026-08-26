@@ -14,8 +14,8 @@ vi.mock('@/stores/toast', () => ({
 /**
  * Testes do componente DeleteHydrometerDialog.
  *
- * Validam renderizacao da mensagem de confirmacao, chamada da store
- * de exclusao e emissao do evento close.
+ * Validam renderização da mensagem de confirmação, chamada da store
+ * de exclusão e emissão do evento close.
  */
 
 const mockHydrometer: Hydrometer = {
@@ -62,15 +62,15 @@ describe('DeleteHydrometerDialog', () => {
     })
   }
 
-  it('renderiza mensagem de confirmacao com codigo do hidrometro', () => {
+  it('renderiza mensagem de confirmação com código do hidrômetro', () => {
     const wrapper = mountComponent()
 
-    expect(wrapper.text()).toContain('Confirmar Exclusao')
+    expect(wrapper.text()).toContain('Confirmar Exclusão')
     expect(wrapper.text()).toContain('HYD-003')
-    expect(wrapper.text()).toContain('Esta acao e irreversivel')
+    expect(wrapper.text()).toContain('Esta ação é irreversível')
   })
 
-  it('chama deleteHydrometer e emite close ao confirmar exclusao', async () => {
+  it('chama deleteHydrometer e emite close ao confirmar exclusão', async () => {
     const wrapper = mountComponent()
     const store = useHydrometerStore()
 

@@ -8,10 +8,11 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 
 /**
- * View de Autenticação.
+ * View de autenticação.
  *
- * Exibe o formulário de login e faz a interface com o AuthStore
- * para requisição de token Sanctum. Trata erros visuais (401, 422, etc).
+ * Aplica validação client-side customizada (form com `novalidate`), trata erros
+ * HTTP de forma amigável e redireciona para rotas internas após login,
+ * prevenindo open redirect.
  */
 
 const router = useRouter()
@@ -23,11 +24,16 @@ const password = ref('')
 const loading = ref(false)
 const error = ref('')
 
+/**
+ * Realiza login via API, armazena o token e redireciona de forma segura.
+ *
+ * A validação client-side substitui os tooltips nativos do browser (form com `novalidate`).
+ * O redirecionamento pós-login é validado para evitar open redirect.
+ */
 async function handleLogin() {
   loading.value = true
   error.value = ''
 
-  // Validação client-side customizada (substitui tooltips nativos do browser)
   const errors: string[] = []
   if (!email.value) {
     errors.push('O campo e-mail é obrigatório.')
@@ -53,6 +59,7 @@ async function handleLogin() {
     await authStore.fetchUser()
 
     const redirect = (route.query.redirect as string) || '/'
+    // Garante que o redirecionamento pós-login seja interno, evitando open redirect.
     const isInternalRedirect = redirect.startsWith('/') && !redirect.startsWith('//')
     router.push(isInternalRedirect ? redirect : '/')
 
@@ -77,14 +84,12 @@ async function handleLogin() {
 <template>
   <div class="flex min-h-dvh items-center justify-center bg-surface px-4">
     <div class="w-full max-w-md animate-fade-in">
-      <!-- Logo -->
       <div class="flex flex-col items-center mb-8">
         <img src="/favicon.svg" alt="HydroTrack" class="h-16 w-16 mb-4 drop-shadow-lg" />
         <h1 class="text-2xl font-bold text-text-heading">HydroTrack</h1>
         <p class="text-sm text-text-muted mt-1">Monitoramento Hídrico Inteligente</p>
       </div>
 
-      <!-- Formulário -->
       <div class="rounded-xl border border-border bg-surface-card p-6 sm:p-8 shadow-card">
         <h2 class="text-lg font-semibold text-text-heading mb-6">Entrar na plataforma</h2>
 

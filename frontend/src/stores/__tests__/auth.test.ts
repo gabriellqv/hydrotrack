@@ -4,9 +4,9 @@ import { useAuthStore } from '../auth'
 import { api } from '@/services/api'
 
 /**
- * Testes unitarios da store de autenticacao.
+ * Testes unitários da store de autenticação.
  *
- * Validam persistencia do token, logout e carregamento do usuario autenticado.
+ * Validam persistência do token, logout e carregamento do usuário autenticado.
  */
 
 vi.mock('@/services/api')
@@ -28,7 +28,7 @@ beforeEach(() => {
 })
 
 describe('useAuthStore', () => {
-  it('inicia nao autenticada sem token', () => {
+  it('inicia não autenticada sem token', () => {
     const store = useAuthStore()
 
     expect(store.token).toBeNull()
@@ -46,7 +46,7 @@ describe('useAuthStore', () => {
     expect(localStorageMock.setItem).toHaveBeenCalledWith('auth_token', 'fake-token')
   })
 
-  it('carrega usuario autenticado da API', async () => {
+  it('carrega usuário autenticado da API', async () => {
     const mockUser = { id: 1, name: 'Admin', email: 'admin@hydrotrack.com', role: 'admin' }
     vi.mocked(api.get).mockResolvedValue({ data: mockUser })
 

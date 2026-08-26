@@ -1,3 +1,5 @@
+/** * Skeleton da view Dashboard, espelhando o layout de gráficos, mapa e alertas. */
+
 <template>
   <div
     class="flex flex-col min-h-[calc(100vh-4rem)] lg:h-[calc(100vh-4rem)] space-y-3 lg:min-h-0 animate-pulse p-4 lg:p-5"
@@ -7,10 +9,8 @@
       <Skeleton class="h-4 w-64" />
     </div>
 
-    <!-- Unified Dashboard Wrapper Skeleton -->
     <div class="flex-1 flex flex-col lg:min-h-0">
       <div class="grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-3 gap-6 lg:gap-8 flex-1">
-        <!-- Top Left: Gráfico Normal -->
         <div
           class="flex flex-col lg:row-span-2 bg-surface-card border border-border/50 rounded-xl p-4 lg:p-5"
         >
@@ -18,7 +18,6 @@
           <div
             class="flex-1 w-full bg-surface-hover/50 rounded-lg border border-border/30 p-4 flex items-end gap-2"
           >
-            <!-- Simulated chart bars -->
             <Skeleton
               v-for="i in 12"
               :key="i"
@@ -28,12 +27,10 @@
           </div>
         </div>
 
-        <!-- Top Right: Mapa -->
         <div
           class="flex flex-col lg:row-span-2 bg-surface-card border border-border/50 rounded-xl p-4 lg:p-5"
         >
           <Skeleton class="h-5 w-48 mb-3" />
-          <!-- Data ribbon skeleton -->
           <div class="flex gap-2 mb-3 h-12">
             <Skeleton class="flex-1 rounded-lg" />
             <Skeleton class="flex-1 rounded-lg" />
@@ -43,7 +40,6 @@
           <Skeleton class="flex-1 w-full rounded-lg" />
         </div>
 
-        <!-- Bottom Left: Gráfico Pizza -->
         <div
           class="flex flex-col lg:row-span-1 bg-surface-card border border-border/50 rounded-xl p-4 lg:p-5"
         >
@@ -53,7 +49,6 @@
           </div>
         </div>
 
-        <!-- Bottom Right: Últimos Alertas -->
         <div
           class="flex flex-col lg:row-span-1 bg-surface-card border border-border/50 rounded-xl p-4 lg:p-5"
         >

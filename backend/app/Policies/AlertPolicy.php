@@ -6,12 +6,12 @@ use App\Models\Alert;
 use App\Models\User;
 
 /**
- * Policy de autorizacao para acoes sobre alertas.
+ * Policy de autorização para ações sobre alertas.
  */
 class AlertPolicy
 {
     /**
-     * Determina se o usuario pode resolver um alerta.
+     * Determina se o usuário pode resolver um alerta.
      */
     public function resolve(User $user, Alert $alert): bool
     {

@@ -16,7 +16,7 @@ class StoreHydrometerRequest extends FormRequest
     /**
      * Determina se o usuário tem autorização para fazer esta request.
      *
-     * @return bool Sempre true — a autorização é feita via middleware.
+     * @return bool Sempre true, pois a autorização é feita via middleware.
      */
     public function authorize(): bool
     {

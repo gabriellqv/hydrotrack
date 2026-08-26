@@ -1,14 +1,15 @@
 <script setup lang="ts">
 /**
- * Input reutilizável com label, erro e ícone opcional.
+ * Input base com suporte a v-model.
  *
- * @prop {string} label - Label do campo
- * @prop {string} modelValue - Valor do v-model
- * @prop {string} type - Tipo do input (text, email, password, number)
- * @prop {string} placeholder - Texto placeholder
- * @prop {string} error - Mensagem de erro de validação
- * @prop {boolean} disabled - Desabilita o campo
+ * @prop {string | number} modelValue - Valor atual controlado pelo v-model.
+ * @prop {string} type - Tipo nativo do input.
+ * @prop {string} label - Rótulo exibido acima do campo.
+ * @prop {string} placeholder - Texto placeholder.
+ * @prop {string} error - Mensagem de erro a ser exibida.
+ * @prop {boolean} disabled - Desabilita o campo.
  */
+
 defineProps<{
   label?: string
   modelValue: string | number

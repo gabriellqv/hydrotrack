@@ -8,17 +8,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 /**
- * Servico responsavel pela logica de negocio de alertas.
+ * Serviço responsável pela lógica de negócio de alertas.
  *
- * Centraliza listagem paginada, filtragem e resolucao de alertas,
- * mantendo o controller fino e alinhado com o padrao Service do projeto.
+ * Centraliza listagem paginada, filtragem e resolução de alertas,
+ * mantendo o controller fino e alinhado com o padrão Service do projeto.
  */
 class AlertService
 {
     /**
      * Lista alertas paginados com filtros opcionais.
      *
-     * @return LengthAwarePaginator Coleção paginada de alertas com hidrometro
+     * @return LengthAwarePaginator Coleção paginada de alertas com hidrômetro
      */
     public function list(Request $request): LengthAwarePaginator
     {
@@ -38,15 +38,18 @@ class AlertService
     /**
      * Marca um alerta como resolvido.
      *
-     * @param  Alert  $alert  Instancia do alerta a ser resolvido
+     * Atualiza os campos `resolved` e `resolved_at` e invalida o cache
+     * do dashboard para refletir a redução de alertas pendentes.
+     *
+     * @param  Alert  $alert  Instância do alerta a ser resolvido
      * @return Alert Alerta atualizado
      *
-     * @throws \RuntimeException Se o alerta ja estiver resolvido
+     * @throws \RuntimeException Se o alerta já estiver resolvido
      */
     public function resolve(Alert $alert): Alert
     {
         if ($alert->resolved) {
-            throw new \RuntimeException('Alerta ja resolvido.');
+            throw new \RuntimeException('Alerta já resolvido.');
         }
 
         $alert->update([

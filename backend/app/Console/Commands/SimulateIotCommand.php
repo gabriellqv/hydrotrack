@@ -35,6 +35,9 @@ class SimulateIotCommand extends Command
      */
     protected $description = 'Simula sensores IoT enviando leituras de consumo hídrico em tempo real';
 
+    /**
+     * @param  ReadingService  $readingService  Serviço de ingestão de leituras
+     */
     public function __construct(
         private readonly ReadingService $readingService
     ) {
@@ -84,7 +87,7 @@ class SimulateIotCommand extends Command
             $statusIcon = $value > 10 ? '[ALERTA]' : '[OK]';
             $this->line(
                 sprintf(
-                    '  %s [%s] %s — %.3f m3 @ %s',
+                    '  %s [%s] %s - %.3f m3 @ %s',
                     $statusIcon,
                     Carbon::now()->format('H:i:s'),
                     $hydrometer->code,

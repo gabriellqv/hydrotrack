@@ -67,7 +67,7 @@ it('rejeita resolucao de alerta ja resolvido com 409', function () {
         ->patchJson("/api/alerts/{$alert->id}/resolve");
 
     $response->assertStatus(409)
-        ->assertJsonPath('message', 'Alerta ja resolvido.');
+        ->assertJsonPath('message', 'Alerta já resolvido.');
 
     expect($alert->fresh()->resolved_at)->not->toBeNull();
 });

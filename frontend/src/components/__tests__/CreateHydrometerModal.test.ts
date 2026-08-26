@@ -15,8 +15,8 @@ vi.mock('@/stores/toast', () => ({
 /**
  * Testes do componente CreateHydrometerModal.
  *
- * Validam renderizacao do formulario, submissao bem-sucedida,
- * emissao de evento close e exibicao de erros de validacao vindos da API.
+ * Validam renderização do formulário, submissão bem-sucedida,
+ * emissão de evento close e exibição de erros de validação vindos da API.
  */
 
 describe('CreateHydrometerModal', () => {
@@ -49,17 +49,17 @@ describe('CreateHydrometerModal', () => {
     })
   }
 
-  it('renderiza titulo e campos do formulario', () => {
+  it('renderiza título e campos do formulário', () => {
     const wrapper = mountComponent()
 
-    expect(wrapper.text()).toContain('Novo Hidrometro')
+    expect(wrapper.text()).toContain('Novo Hidrômetro')
     expect(wrapper.find('input[placeholder="HYD-201"]').exists()).toBe(true)
-    expect(wrapper.find('input[placeholder="Rua das Aguas, 100"]').exists()).toBe(true)
+    expect(wrapper.find('input[placeholder="Rua das Águas, 100"]').exists()).toBe(true)
     expect(wrapper.find('input[placeholder="Centro"]').exists()).toBe(true)
     expect(wrapper.find('select').exists()).toBe(true)
   })
 
-  it('emite close e reseta formulario ao criar hidrometro com sucesso', async () => {
+  it('emite close e reseta formulário ao criar hidrômetro com sucesso', async () => {
     const wrapper = mountComponent()
     const store = useHydrometerStore()
 
@@ -89,7 +89,7 @@ describe('CreateHydrometerModal', () => {
     const store = useHydrometerStore()
 
     vi.spyOn(store, 'createHydrometer').mockRejectedValue(
-      new ApiError('Erro de validacao', 422, { code: ['Codigo ja existe.'] }),
+      new ApiError('Erro de validação', 422, { code: ['Código já existe.'] }),
     )
 
     const latitudeInput = wrapper.find('input[placeholder="-17.1085"]')
@@ -100,8 +100,8 @@ describe('CreateHydrometerModal', () => {
     await longitudeInput.setValue('-43.8143')
 
     await wrapper.find('form').trigger('submit.prevent')
-    await vi.waitFor(() => wrapper.text().includes('Codigo ja existe.'))
+    await vi.waitFor(() => wrapper.text().includes('Código já existe.'))
 
-    expect(wrapper.text()).toContain('Codigo ja existe.')
+    expect(wrapper.text()).toContain('Código já existe.')
   })
 })

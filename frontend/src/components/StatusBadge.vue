@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { HYDROMETER_STATUS_CONFIG } from '@/constants'
 import BaseBadge from './ui/BaseBadge.vue'
 
 /**
@@ -12,8 +13,6 @@ import BaseBadge from './ui/BaseBadge.vue'
 const props = defineProps<{
   status: 'online' | 'offline' | 'alert'
 }>()
-
-import { HYDROMETER_STATUS_CONFIG } from '@/constants'
 
 const statusMap = {
   online: { variant: 'success' as const, label: HYDROMETER_STATUS_CONFIG.online.label },

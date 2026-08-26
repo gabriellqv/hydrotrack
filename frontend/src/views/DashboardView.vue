@@ -11,16 +11,18 @@ import { Droplets, Wifi, WifiOff, AlertTriangle, BarChart3, Bell } from 'lucide-
 import { PERIOD_OPTIONS } from '@/constants'
 
 /**
- * View Principal do Dashboard.
+ * View principal do dashboard.
  *
  * Consolida as métricas do sistema em 4 blocos: cards de resumo,
  * gráfico de consumo + mapa interativo, e donut de status + alertas recentes.
  *
- * Implementa polling a cada 5 segundos para atualização em tempo real.
+ * Implementa polling a cada 15 segundos, pausado em abas ocultas.
  */
 const store = useDashboardStore()
 
-/** Título dinâmico baseado no período selecionado */
+/**
+ * Título do gráfico de consumo conforme o período selecionado (7, 30, 90 dias).
+ */
 const chartTitle = computed(() => {
   const labels: Record<number, string> = {
     7: 'Consumo Diário (últimos 7 dias)',
@@ -30,24 +32,37 @@ const chartTitle = computed(() => {
   return labels[store.selectedDays] || 'Consumo Diário'
 })
 
-/** Altera o periodo e recarrega os dados de consumo */
+/**
+ * Altera o período do gráfico de consumo (7, 30 ou 90 dias) e recarrega os dados.
+ *
+ * @param days - Novo período em dias.
+ */
 async function changePeriod(days: 7 | 30 | 90) {
   await store.fetchConsumption(days)
 }
 
-/** Intervalo de polling em milissegundos (15s: equilibrio entre tempo real e trafego) */
+/**
+ * Intervalo de polling em milissegundos (15s: equilíbrio entre tempo real e tráfego).
+ */
 const POLLING_INTERVAL = 15_000
 
 let pollingTimer: ReturnType<typeof setInterval> | null = null
 let abortController: AbortController | null = null
 
+/**
+ * Cancela a requisição anterior e cria um novo `AbortController`.
+ */
 function createAbortController() {
   abortController?.abort()
   abortController = new AbortController()
   return abortController
 }
 
-/** Busca todos os dados do dashboard */
+/**
+ * Busca summary, consumo, mapa e alertas em paralelo.
+ * Cancela requisições pendentes do polling anterior via AbortController.
+ * Erros são tratados pela store (toast).
+ */
 async function refreshDashboard() {
   const controller = createAbortController()
   await Promise.all([
@@ -56,18 +71,24 @@ async function refreshDashboard() {
     store.fetchMap(controller.signal),
     store.fetchAlerts(controller.signal),
   ]).catch(() => {
-    // Erros ja sao tratados e notificados pelas stores
+    // Rejeições ignoradas: a store já exibe toasts de erro.
   })
 }
 
-// Top level await to trigger Suspense
+// await de nível superior para ativar o fallback do Suspense no App.vue.
 await refreshDashboard()
 
+/**
+ * Inicia o polling periódico do dashboard.
+ */
 function startPolling() {
   if (pollingTimer) return
   pollingTimer = setInterval(refreshDashboard, POLLING_INTERVAL)
 }
 
+/**
+ * Interrompe o polling periódico.
+ */
 function stopPolling() {
   if (pollingTimer) {
     clearInterval(pollingTimer)
@@ -75,6 +96,9 @@ function stopPolling() {
   }
 }
 
+/**
+ * Pausa o polling quando a aba fica oculta e retoma quando volta ao foco.
+ */
 function handleVisibilityChange() {
   if (document.hidden) {
     stopPolling()
@@ -94,6 +118,9 @@ onUnmounted(() => {
   document.removeEventListener('visibilitychange', handleVisibilityChange)
 })
 
+/**
+ * Configuração dos cards do resumo exibidos no painel superior do mapa.
+ */
 const summaryCards = [
   {
     key: 'total_hydrometers',
@@ -143,11 +170,8 @@ const summaryCards = [
       <p class="text-sm text-text-muted">Visão geral do sistema de monitoramento</p>
     </div>
 
-    <!-- Unified Dashboard Wrapper -->
     <div class="flex-1 flex flex-col z-0 lg:min-h-0">
-      <!-- Layout 2x2: Gráfico | Mapa // Status | Alertas -->
       <div class="grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-3 gap-6 lg:gap-8 flex-1 lg:min-h-0">
-        <!-- Top Left: Gráfico -->
         <BaseCard
           class="flex flex-col lg:row-span-2 min-h-[300px] lg:min-h-0 animate-fade-in anim-delay-100 p-4 lg:p-5"
         >
@@ -177,14 +201,12 @@ const summaryCards = [
           </div>
         </BaseCard>
 
-        <!-- Top Right: Mapa -->
         <BaseCard
           class="flex flex-col lg:row-span-2 min-h-0 animate-fade-in anim-delay-200 p-4 lg:p-5"
         >
           <h3 class="text-sm font-bold text-text-heading mb-3 uppercase tracking-wider shrink-0">
             Mapa de Hidrômetros
           </h3>
-          <!-- Data Ribbon HUD -->
           <div
             class="flex flex-wrap sm:flex-nowrap w-full bg-surface/40 rounded-lg border border-border/50 py-2.5 mb-3 shrink-0"
           >
@@ -213,7 +235,6 @@ const summaryCards = [
           </div>
         </BaseCard>
 
-        <!-- Bottom Left: Donut Chart -->
         <BaseCard
           class="flex flex-col lg:row-span-1 min-h-[250px] lg:min-h-0 animate-fade-in anim-delay-300 p-4 lg:p-5"
         >
@@ -224,7 +245,6 @@ const summaryCards = [
           <p v-else class="text-sm text-text-muted text-center py-4">Carregando...</p>
         </BaseCard>
 
-        <!-- Bottom Right: Últimos Alertas -->
         <BaseCard
           class="flex flex-col lg:row-span-1 min-h-[300px] lg:min-h-0 animate-fade-in anim-delay-400 p-4 lg:p-5"
         >

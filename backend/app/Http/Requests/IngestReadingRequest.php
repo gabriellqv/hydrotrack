@@ -16,7 +16,7 @@ class IngestReadingRequest extends FormRequest
     /**
      * Determina se a request está autorizada.
      *
-     * @return bool Sempre true — a autenticação M2M é feita via middleware.
+     * @return bool Sempre true, pois a autenticação M2M é feita via middleware.
      */
     public function authorize(): bool
     {

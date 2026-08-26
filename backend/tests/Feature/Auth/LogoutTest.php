@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * Testes de integração para o endpoint POST /api/auth/logout.
+ *
+ * Validam a revogação do token Sanctum atual e a manutenção
+ * de tokens de outros usuários.
+ */
+
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -35,9 +42,9 @@ it('impede acesso autenticado apos logout', function () {
         ->postJson('/api/auth/logout')
         ->assertOk();
 
-    // Sanctum nao invalida imediatamente o token em memoria no mesmo teste,
-    // pois o token plain text so e validado contra o hash. Portanto, validamos
-    // a revogacao verificando que o registro foi removido do banco.
+    // Sanctum não invalida imediatamente o token em memória no mesmo teste,
+    // pois o token plain text só é validado contra o hash. Portanto, validamos
+    // a revogação verificando que o registro foi removido do banco.
     $this->assertDatabaseCount('personal_access_tokens', 0);
 });
 

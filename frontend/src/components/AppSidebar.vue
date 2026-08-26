@@ -77,7 +77,6 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <!-- Backdrop mobile -->
   <Transition name="fade">
     <div
       v-if="open"
@@ -86,7 +85,6 @@ onUnmounted(() => {
     />
   </Transition>
 
-  <!-- Sidebar -->
   <aside
     :class="[
       'fixed top-0 left-0 z-50 h-dvh w-full lg:w-[var(--sidebar-width)] flex flex-col border-r backdrop-blur-2xl',
@@ -98,14 +96,12 @@ onUnmounted(() => {
       borderColor: 'var(--sidebar-border)',
     }"
   >
-    <!-- Logo + Close button (mobile) -->
     <div class="flex items-center gap-3 px-6 py-5 border-b border-border">
       <img src="/favicon.svg" alt="HydroTrack" class="h-8 w-8 drop-shadow-sm" />
       <div class="flex-1">
         <h1 class="text-lg font-bold text-text-heading">HydroTrack</h1>
         <p class="text-xs text-text-muted">Monitoramento</p>
       </div>
-      <!-- Toggle de tema -->
       <button
         @click="toggleTheme"
         class="rounded-lg p-1.5 text-text-muted hover:bg-surface-hover hover:text-text-heading transition-colors"
@@ -123,7 +119,6 @@ onUnmounted(() => {
       </button>
     </div>
 
-    <!-- Navegação -->
     <nav class="flex-1 px-3 py-4 space-y-1">
       <RouterLink
         v-for="item in navItems"
@@ -141,11 +136,8 @@ onUnmounted(() => {
       </RouterLink>
     </nav>
 
-    <!-- Rodapé com usuário e logout -->
     <div class="border-t border-border px-4 py-4 space-y-3">
-      <!-- Usuário e logout -->
       <div class="flex items-center gap-3">
-        <!-- Avatar -->
         <div
           class="flex h-9 w-9 items-center justify-center rounded-full bg-primary-600/20 text-primary-400 text-sm font-bold shrink-0"
         >
@@ -161,7 +153,6 @@ onUnmounted(() => {
           </p>
         </div>
 
-        <!-- Botão de logout -->
         <button
           @click="authStore.logout()"
           class="rounded-lg p-2 text-text-muted hover:bg-surface-hover hover:text-red-400 transition-colors"
