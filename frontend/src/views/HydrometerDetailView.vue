@@ -12,11 +12,12 @@ import { ArrowLeft, Download, MapPin } from 'lucide-vue-next'
 import { HYDROMETER_TYPE_LABELS, PERIOD_OPTIONS } from '@/constants'
 
 /**
- * View de Detalhe do Hidrômetro.
+ * View de detalhe do hidrômetro.
  *
  * Exibe informações completas de um hidrômetro individual, incluindo
- * mini-gráfico das últimas leituras, lista de alertas associados e
- * botão de exportação CSV.
+ * mini-gráfico das últimas leituras configurável por período,
+ * lista de alertas associados e ação de exportação CSV.
+ * Valida o ID da rota e redireciona para a lista quando inválido.
  */
 
 const route = useRoute()
@@ -28,21 +29,29 @@ const id = Number(route.params.id)
 if (isNaN(id)) {
   router.push({ name: 'hydrometers' })
 } else {
+  // Valida o ID da rota e busca o hidrômetro; redireciona para a lista em caso de ID inválido.
   await store.fetchHydrometer(id)
 }
 
-/** Mapeia leituras para o formato esperado pelo ConsumptionChart */
+/**
+ * Retorna os dados brutos do gráfico mantidos pelo store.
+ */
 function readingsToChartData() {
   if (!store.currentHydrometer?.chart_data) return []
   return store.currentHydrometer.chart_data
 }
 
+/**
+ * Solicita a exportação CSV das leituras do hidrômetro exibido.
+ */
 async function handleExport() {
   if (!store.currentHydrometer) return
   await store.exportReadings(store.currentHydrometer.id, store.currentHydrometer.code)
 }
 
-/** Título dinâmico do gráfico baseado no período */
+/**
+ * Título do gráfico baseado no período selecionado (7, 30, 90 dias).
+ */
 const chartTitle = computed(() => {
   const labels: Record<number, string> = {
     7: 'Leituras (últimos 7 dias)',
@@ -52,13 +61,21 @@ const chartTitle = computed(() => {
   return labels[store.detailDays] || 'Leituras'
 })
 
-/** Altera o período e recarrega as leituras */
+/**
+ * Altera o período de leituras (7, 30 ou 90 dias) e recarrega os dados do hidrômetro atual.
+ *
+ * @param days - Novo período em dias.
+ */
 async function changePeriod(days: 7 | 30 | 90) {
   if (!store.currentHydrometer) return
   await store.fetchHydrometer(store.currentHydrometer.id, days)
 }
 
-/** Resolve o alerta e recarrega os dados do hidrômetro para atualizar a lista */
+/**
+ * Resolve o alerta e recarrega o hidrômetro mantendo o período atual selecionado.
+ *
+ * @param alertId - Identificador do alerta a resolver.
+ */
 async function handleResolveAlert(alertId: number) {
   if (!store.currentHydrometer) return
   await alertStore.resolveAlert(alertId)
@@ -68,7 +85,6 @@ async function handleResolveAlert(alertId: number) {
 
 <template>
   <div class="animate-fade-in flex flex-col gap-4 pb-6">
-    <!-- Header com botão voltar -->
     <div class="flex flex-col sm:flex-row sm:items-center gap-4 shrink-0">
       <div class="flex items-center gap-4 flex-1">
         <button
@@ -106,13 +122,10 @@ async function handleResolveAlert(alertId: number) {
       </div>
     </div>
 
-    <!-- Loading -->
     <div v-if="store.loading" class="text-center py-12 text-text-muted">Carregando detalhes...</div>
 
     <template v-else-if="store.currentHydrometer">
-      <!-- Grid de informações -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <!-- Dados do dispositivo -->
         <BaseCard class="lg:col-span-1">
           <h3 class="text-sm font-bold text-text-heading mb-4 uppercase tracking-wider">
             Informações do Dispositivo
@@ -168,7 +181,6 @@ async function handleResolveAlert(alertId: number) {
           </div>
         </BaseCard>
 
-        <!-- Gráfico de leituras -->
         <BaseCard class="lg:col-span-2">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
             <h3 class="text-sm font-bold text-text-heading uppercase tracking-wider">
@@ -203,7 +215,6 @@ async function handleResolveAlert(alertId: number) {
         </BaseCard>
       </div>
 
-      <!-- Alertas do hidrômetro -->
       <BaseCard>
         <h3 class="text-sm font-bold text-text-heading mb-4 uppercase tracking-wider">
           Alertas Recentes

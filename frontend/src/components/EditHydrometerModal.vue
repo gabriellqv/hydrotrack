@@ -9,10 +9,13 @@ import { useToastStore } from '@/stores/toast'
 import type { Hydrometer, UpdateHydrometerPayload } from '@/types'
 
 /**
- * Modal de edicao de hidrometro.
+ * Modal de edição de hidrômetro.
  *
- * @prop {Hydrometer} hydrometer - Hidrometro a ser editado
- * @emits close - Emitido quando o modal deve ser fechado
+ * Sincroniza o formulário com a prop `hydrometer` via `watch`, valida coordenadas
+ * como números finitos e exibe erros 422 nos campos correspondentes.
+ *
+ * @prop {Hydrometer} hydrometer - Hidrômetro a ser editado.
+ * @emits close - Emitido quando o modal deve ser fechado.
  */
 const props = defineProps<{
   hydrometer: Hydrometer
@@ -35,6 +38,12 @@ const editForm = ref({
 const editFormErrors = ref<Record<string, string>>({})
 const loading = ref(false)
 
+/**
+ * Converte uma string de coordenada em número finito.
+ *
+ * @param value - Valor digitado no campo de coordenada.
+ * @returns Número válido ou `null` quando vazio/inválido.
+ */
 function parseCoordinate(value: string): number | null {
   const trimmed = value.trim()
   if (trimmed === '') return null
@@ -42,6 +51,11 @@ function parseCoordinate(value: string): number | null {
   return Number.isFinite(parsed) ? parsed : null
 }
 
+/**
+ * Monta o payload de atualização a partir do formulário.
+ *
+ * @returns Payload válido ou `null` quando as coordenadas são inválidas.
+ */
 function buildPayload(): UpdateHydrometerPayload | null {
   const latitude = parseCoordinate(editForm.value.latitude)
   const longitude = parseCoordinate(editForm.value.longitude)
@@ -60,6 +74,9 @@ function buildPayload(): UpdateHydrometerPayload | null {
   }
 }
 
+/**
+ * Reseta o formulário quando a prop `hydrometer` é atualizada (reabertura com outro item).
+ */
 watch(
   () => props.hydrometer,
   (h) => {
@@ -76,13 +93,16 @@ watch(
   { immediate: true },
 )
 
+/**
+ * Submete o formulário de edição, tratando erros de validação da API.
+ */
 async function handleEdit() {
   editFormErrors.value = {}
   loading.value = true
 
   const payload = buildPayload()
   if (!payload) {
-    toast.error('Latitude e longitude devem ser numeros validos.')
+    toast.error('Latitude e longitude devem ser números válidos.')
     loading.value = false
     return
   }
@@ -94,10 +114,10 @@ async function handleEdit() {
   } catch (error) {
     if (error instanceof ApiError && error.status === 422 && error.errors) {
       for (const [field, messages] of Object.entries(error.errors)) {
-        editFormErrors.value[field] = messages[0] || 'Erro de validacao'
+        editFormErrors.value[field] = messages[0] || 'Erro de validação'
       }
     } else {
-      toast.error('Erro inesperado ao atualizar o hidrometro. Tente novamente.')
+      toast.error('Erro inesperado ao atualizar o hidrômetro. Tente novamente.')
     }
   } finally {
     loading.value = false
@@ -106,11 +126,11 @@ async function handleEdit() {
 </script>
 
 <template>
-  <BaseModal :open="true" title="Editar Hidrometro" @close="$emit('close')">
+  <BaseModal :open="true" title="Editar Hidrômetro" @close="$emit('close')">
     <form @submit.prevent="handleEdit" class="space-y-4">
       <BaseInput
         v-model="editForm.code"
-        label="Codigo"
+        label="Código"
         placeholder="HYD-201"
         :error="editFormErrors.code"
       />
@@ -136,8 +156,8 @@ async function handleEdit() {
 
       <BaseInput
         v-model="editForm.address"
-        label="Endereco"
-        placeholder="Rua das Aguas, 100"
+        label="Endereço"
+        placeholder="Rua das Águas, 100"
         :error="editFormErrors.address"
       />
       <BaseInput
@@ -168,7 +188,7 @@ async function handleEdit() {
 
     <template #footer>
       <BaseButton variant="secondary" @click="$emit('close')">Cancelar</BaseButton>
-      <BaseButton :loading="loading" @click="handleEdit">Salvar Alteracoes</BaseButton>
+      <BaseButton :loading="loading" @click="handleEdit">Salvar Alterações</BaseButton>
     </template>
   </BaseModal>
 </template>

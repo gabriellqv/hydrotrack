@@ -5,7 +5,7 @@ import { useToastStore } from '@/stores/toast'
 import type { Alert } from '@/types'
 
 /**
- * Store de alertas — gerencia listagem, filtragem e resolucao de alertas.
+ * Store de alertas - gerencia listagem, filtragem e resolução de alertas.
  */
 export const useAlertStore = defineStore('alert', () => {
   const alerts = ref<Alert[]>([])
@@ -18,10 +18,17 @@ export const useAlertStore = defineStore('alert', () => {
     resolved: '',
   })
 
+  /**
+   * Limpa o estado de erro da store.
+   */
   function clearError() {
     error.value = null
   }
 
+  /**
+   * Normaliza erros de requisição, ignorando cancelamentos controlados por AbortSignal.
+   * Em outros casos, armazena a mensagem e exibe um toast de erro.
+   */
   function handleError(message: string, err: unknown) {
     const toast = useToastStore()
     if (isCancelled(err)) {
@@ -31,6 +38,11 @@ export const useAlertStore = defineStore('alert', () => {
     toast.error(message)
   }
 
+  /**
+   * Carrega a lista de alertas da API, aplicando os filtros ativos.
+   *
+   * @param signal - Sinal opcional para abortar a requisição.
+   */
   async function fetchAlerts(signal?: AbortSignal) {
     loading.value = true
     clearError()
@@ -51,6 +63,11 @@ export const useAlertStore = defineStore('alert', () => {
     }
   }
 
+  /**
+   * Marca um alerta como resolvido e recarrega a listagem.
+   *
+   * @param id - Identificador do alerta.
+   */
   async function resolveAlert(id: number) {
     const toast = useToastStore()
     clearError()
@@ -67,6 +84,9 @@ export const useAlertStore = defineStore('alert', () => {
   return { alerts, loading, error, filters, fetchAlerts, resolveAlert }
 })
 
+/**
+ * Verifica se o erro é resultante de um aborto de requisição.
+ */
 function isCancelled(err: unknown): boolean {
   return err instanceof DOMException && err.name === 'AbortError'
 }

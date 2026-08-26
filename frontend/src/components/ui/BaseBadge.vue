@@ -27,7 +27,6 @@ withDefaults(
       },
     ]"
   >
-    <!-- Dot indicador -->
     <span
       :class="[
         'h-1.5 w-1.5 rounded-full',

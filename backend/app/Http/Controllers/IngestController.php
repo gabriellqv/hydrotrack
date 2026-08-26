@@ -19,6 +19,9 @@ use Illuminate\Http\JsonResponse;
  */
 class IngestController extends Controller
 {
+    /**
+     * @param  ReadingService  $readingService  Serviço de ingestão de leituras
+     */
     public function __construct(
         private readonly ReadingService $readingService
     ) {}

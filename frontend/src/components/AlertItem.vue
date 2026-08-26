@@ -25,6 +25,9 @@ const emit = defineEmits<{
 
 const { isAdmin } = useIsAdmin()
 
+/**
+ * Mapeia tipo de alerta para variante visual e label localizado.
+ */
 const typeMap: Record<string, { variant: 'danger' | 'warning' | 'muted'; label: string }> = {
   high_consumption: { variant: 'danger', label: 'Consumo Alto' },
   zero_reading: { variant: 'warning', label: 'Leitura Zero' },
@@ -41,7 +44,6 @@ const typeMap: Record<string, { variant: 'danger' | 'warning' | 'muted'; label: 
         : 'border-border bg-surface-card hover:border-border-hover',
     ]"
   >
-    <!-- Conteúdo -->
     <div class="flex-1 min-w-0">
       <div class="flex items-center gap-2 mb-1">
         <BaseBadge :variant="typeMap[alert.type]?.variant ?? 'muted'">
@@ -66,7 +68,6 @@ const typeMap: Record<string, { variant: 'danger' | 'warning' | 'muted'; label: 
       </div>
     </div>
 
-    <!-- Ação -->
     <BaseButton
       v-if="isAdmin && !alert.resolved"
       variant="ghost"

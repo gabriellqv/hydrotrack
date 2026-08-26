@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * Testes do middleware EnsureValidApiKey.
+ *
+ * Validam a autenticação M2M via header X-API-Key, incluindo
+ * prevenção contra timing attacks e rejeição de chaves inválidas.
+ */
+
 use App\Http\Middleware\EnsureValidApiKey;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;

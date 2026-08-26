@@ -12,7 +12,7 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 /**
  * Controller de alertas do sistema de monitoramento.
  *
- * Delega toda a logica de negocio ao AlertService.
+ * Delega toda a lógica de negócio ao AlertService.
  */
 class AlertController extends Controller
 {
@@ -24,10 +24,10 @@ class AlertController extends Controller
     ) {}
 
     /**
-     * Lista todos os alertas com paginacao, filtros e dados do hidrometro.
+     * Lista todos os alertas com paginação, filtros e dados do hidrômetro.
      *
      * @param  Request  $request  Query params: type, resolved
-     * @return AnonymousResourceCollection Colecao paginada de AlertResource
+     * @return AnonymousResourceCollection Coleção paginada de AlertResource
      */
     public function index(Request $request): AnonymousResourceCollection
     {

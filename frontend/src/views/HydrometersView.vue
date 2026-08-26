@@ -15,10 +15,10 @@ import type { Hydrometer } from '@/types'
 import { Plus, Search, ChevronLeft, ChevronRight, Pencil, Trash2 } from 'lucide-vue-next'
 
 /**
- * View de Gerenciamento de Hidrometros (CRUD).
+ * View de gerenciamento de hidrômetros (CRUD).
  *
- * Exibe a tabela paginada com buscas e filtros integrados via HydrometerStore.
- * Apenas administradores podem criar, editar ou excluir hidrometros.
+ * Exibe a tabela paginada com busca e filtros integrados via HydrometerStore.
+ * Apenas administradores podem criar, editar ou excluir hidrômetros.
  */
 
 const store = useHydrometerStore()
@@ -36,6 +36,9 @@ const deletingHydrometer = ref<Hydrometer | null>(null)
 
 await store.fetchHydrometers()
 
+/**
+ * Aplica filtros de busca e status, reiniciando a paginação.
+ */
 function applyFilters() {
   const filters: Record<string, string> = {}
   if (statusFilter.value) filters.status = statusFilter.value
@@ -66,26 +69,24 @@ function closeDeleteDialog() {
 
 <template>
   <div class="animate-fade-in view-scroll-layout">
-    <!-- Header -->
     <div class="flex items-center justify-between shrink-0">
       <div>
-        <h1 class="text-2xl font-bold text-text-heading">Hidrometros</h1>
+        <h1 class="text-2xl font-bold text-text-heading">Hidrômetros</h1>
         <p class="text-sm text-text-muted mt-1">
           {{ store.pagination.total }} dispositivos cadastrados
         </p>
       </div>
       <BaseButton v-if="isAdmin" @click="showCreateModal = true">
-        <Plus class="h-4 w-4" /> Novo Hidrometro
+        <Plus class="h-4 w-4" /> Novo Hidrômetro
       </BaseButton>
     </div>
 
-    <!-- Filtros -->
     <BaseCard compact class="shrink-0">
       <div class="flex flex-wrap gap-3">
         <div class="flex-1 min-w-[12.5rem]">
           <BaseInput
             v-model="search"
-            placeholder="Buscar por codigo ou endereco..."
+            placeholder="Buscar por código ou endereço..."
             @keyup.enter="applyFilters"
           >
             <template #icon>
@@ -106,17 +107,16 @@ function closeDeleteDialog() {
       </div>
     </BaseCard>
 
-    <!-- Tabela -->
     <BaseCard compact class="view-scroll-card">
       <div class="view-scroll-content overflow-x-auto">
         <table class="w-full text-sm">
           <thead class="sticky top-0 z-10 bg-surface-card">
             <tr class="border-b border-border">
               <th class="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase">
-                Codigo
+                Código
               </th>
               <th class="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase">
-                Endereco
+                Endereço
               </th>
               <th class="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase">
                 Bairro
@@ -128,13 +128,13 @@ function closeDeleteDialog() {
                 Status
               </th>
               <th class="text-left py-3 px-4 text-xs font-medium text-text-muted uppercase">
-                Ultima Leitura
+                Última Leitura
               </th>
               <th
                 v-if="isAdmin"
                 class="text-right py-3 px-4 text-xs font-medium text-text-muted uppercase"
               >
-                Acoes
+                Ações
               </th>
             </tr>
           </thead>
@@ -164,14 +164,14 @@ function closeDeleteDialog() {
                   <button
                     @click="openEditModal(h)"
                     class="rounded-lg p-1.5 text-text-muted hover:text-primary-400 hover:bg-primary-500/10 transition-colors"
-                    title="Editar hidrometro"
+                    title="Editar hidrômetro"
                   >
                     <Pencil class="h-4 w-4" />
                   </button>
                   <button
                     @click="openDeleteDialog(h)"
                     class="rounded-lg p-1.5 text-text-muted hover:text-red-400 hover:bg-red-500/10 transition-colors"
-                    title="Excluir hidrometro"
+                    title="Excluir hidrômetro"
                   >
                     <Trash2 class="h-4 w-4" />
                   </button>
@@ -182,10 +182,9 @@ function closeDeleteDialog() {
         </table>
       </div>
 
-      <!-- Paginacao -->
       <div class="flex items-center justify-between border-t border-border pt-4 mt-4 shrink-0">
         <p class="text-xs text-text-muted">
-          Pagina {{ store.pagination.currentPage }} de {{ store.pagination.lastPage }}
+          Página {{ store.pagination.currentPage }} de {{ store.pagination.lastPage }}
         </p>
         <div class="flex gap-2">
           <BaseButton
@@ -208,7 +207,6 @@ function closeDeleteDialog() {
       </div>
     </BaseCard>
 
-    <!-- Modais -->
     <CreateHydrometerModal v-if="showCreateModal" @close="showCreateModal = false" />
     <EditHydrometerModal
       v-if="showEditModal && editingHydrometer"

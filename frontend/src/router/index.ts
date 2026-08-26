@@ -1,3 +1,10 @@
+/**
+ * Configuração de rotas da aplicação.
+ *
+ * Rotas públicas definem `meta.requiresAuth = false`. Rotas protegidas exigem
+ * autenticação e são interceptadas pelo guard global `beforeEach`.
+ */
+
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
@@ -46,8 +53,9 @@ const router = createRouter({
 /**
  * Guard global de navegação.
  *
- * Redireciona para /login se a rota exige autenticação e o
- * usuário não está logado. Preserva a rota de destino via query param.
+ * Redireciona usuários não autenticados para `/login` quando a rota exige autenticação,
+ * preservando a rota de destino no parâmetro de query `redirect`.
+ * Redireciona usuários já autenticados que acessam `/login` para o dashboard.
  */
 router.beforeEach((to) => {
   const authStore = useAuthStore()

@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  *
  * Responsável exclusivamente por receber requests HTTP, delegar ao
  * HydrometerService e formatar a response via HydrometerResource.
- * Zero lógica de negócio aqui — apenas I/O.
+ * Zero lógica de negócio aqui; apenas I/O.
  */
 class HydrometerController extends Controller
 {
@@ -126,7 +126,6 @@ class HydrometerController extends Controller
         return response()->streamDownload(function () use ($hydrometer) {
             $handle = fopen('php://output', 'w');
 
-            // Adiciona BOM (Byte Order Mark) para o Excel forçar a leitura em UTF-8
             fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
 
             fputcsv($handle, ['Data', 'Consumo (m³)'], ';');

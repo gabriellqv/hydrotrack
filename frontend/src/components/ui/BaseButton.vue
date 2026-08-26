@@ -46,7 +46,6 @@ withDefaults(
       },
     ]"
   >
-    <!-- Spinner de carregamento -->
     <svg
       v-if="loading"
       class="animate-spin h-4 w-4"

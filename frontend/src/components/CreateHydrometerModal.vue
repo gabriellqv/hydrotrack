@@ -9,9 +9,12 @@ import { useToastStore } from '@/stores/toast'
 import type { CreateHydrometerPayload } from '@/types'
 
 /**
- * Modal de criacao de novo hidrometro.
+ * Modal de criação de novo hidrômetro.
  *
- * @emits close - Emitido quando o modal deve ser fechado
+ * Valida coordenadas como números finitos, converte os dados para o payload
+ * da API e exibe erros 422 nos campos correspondentes.
+ *
+ * @emits close - Emitido quando o modal deve ser fechado.
  */
 const emit = defineEmits(['close'])
 
@@ -30,6 +33,12 @@ const form = ref({
 const formErrors = ref<Record<string, string>>({})
 const loading = ref(false)
 
+/**
+ * Converte uma string de coordenada em número finito.
+ *
+ * @param value - Valor digitado no campo de coordenada.
+ * @returns Número válido ou `null` quando vazio/inválido.
+ */
 function parseCoordinate(value: string): number | null {
   const trimmed = value.trim()
   if (trimmed === '') return null
@@ -37,6 +46,11 @@ function parseCoordinate(value: string): number | null {
   return Number.isFinite(parsed) ? parsed : null
 }
 
+/**
+ * Monta o payload de criação a partir do formulário.
+ *
+ * @returns Payload válido ou `null` quando as coordenadas são inválidas.
+ */
 function buildPayload(): CreateHydrometerPayload | null {
   const latitude = parseCoordinate(form.value.latitude)
   const longitude = parseCoordinate(form.value.longitude)
@@ -55,13 +69,16 @@ function buildPayload(): CreateHydrometerPayload | null {
   }
 }
 
+/**
+ * Submete o formulário de criação, tratando erros de validação da API.
+ */
 async function handleCreate() {
   formErrors.value = {}
   loading.value = true
 
   const payload = buildPayload()
   if (!payload) {
-    toast.error('Latitude e longitude devem ser numeros validos.')
+    toast.error('Latitude e longitude devem ser números válidos.')
     loading.value = false
     return
   }
@@ -74,16 +91,19 @@ async function handleCreate() {
   } catch (error) {
     if (error instanceof ApiError && error.status === 422 && error.errors) {
       for (const [field, messages] of Object.entries(error.errors)) {
-        formErrors.value[field] = messages[0] || 'Erro de validacao'
+        formErrors.value[field] = messages[0] || 'Erro de validação'
       }
     } else {
-      toast.error('Erro inesperado ao criar o hidrometro. Tente novamente.')
+      toast.error('Erro inesperado ao criar o hidrômetro. Tente novamente.')
     }
   } finally {
     loading.value = false
   }
 }
 
+/**
+ * Reseta o formulário para o estado inicial.
+ */
 function resetForm() {
   form.value = {
     code: '',
@@ -97,11 +117,11 @@ function resetForm() {
 </script>
 
 <template>
-  <BaseModal :open="true" title="Novo Hidrometro" @close="$emit('close')">
+  <BaseModal :open="true" title="Novo Hidrômetro" @close="$emit('close')">
     <form @submit.prevent="handleCreate" class="space-y-4">
       <BaseInput
         v-model="form.code"
-        label="Codigo"
+        label="Código"
         placeholder="HYD-201"
         :error="formErrors.code"
       />
@@ -127,8 +147,8 @@ function resetForm() {
 
       <BaseInput
         v-model="form.address"
-        label="Endereco"
-        placeholder="Rua das Aguas, 100"
+        label="Endereço"
+        placeholder="Rua das Águas, 100"
         :error="formErrors.address"
       />
       <BaseInput
@@ -159,7 +179,7 @@ function resetForm() {
 
     <template #footer>
       <BaseButton variant="secondary" @click="$emit('close')">Cancelar</BaseButton>
-      <BaseButton :loading="loading" @click="handleCreate">Criar Hidrometro</BaseButton>
+      <BaseButton :loading="loading" @click="handleCreate">Criar Hidrômetro</BaseButton>
     </template>
   </BaseModal>
 </template>

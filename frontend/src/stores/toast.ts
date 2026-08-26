@@ -30,13 +30,15 @@ export const useToastStore = defineStore('toast', () => {
   /** Fila reativa de notificações ativas na tela */
   const toasts = ref<Toast[]>([])
 
-  /** Numero maximo de toasts visiveis simultaneamente */
+  /** Número máximo de toasts visíveis simultaneamente */
   const MAX_VISIBLE_TOASTS = 5
 
   /**
    * Adiciona uma notificação à fila com remoção automática.
+   * Limita a fila a `MAX_VISIBLE_TOASTS` itens, removendo o mais antigo quando necessário.
+   * Gera um identificador aleatório para o toast.
    *
-   * @param {Omit<Toast, 'id'>} toast - Dados da notificação (sem ID)
+   * @param toast - Dados da notificação (sem id).
    */
   function add(toast: Omit<Toast, 'id'>) {
     const id = Math.random().toString(36).substring(2, 9)
@@ -54,9 +56,9 @@ export const useToastStore = defineStore('toast', () => {
   }
 
   /**
-   * Remove uma notificação específica da fila pelo ID.
+   * Remove uma notificação específica da fila pelo id.
    *
-   * @param {string} id - Identificador do toast a remover
+   * @param id - Identificador do toast a remover.
    */
   function remove(id: string) {
     const index = toasts.value.findIndex((t) => t.id === id)
@@ -66,40 +68,40 @@ export const useToastStore = defineStore('toast', () => {
   }
 
   /**
-   * Atalho para emitir uma notificação de sucesso (verde).
+   * Emite uma notificação de sucesso.
    *
-   * @param {string} message - Texto da mensagem
-   * @param {number} duration - Duração em ms (opcional)
+   * @param message - Texto da mensagem.
+   * @param duration - Duração em ms (opcional).
    */
   function success(message: string, duration?: number) {
     add({ message, type: 'success', duration })
   }
 
   /**
-   * Atalho para emitir uma notificação de erro (vermelho).
+   * Emite uma notificação de erro.
    *
-   * @param {string} message - Texto da mensagem
-   * @param {number} duration - Duração em ms (opcional)
+   * @param message - Texto da mensagem.
+   * @param duration - Duração em ms (opcional).
    */
   function error(message: string, duration?: number) {
     add({ message, type: 'error', duration })
   }
 
   /**
-   * Atalho para emitir uma notificação de aviso (amarelo).
+   * Emite uma notificação de aviso.
    *
-   * @param {string} message - Texto da mensagem
-   * @param {number} duration - Duração em ms (opcional)
+   * @param message - Texto da mensagem.
+   * @param duration - Duração em ms (opcional).
    */
   function warning(message: string, duration?: number) {
     add({ message, type: 'warning', duration })
   }
 
   /**
-   * Atalho para emitir uma notificação informativa (azul).
+   * Emite uma notificação informativa.
    *
-   * @param {string} message - Texto da mensagem
-   * @param {number} duration - Duração em ms (opcional)
+   * @param message - Texto da mensagem.
+   * @param duration - Duração em ms (opcional).
    */
   function info(message: string, duration?: number) {
     add({ message, type: 'info', duration })

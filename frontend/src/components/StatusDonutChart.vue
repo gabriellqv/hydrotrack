@@ -59,17 +59,15 @@ const fullChartData = computed(() => ({
   datasets: [
     {
       data: [props.summary.online, props.summary.offline, props.summary.alert],
-      // Transparência intensa para simular o vidro (35% a 40%)
+      // Cores semitransparentes alinhadas ao tema glassmorphism.
       backgroundColor: [
-        'rgba(34, 197, 94, 0.35)', // Verde Translúcido
-        'rgba(148, 163, 184, 0.20)', // Cinza Translúcido
-        'rgba(239, 68, 68, 0.35)', // Vermelho Translúcido
+        'rgba(34, 197, 94, 0.35)',
+        'rgba(148, 163, 184, 0.20)',
+        'rgba(239, 68, 68, 0.35)',
       ],
-      // Bordas quase sólidas para dar definição à fatia de vidro
       borderColor: ['rgba(34, 197, 94, 0.8)', 'rgba(148, 163, 184, 0.4)', 'rgba(239, 68, 68, 0.8)'],
       borderWidth: 2,
       hoverOffset: 8,
-      // Fica mais denso ao passar o mouse
       hoverBackgroundColor: [
         'rgba(34, 197, 94, 0.6)',
         'rgba(148, 163, 184, 0.4)',
@@ -105,11 +103,14 @@ const chartOptions: ChartOptions<'pie'> = {
   },
 }
 
+/**
+ * Dados exibidos pelo gráfico. Inicialmente vazios para animar o crescimento das fatias.
+ */
 const displayedData = ref<ChartData<'pie'>>({
   labels: ['Online', 'Offline', 'Em Alerta'],
   datasets: [
     {
-      data: [0, 0, 0], // Inicia zerado para a animação "crescer"
+      data: [0, 0, 0],
       backgroundColor: [
         'rgba(34, 197, 94, 0.35)',
         'rgba(148, 163, 184, 0.20)',
@@ -122,6 +123,7 @@ const displayedData = ref<ChartData<'pie'>>({
 })
 
 onMounted(() => {
+  // Aplica os dados após delay para ativar a animação de entrada.
   setTimeout(() => {
     displayedData.value = fullChartData.value
   }, 600)
@@ -132,7 +134,6 @@ onMounted(() => {
   <div
     class="flex flex-col-reverse sm:flex-row items-center justify-center gap-6 sm:gap-4 h-full min-h-0 sm:-my-4 sm:pl-2"
   >
-    <!-- Legenda Custom -->
     <div
       class="flex flex-row sm:flex-col flex-wrap justify-center gap-4 sm:gap-3 shrink-0 w-full sm:w-auto"
     >

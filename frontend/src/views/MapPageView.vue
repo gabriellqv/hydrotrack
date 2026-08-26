@@ -9,14 +9,15 @@ import { HYDROMETER_TYPE_LABELS } from '@/constants'
 import type { Hydrometer } from '@/types'
 
 /**
- * View Dedicada do Mapa.
+ * View dedicada do mapa.
  *
- * Utiliza o componente base MapView para exibir a mancha de dispositivos,
+ * Utiliza o componente base MapView para exibir a malha de dispositivos,
  * adicionando um painel lateral dinâmico para exibição de detalhes de telemetria
  * quando um pino é clicado.
  *
- * Implementa polling a cada 5 segundos para refletir mudanças de status
- * dos hidrômetros enquanto o simulador IoT está rodando.
+ * Implementa polling a cada 5 segundos, pausado em abas ocultas, cancela
+ * requisições pendentes via AbortController e suporta centralização em
+ * hidrômetro a partir do query param `hydrometer_id`.
  */
 
 const store = useDashboardStore()
@@ -26,17 +27,25 @@ const activeFilter = ref<'all' | 'online' | 'offline' | 'alert'>('all')
 
 const mapViewRef = ref<InstanceType<typeof MapView> | null>(null)
 
-/** Intervalo de polling em milissegundos (5s) */
+/**
+ * Intervalo de polling ativo em milissegundos. Pausado automaticamente quando a aba fica oculta.
+ */
 const POLLING_INTERVAL = 5_000
 let pollingTimer: ReturnType<typeof setInterval> | null = null
 let abortController: AbortController | null = null
 let focusTimeout: ReturnType<typeof setTimeout> | null = null
 
+/**
+ * Hidrômetros filtrados conforme o filtro ativo de status.
+ */
 const filteredHydrometers = computed(() => {
   if (activeFilter.value === 'all') return store.mapHydrometers
   return store.mapHydrometers.filter((h) => h.status === activeFilter.value)
 })
 
+/**
+ * Contadores derivados da lista de hidrômetros exibidos, sem nova requisição.
+ */
 const filterCounts = computed(() => {
   const all = store.mapHydrometers.length
   return {
@@ -47,40 +56,55 @@ const filterCounts = computed(() => {
   }
 })
 
+/**
+ * Cancela a requisição anterior e cria um novo `AbortController`.
+ */
 function createAbortController() {
   abortController?.abort()
   abortController = new AbortController()
   return abortController
 }
 
+/**
+ * Atualiza os dados do mapa. Rejeições são ignoradas porque a store já exibe toasts de erro.
+ */
 async function refreshMap() {
   const controller = createAbortController()
   await store.fetchMap(controller.signal).catch(() => {
-    // Erros ja sao tratados pela store
+    // A store já exibe toasts de erro.
   })
 }
 
 await refreshMap()
 
+/**
+ * Centraliza o mapa no hidrômetro indicado pelo query param `hydrometer_id`.
+ * Aguarda 500ms para garantir que a instância Leaflet tenha sido montada.
+ */
+function focusHydrometerFromQuery() {
+  const targetId = Number(route.query.hydrometer_id)
+  if (!targetId) return
+
+  const target = store.mapHydrometers.find((h) => h.id === targetId)
+  if (!target) return
+
+  selectedHydrometer.value = target
+  focusTimeout = setTimeout(() => {
+    mapViewRef.value?.centerAndOpenPopup(target.id, target.latitude, target.longitude)
+  }, 500)
+}
+
 onMounted(() => {
   pollingTimer = setInterval(refreshMap, POLLING_INTERVAL)
 
-  // Verifica se o usuario chegou do botao "Ver no Mapa" na view de Detalhes
-  const targetId = Number(route.query.hydrometer_id)
-  if (targetId) {
-    const target = store.mapHydrometers.find((h) => h.id === targetId)
-    if (target) {
-      selectedHydrometer.value = target
-      // Aguarda um pouco para o Leaflet renderizar antes de voar para o ponto
-      focusTimeout = setTimeout(() => {
-        mapViewRef.value?.centerAndOpenPopup(target.id, target.latitude, target.longitude)
-      }, 500)
-    }
-  }
+  focusHydrometerFromQuery()
 
   document.addEventListener('visibilitychange', handleVisibilityChange)
 })
 
+/**
+ * Interrompe o polling periódico.
+ */
 function stopPolling() {
   if (pollingTimer) {
     clearInterval(pollingTimer)
@@ -88,6 +112,9 @@ function stopPolling() {
   }
 }
 
+/**
+ * Pausa o polling quando a aba fica oculta e retoma quando volta ao foco.
+ */
 function handleVisibilityChange() {
   if (document.hidden) {
     stopPolling()
@@ -106,6 +133,11 @@ onUnmounted(() => {
   document.removeEventListener('visibilitychange', handleVisibilityChange)
 })
 
+/**
+ * Seleciona um hidrômetro ao clicar em seu marcador no mapa.
+ *
+ * @param hydrometer - Hidrômetro selecionado.
+ */
 function handleMarkerClick(hydrometer: Hydrometer) {
   selectedHydrometer.value = hydrometer
 }
@@ -123,9 +155,7 @@ function handleMarkerClick(hydrometer: Hydrometer) {
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 flex-1 min-h-0">
-      <!-- Mapa e Filtros -->
       <div class="lg:col-span-3 flex flex-col gap-3 min-h-0">
-        <!-- Filtros Rápidos -->
         <div
           class="flex flex-wrap gap-3 bg-surface-card/60 backdrop-blur-xl rounded-xl px-4 py-3 border border-border ring-1 ring-white/5"
         >
@@ -190,7 +220,6 @@ function handleMarkerClick(hydrometer: Hydrometer) {
         </BaseCard>
       </div>
 
-      <!-- Painel lateral -->
       <div>
         <BaseCard :title="!selectedHydrometer ? 'Selecione um pino' : undefined">
           <template v-if="selectedHydrometer">

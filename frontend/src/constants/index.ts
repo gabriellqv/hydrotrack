@@ -5,7 +5,7 @@
 import type { Hydrometer } from '@/types'
 
 /**
- * Periodos disponiveis para graficos de consumo.
+ * Opções de período disponíveis para filtros e gráficos de consumo.
  */
 export const PERIOD_OPTIONS: { days: 7 | 30 | 90; label: string }[] = [
   { days: 7, label: '7d' },
@@ -14,7 +14,7 @@ export const PERIOD_OPTIONS: { days: 7 | 30 | 90; label: string }[] = [
 ]
 
 /**
- * Mapeamento de tipos de imovel para labels em portugues.
+ * Rótulos para os tipos de imóvel.
  */
 export const HYDROMETER_TYPE_LABELS: Record<Hydrometer['type'], string> = {
   residential: 'Residencial',
@@ -23,7 +23,7 @@ export const HYDROMETER_TYPE_LABELS: Record<Hydrometer['type'], string> = {
 }
 
 /**
- * Configuracao visual dos status de hidrometro.
+ * Configuração visual dos status de hidrômetro.
  */
 export const HYDROMETER_STATUS_CONFIG: Record<
   Hydrometer['status'],
@@ -34,27 +34,18 @@ export const HYDROMETER_STATUS_CONFIG: Record<
   alert: { label: 'Em Alerta', color: '#ef4444', dotClass: 'bg-red-500' },
 }
 
-/**
- * Mapeamento de status de hidrometro para labels em portugues.
- */
 export const HYDROMETER_STATUS_LABELS: Record<Hydrometer['status'], string> = {
   online: HYDROMETER_STATUS_CONFIG.online.label,
   offline: HYDROMETER_STATUS_CONFIG.offline.label,
   alert: HYDROMETER_STATUS_CONFIG.alert.label,
 }
 
-/**
- * Mapeamento de status de hidrometro para cores hexadecimais.
- */
 export const HYDROMETER_STATUS_COLORS: Record<Hydrometer['status'], string> = {
   online: HYDROMETER_STATUS_CONFIG.online.color,
   offline: HYDROMETER_STATUS_CONFIG.offline.color,
   alert: HYDROMETER_STATUS_CONFIG.alert.color,
 }
 
-/**
- * Mapeamento de status de hidrometro para classes de cor de ponto.
- */
 export const HYDROMETER_STATUS_DOT_CLASSES: Record<Hydrometer['status'], string> = {
   online: HYDROMETER_STATUS_CONFIG.online.dotClass,
   offline: HYDROMETER_STATUS_CONFIG.offline.dotClass,

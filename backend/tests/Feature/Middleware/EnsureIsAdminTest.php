@@ -35,7 +35,7 @@ it('nega acesso para usuario nao admin', function () {
         ->getJson('/admin-test')
         ->assertForbidden()
         ->assertJson([
-            'message' => 'Acesso negado. Apenas administradores podem realizar esta acao.',
+            'message' => 'Acesso negado. Apenas administradores podem realizar esta ação.',
         ]);
 });
 

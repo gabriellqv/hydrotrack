@@ -17,7 +17,6 @@ uses(RefreshDatabase::class);
 it('retorna o resumo correto do dashboard', function () {
     $user = User::factory()->create();
 
-    // Arrange: cenário controlado
     Hydrometer::factory()->count(5)->create(['status' => 'online']);
     Hydrometer::factory()->count(2)->create(['status' => 'offline']);
     Hydrometer::factory()->count(1)->create(['status' => 'alert']);
@@ -33,10 +32,8 @@ it('retorna o resumo correto do dashboard', function () {
         'resolved' => false,
     ]);
 
-    // Act
     $response = $this->actingAs($user)->getJson('/api/dashboard/summary');
 
-    // Assert
     $response->assertOk()
         ->assertJson([
             'total_hydrometers' => 8,

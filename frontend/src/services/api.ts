@@ -25,12 +25,14 @@ export class ApiError extends Error {
 }
 
 /**
- * Cria e configura a instância Axios centralizada.
+ * Cria e configura a instância central do Axios.
  *
- * Intercepta todas as requests para injetar o Bearer token
- * e intercepta responses 401 para redirecionar ao login.
+ * Interceptadores:
+ * - Request: injeta o token Bearer quando o usuário está autenticado.
+ * - Response: mapeia erros HTTP para mensagens amigáveis, exibe toasts para erros 5xx,
+ *   desloga o usuário em 401 (exceto no logout) e lança `ApiError`.
  *
- * @returns {AxiosInstance} Instância configurada do Axios
+ * @returns Instância configurada do Axios.
  */
 function createApiClient(): AxiosInstance {
   const client = axios.create({
@@ -41,7 +43,7 @@ function createApiClient(): AxiosInstance {
     },
   })
 
-  // Interceptor de request: injeta o token de autenticacao
+  // Interceptor de request: injeta o token de autenticação.
   client.interceptors.request.use((config) => {
     const authStore = useAuthStore()
     if (authStore.token) {
@@ -50,7 +52,7 @@ function createApiClient(): AxiosInstance {
     return config
   })
 
-  // Interceptor de response: trata erros de rede e 401 (token expirado/invalido)
+  // Interceptor de response: trata erros de rede, 401 e mensagens amigáveis por status.
   client.interceptors.response.use(
     (response) => response,
     createResponseErrorHandler(() => ({
@@ -63,6 +65,18 @@ function createApiClient(): AxiosInstance {
   return client
 }
 
+/**
+ * Cria o handler de erros de resposta do Axios.
+ *
+ * @param resolveDependencies - Factory que retorna authStore, router e toastStore.
+ * @returns Handler para interceptadores `onRejected` do Axios.
+ *
+ * Comportamentos:
+ * - Erro de rede: exibe toast de erro e lança `ApiError` com status 0.
+ * - 401 (exceto logout): desloga o usuário e redireciona para login.
+ * - 5xx: exibe toast de erro.
+ * - Sempre lança `ApiError` com mensagem amigável e, quando disponível, erros de validação.
+ */
 export function createResponseErrorHandler(
   resolveDependencies: () => {
     authStore: ReturnType<typeof useAuthStore>
@@ -90,7 +104,7 @@ export function createResponseErrorHandler(
     const status = error.response.status
     const errors = error.response.data?.errors
 
-    /** Mensagens amigáveis por status — nunca expõe detalhes técnicos ao usuário */
+    // Mapeamento de mensagens amigáveis por status HTTP.
     const friendlyMessages: Record<number, string> = {
       400: 'Requisição inválida. Verifique os dados informados.',
       401: 'Credenciais inválidas. Verifique seu e-mail e senha.',
@@ -117,5 +131,4 @@ export function createResponseErrorHandler(
   }
 }
 
-/** Instância global do cliente API */
 export const api = createApiClient()

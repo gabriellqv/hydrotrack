@@ -37,10 +37,8 @@ watch(
   <Teleport to="body">
     <Transition name="modal">
       <div v-if="open" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <!-- Backdrop -->
         <div class="absolute inset-0 bg-black/70 backdrop-blur-md" @click="emit('close')" />
 
-        <!-- Conteúdo do modal -->
         <div
           :class="[
             'relative rounded-2xl border border-border bg-surface-card/95 backdrop-blur-2xl shadow-2xl ring-1 ring-white/5',
@@ -52,7 +50,6 @@ watch(
             },
           ]"
         >
-          <!-- Header -->
           <div
             v-if="title"
             class="flex items-center justify-between border-b border-border px-6 py-4"
@@ -73,12 +70,10 @@ watch(
             </button>
           </div>
 
-          <!-- Body -->
           <div class="p-6">
             <slot />
           </div>
 
-          <!-- Footer -->
           <div v-if="$slots.footer" class="border-t border-border px-6 py-4 flex justify-end gap-3">
             <slot name="footer" />
           </div>

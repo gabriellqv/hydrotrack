@@ -1,3 +1,6 @@
+/** * Componente raiz da aplicação. * * Gerencia autenticação, tema, layout responsivo, Suspense e
+skeleton condicional. */
+
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
@@ -24,18 +27,15 @@ onMounted(async () => {
 </script>
 
 <template>
-  <!-- Login: sem sidebar -->
   <template v-if="route.name === 'login'">
     <RouterView />
   </template>
 
-  <!-- App: com sidebar -->
   <template v-else>
     <div class="min-h-screen bg-surface">
       <AppSidebar :open="sidebarOpen" @close="sidebarOpen = false" />
 
       <div class="flex flex-col min-h-screen lg:ml-[var(--sidebar-width)]">
-        <!-- Header mobile -->
         <header
           class="sticky top-0 z-30 flex items-center gap-3 px-4 py-3 border-b border-border bg-surface/80 backdrop-blur-xl lg:hidden"
         >
@@ -50,7 +50,6 @@ onMounted(async () => {
           <span class="text-sm font-bold text-text-heading">HydroTrack</span>
         </header>
 
-        <!-- Conteúdo principal -->
         <main class="flex-1 p-4 lg:p-8">
           <RouterView v-slot="{ Component }">
             <template v-if="Component">

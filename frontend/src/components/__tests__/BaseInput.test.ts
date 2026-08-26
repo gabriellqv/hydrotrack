@@ -5,24 +5,24 @@ import BaseInput from '../ui/BaseInput.vue'
 /**
  * Testes do componente BaseInput.
  *
- * Validam renderizacao de label, erro, icone e atualizacao de v-model.
+ * Validam renderização de label, erro, ícone e atualização de v-model.
  */
 
 describe('BaseInput', () => {
   it('renderiza label quando fornecido', () => {
     const wrapper = mount(BaseInput, {
-      props: { modelValue: '', label: 'Codigo' },
+      props: { modelValue: '', label: 'Código' },
     })
 
-    expect(wrapper.text()).toContain('Codigo')
+    expect(wrapper.text()).toContain('Código')
   })
 
   it('renderiza mensagem de erro quando fornecida', () => {
     const wrapper = mount(BaseInput, {
-      props: { modelValue: '', error: 'Campo obrigatorio' },
+      props: { modelValue: '', error: 'Campo obrigatório' },
     })
 
-    expect(wrapper.text()).toContain('Campo obrigatorio')
+    expect(wrapper.text()).toContain('Campo obrigatório')
     expect(wrapper.find('input').classes()).toContain('border-danger')
   })
 
@@ -37,7 +37,7 @@ describe('BaseInput', () => {
     expect(wrapper.emitted('update:modelValue')![0]).toEqual(['HYD-001'])
   })
 
-  it('renderiza slot de icone', () => {
+  it('renderiza slot de ícone', () => {
     const wrapper = mount(BaseInput, {
       props: { modelValue: '' },
       slots: { icon: '<span data-testid="icon">Icon</span>' },

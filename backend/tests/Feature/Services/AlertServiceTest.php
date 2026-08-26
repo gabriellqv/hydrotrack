@@ -77,5 +77,5 @@ it('lanca excecao ao tentar resolver alerta ja resolvido', function () {
     $alert = Alert::factory()->create(['resolved' => true, 'resolved_at' => now()]);
 
     expect(fn () => $this->service->resolve($alert))
-        ->toThrow(RuntimeException::class, 'Alerta ja resolvido.');
+        ->toThrow(RuntimeException::class, 'Alerta já resolvido.');
 });

@@ -18,8 +18,11 @@ export interface Hydrometer {
   type: 'residential' | 'commercial' | 'industrial'
   last_reading_at: string | null
   created_at: string
+  /** Leituras associadas, normalmente presentes na resposta de detalhe. */
   readings?: Reading[]
+  /** Dados agregados para renderização do gráfico de consumo. */
   chart_data?: { date: string; total_m3: number }[]
+  /** Alertas vinculados ao hidrômetro, presentes na resposta de detalhe. */
   alerts?: Alert[]
 }
 
@@ -98,7 +101,7 @@ export interface CreateHydrometerPayload {
 }
 
 /**
- * Payload para atualização de um hidrômetro.
+ * Payload para atualização parcial de um hidrômetro.
  */
 export type UpdateHydrometerPayload = Partial<CreateHydrometerPayload>
 
