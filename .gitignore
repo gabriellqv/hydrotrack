@@ -75,6 +75,7 @@ frontend/.eslintcache
 frontend/cypress/videos/
 frontend/cypress/screenshots/
 frontend/__screenshots__/
+frontend/test-results/
 frontend/*.timestamp-*-*.mjs
 
 # =========================================================================
