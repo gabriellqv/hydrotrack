@@ -5,11 +5,16 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
+beforeEach(function () {
+    config(['auth.registration_enabled' => true]);
+});
+
 /**
  * Testes de integração para o endpoint POST /api/auth/register.
  *
- * Validam criação de usuário, duplicidade de email e regras
- * de senha mínima com confirmação obrigatória.
+ * Validam criação de usuário, duplicidade de email, regras
+ * de senha mínima com confirmação obrigatória e controle
+ * de registro público por flag de configuração.
  */
 it('registra um novo usuário e retorna token', function () {
     $response = $this->postJson('/api/auth/register', [
@@ -24,6 +29,22 @@ it('registra um novo usuário e retorna token', function () {
         ->assertJsonPath('user.email', 'joao@hydrotrack.com');
 
     $this->assertDatabaseHas('users', ['email' => 'joao@hydrotrack.com']);
+});
+
+it('rejeita registro quando REGISTRATION_ENABLED esta false', function () {
+    config(['auth.registration_enabled' => false]);
+
+    $response = $this->postJson('/api/auth/register', [
+        'name' => 'João Operador',
+        'email' => 'joao@hydrotrack.com',
+        'password' => 'SenhaSegura123',
+        'password_confirmation' => 'SenhaSegura123',
+    ]);
+
+    $response->assertStatus(403)
+        ->assertJsonPath('message', 'Registro publico esta desabilitado.');
+
+    $this->assertDatabaseMissing('users', ['email' => 'joao@hydrotrack.com']);
 });
 
 it('rejeita registro com email já existente', function () {
