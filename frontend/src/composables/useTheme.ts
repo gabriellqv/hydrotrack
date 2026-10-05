@@ -3,9 +3,10 @@ import { ref } from 'vue'
 /**
  * Composable para gerenciamento do tema claro/escuro.
  *
- * Persiste a escolha do usuário no localStorage e aplica/remove
- * a classe 'light' no elemento <html> para ativar as CSS variables
- * do tema claro.
+ * Persiste a escolha do usuário no localStorage e alterna as classes
+ * 'dark'/'light' no elemento <html>: 'light' ativa as CSS variables do
+ * tema claro e 'dark' habilita as variantes dark: do Tailwind. O tema
+ * padrão do sistema é escuro (#111924).
  */
 const isDark = ref(true)
 

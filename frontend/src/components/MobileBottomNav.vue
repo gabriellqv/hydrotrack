@@ -5,13 +5,10 @@ import { LayoutGrid, Droplets, Map, Bell, Menu } from 'lucide-vue-next'
 import { useDashboardStore } from '@/stores/dashboard'
 
 /**
- * Barra de navegação inferior móvel (Mobile Bottom Navigation Bar) do HydroTrack.
+ * Barra de navegação inferior para mobile.
  *
- * Implementa o efeito visual de luz "Top Neon Glow / Spotlight":
- * - Barra indicadora superior neon na aba ativa e no hover
- * - Cone de luz ambiente radial (spotlight) descendo do topo
- * - Ícone e tipografia iluminados com drop-shadow ciano
- * - Cantos superiores arredondados e acabamento Midnight Glass
+ * Destaca a aba ativa (com indicador neon), exibe badge de alertas pendentes
+ * e respeita a safe-area do dispositivo.
  *
  * @prop {boolean} menuOpen - Indica se o menu lateral está atualmente aberto
  * @emits toggleMenu - Emitido ao clicar no botão de menu

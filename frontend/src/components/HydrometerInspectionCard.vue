@@ -16,9 +16,17 @@ import {
   Crosshair,
 } from 'lucide-vue-next'
 
+/**
+ * Painel de inspeção de um hidrômetro selecionado no mapa.
+ *
+ * Exibe dados geográficos, status IoT e ações de navegação/cópia.
+ *
+ * @prop {Hydrometer} hydrometer - Hidrômetro em inspeção
+ * @emits close - Fecha o painel
+ * @emits center - Centraliza o mapa no hidrômetro
+ */
 defineProps<{
   hydrometer: Hydrometer
-  isDark: boolean
 }>()
 
 const emit = defineEmits<{
@@ -53,24 +61,14 @@ function copyToClipboard(text: string, type: 'coord' | 'code') {
 
 <template>
   <div
-    class="h-full flex flex-col justify-between overflow-y-auto custom-scrollbar rounded-2xl p-5 border shadow-2xl transition-all duration-300"
-    :class="[
-      isDark
-        ? 'bg-[#101724] border-slate-700/60 shadow-black/80 ring-1 ring-white/10'
-        : 'bg-white border-slate-200/90 shadow-slate-900/10 ring-1 ring-black/5',
-    ]"
+    class="h-full flex flex-col justify-between overflow-y-auto custom-scrollbar rounded-2xl p-5 border bg-surface-card border-border shadow-2xl ring-1 ring-black/5 dark:ring-white/10 transition-all duration-300"
   >
     <div class="space-y-4">
       <!-- Topo do Card com Código e Fechar -->
       <div class="flex items-center justify-between pb-3 border-b border-border/50">
         <div class="flex items-center gap-2">
           <span
-            class="text-xs font-mono font-bold px-2.5 py-1 rounded-lg"
-            :class="[
-              isDark
-                ? 'text-sky-400 bg-sky-500/15 border border-sky-500/30 shadow-[0_0_12px_rgba(56,189,248,0.2)]'
-                : 'text-primary-700 bg-primary-50 border border-primary-200',
-            ]"
+            class="text-xs font-mono font-bold px-2.5 py-1 rounded-lg border text-primary-700 bg-primary-50 border-primary-200 dark:text-sky-400 dark:bg-sky-500/15 dark:border-sky-500/30 dark:shadow-[0_0_12px_rgba(56,189,248,0.2)]"
           >
             {{ hydrometer.code }}
           </span>
@@ -100,12 +98,7 @@ function copyToClipboard(text: string, type: 'coord' | 'code') {
         <StatusBadge :status="hydrometer.status" />
 
         <span
-          class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
-          :class="[
-            isDark
-              ? 'bg-[#162232] text-slate-300 border border-white/10'
-              : 'bg-slate-100 text-slate-700 border border-slate-200',
-          ]"
+          class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-surface-hover text-text-body border border-border/60"
         >
           <component
             :is="typeMap[hydrometer.type]?.icon || Home"
@@ -117,12 +110,7 @@ function copyToClipboard(text: string, type: 'coord' | 'code') {
 
       <!-- Informações Geográficas -->
       <div
-        class="space-y-2.5 rounded-xl p-3.5 border transition-colors"
-        :class="[
-          isDark
-            ? 'bg-[#15202e] border-white/10 shadow-inner'
-            : 'bg-slate-50 border-slate-200/80 shadow-sm',
-        ]"
+        class="space-y-2.5 rounded-xl p-3.5 border bg-surface/40 border-border/60 shadow-inner transition-colors"
       >
         <div>
           <span class="text-[10px] font-bold text-text-muted uppercase tracking-wider block mb-0.5">
@@ -167,12 +155,7 @@ function copyToClipboard(text: string, type: 'coord' | 'code') {
 
       <!-- Status do Dispositivo IoT -->
       <div
-        class="rounded-xl p-3.5 border space-y-2 transition-colors"
-        :class="[
-          isDark
-            ? 'bg-[#15202e] border-white/10 shadow-inner'
-            : 'bg-slate-50 border-slate-200/80 shadow-sm',
-        ]"
+        class="rounded-xl p-3.5 border space-y-2 bg-surface/40 border-border/60 shadow-inner transition-colors"
       >
         <span class="text-[10px] font-bold text-text-muted uppercase tracking-wider block">
           Comunicação IoT
@@ -212,12 +195,7 @@ function copyToClipboard(text: string, type: 'coord' | 'code') {
 
       <button
         type="button"
-        class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold active:scale-[0.98] transition-all shadow-sm cursor-pointer select-none"
-        :class="[
-          isDark
-            ? 'text-slate-200 hover:text-white bg-[#172232] hover:bg-[#1e2e42] border border-white/10'
-            : 'text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200',
-        ]"
+        class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold active:scale-[0.98] transition-all shadow-sm cursor-pointer select-none text-text-body hover:text-text-heading bg-surface-hover hover:bg-surface-card border border-border/60"
         @click="emit('center')"
       >
         <Crosshair class="h-3.5 w-3.5 mr-1.5 text-primary-400" />

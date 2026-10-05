@@ -136,7 +136,7 @@ onUnmounted(() => {
               : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/80 border border-transparent',
         ]"
       >
-        <!-- Accent Neon Curvado na Esquerda (Ativo & Hover) idêntico à referência, em azul -->
+        <!-- Accent neon curvado na esquerda (ativo & hover) -->
         <div
           :class="[
             'absolute inset-0 rounded-xl pointer-events-none transition-all duration-300 ease-out',
