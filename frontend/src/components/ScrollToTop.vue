@@ -30,7 +30,7 @@ onUnmounted(() => {
     <button
       v-if="isVisible"
       @click="scrollToTop"
-      class="fixed bottom-6 right-6 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-primary-600 text-white shadow-lg hover:bg-primary-500 hover:-translate-y-1 hover:shadow-primary-600/30 transition-all duration-300"
+      class="fixed bottom-20 lg:bottom-6 right-5 sm:right-6 z-30 flex h-12 w-12 items-center justify-center rounded-full bg-primary-600 text-white shadow-lg hover:bg-primary-500 hover:-translate-y-1 hover:shadow-primary-600/30 transition-all duration-300"
       title="Voltar ao topo"
     >
       <ArrowUp class="h-6 w-6" />

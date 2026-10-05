@@ -81,7 +81,7 @@ onUnmounted(() => {
   <Transition name="fade">
     <div
       v-if="open"
-      class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
+      class="fixed inset-0 z-[45] bg-black/60 backdrop-blur-sm lg:hidden"
       @click="emit('close')"
     />
   </Transition>
@@ -99,77 +99,168 @@ onUnmounted(() => {
     }"
   >
     <!-- Logo + Close button (mobile) -->
-    <div class="flex items-center gap-3 px-6 py-5 border-b border-border">
-      <img src="/favicon.svg" alt="HydroTrack" class="h-8 w-8 drop-shadow-sm" />
-      <div class="flex-1">
-        <h1 class="text-lg font-bold text-text-heading">HydroTrack</h1>
-        <p class="text-xs text-text-muted">Monitoramento</p>
+    <div class="flex items-center justify-between px-6 py-5 border-b border-border">
+      <div class="flex items-center gap-3.5">
+        <img src="/logo.png" alt="HydroTrack" class="h-11 w-11 object-contain drop-shadow-md" />
+        <div>
+          <h1 class="text-xl font-bold text-text-heading tracking-tight leading-none">HydroTrack</h1>
+          <p class="text-xs text-text-muted mt-1">Monitoramento Hídrico</p>
+        </div>
       </div>
-      <!-- Toggle de tema -->
-      <button
-        @click="toggleTheme"
-        class="rounded-lg p-1.5 text-text-muted hover:bg-surface-hover hover:text-text-heading transition-colors"
-        :title="isDark ? 'Mudar para tema claro' : 'Mudar para tema escuro'"
-      >
-        <Sun v-if="isDark" class="h-5 w-5" />
-        <Moon v-else class="h-5 w-5" />
-      </button>
       <button
         @click="emit('close')"
-        class="lg:hidden rounded-lg p-1.5 text-text-muted hover:bg-surface-hover hover:text-text-heading transition-colors"
+        class="lg:hidden rounded-lg p-1.5 text-text-muted hover:bg-surface-hover hover:text-text-heading transition-colors cursor-pointer"
         title="Fechar menu"
+        aria-label="Fechar menu"
       >
         <X class="h-5 w-5" />
       </button>
     </div>
 
     <!-- Navegação -->
-    <nav class="flex-1 px-3 py-4 space-y-1">
+    <nav class="flex-1 px-3 py-4 space-y-1.5">
       <RouterLink
         v-for="item in navItems"
         :key="item.name"
         :to="item.path"
         :class="[
-          'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
+          'group relative flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-200 overflow-visible',
           isActive(item)
-            ? 'bg-primary-600/20 text-primary-400 border-r-2 border-primary-400'
-            : 'text-text-muted hover:bg-surface-hover hover:text-text-heading',
+            ? (isDark
+                ? 'text-white bg-white/[0.08] border border-white/10 shadow-sm'
+                : 'text-slate-900 bg-primary-500/15 border border-primary-500/30 shadow-sm')
+            : (isDark
+                ? 'text-slate-400 hover:text-white hover:bg-white/[0.06] border border-transparent'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/80 border border-transparent'),
         ]"
       >
-        <component :is="item.icon" class="h-5 w-5" />
-        {{ item.label }}
+        <!-- Accent Neon Curvado na Esquerda (Ativo & Hover) idêntico à referência, em azul -->
+        <div
+          :class="[
+            'absolute inset-0 rounded-xl pointer-events-none transition-all duration-300 ease-out',
+            isActive(item) ? 'opacity-100' : 'opacity-0 group-hover:opacity-80',
+          ]"
+          :style="{
+            border: '2.5px solid transparent',
+            borderLeftColor: isDark ? '#38bdf8' : '#0284c7',
+            borderTopColor: isDark ? '#38bdf8' : '#0284c7',
+            borderBottomColor: isDark ? '#38bdf8' : '#0284c7',
+            WebkitMaskImage: 'linear-gradient(to right, #000 0px, #000 12px, transparent 26px)',
+            maskImage: 'linear-gradient(to right, #000 0px, #000 12px, transparent 26px)',
+            filter: isDark
+              ? 'drop-shadow(0 0 6px rgba(56, 189, 248, 0.95)) drop-shadow(-3px 0 12px rgba(14, 165, 233, 0.75))'
+              : 'drop-shadow(0 0 4px rgba(2, 132, 199, 0.5))',
+          }"
+        />
+
+        <!-- Brilho Ambiente / Spotlight Suave Interno Azul -->
+        <div
+          :class="[
+            'absolute inset-0 rounded-xl pointer-events-none transition-opacity duration-300',
+            isDark
+              ? (isActive(item)
+                  ? 'opacity-100 bg-gradient-to-r from-sky-500/15 via-primary-500/5 to-transparent'
+                  : 'opacity-0 group-hover:opacity-100 bg-gradient-to-r from-sky-500/10 via-primary-500/5 to-transparent')
+              : (isActive(item)
+                  ? 'opacity-100 bg-gradient-to-r from-primary-500/15 via-sky-500/5 to-transparent'
+                  : 'opacity-0 group-hover:opacity-100 bg-gradient-to-r from-primary-500/10 via-sky-500/5 to-transparent'),
+          ]"
+        />
+
+        <!-- Ícone com realce nítido e contraste adaptativo -->
+        <component
+          :is="item.icon"
+          :class="[
+            'h-5 w-5 transition-all duration-200 z-10',
+            isActive(item)
+              ? (isDark
+                  ? 'text-primary-400 drop-shadow-[0_0_8px_rgba(56,189,248,0.45)] scale-105'
+                  : 'text-primary-600 drop-shadow-sm scale-105')
+              : (isDark
+                  ? 'text-slate-400 group-hover:text-primary-400 group-hover:scale-105'
+                  : 'text-slate-500 group-hover:text-primary-600 group-hover:scale-105'),
+          ]"
+        />
+
+        <span
+          :class="[
+            'z-10 transition-colors duration-200',
+            isActive(item)
+              ? (isDark ? 'font-semibold text-white' : 'font-bold text-slate-900')
+              : (isDark
+                  ? 'font-medium text-slate-400 group-hover:text-white'
+                  : 'font-medium text-slate-600 group-hover:text-slate-900'),
+          ]"
+        >
+          {{ item.label }}
+        </span>
       </RouterLink>
     </nav>
 
-    <!-- Rodapé com usuário e logout -->
-    <div class="border-t border-border px-4 py-4 space-y-3">
-      <!-- Usuário e logout -->
-      <div class="flex items-center gap-3">
-        <!-- Avatar -->
-        <div
-          class="flex h-9 w-9 items-center justify-center rounded-full bg-primary-600/20 text-primary-400 text-sm font-bold shrink-0"
-        >
-          {{ authStore.user?.name?.charAt(0)?.toUpperCase() ?? '?' }}
+    <!-- Rodapé: Perfil do Usuário, Alternador de Tema e Logout -->
+    <div
+      class="border-t border-border p-3.5 space-y-2.5"
+      style="padding-bottom: max(0.875rem, env(safe-area-inset-bottom, 0px));"
+    >
+      <!-- Informações do usuário logado + botão de alternar tema -->
+      <div
+        class="flex items-center justify-between gap-2.5 px-1 py-1"
+      >
+        <!-- Avatar com indicador de status online -->
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="relative shrink-0">
+            <div
+              class="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-primary-500/25 to-primary-600/35 border border-primary-500/30 text-primary-400 text-xs font-bold shadow-sm"
+            >
+              {{ authStore.user?.name?.charAt(0)?.toUpperCase() ?? '?' }}
+            </div>
+            <span
+              class="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-surface"
+              title="Conectado"
+            ></span>
+          </div>
+
+          <div class="flex-1 min-w-0">
+            <p class="text-xs font-bold text-text-heading truncate">
+              {{ authStore.user?.name ?? 'Carregando...' }}
+            </p>
+            <p class="text-[10px] text-text-muted truncate">
+              {{ authStore.user?.role === 'admin' ? 'Administrador' : 'Operador' }}
+            </p>
+          </div>
         </div>
 
-        <div class="flex-1 min-w-0">
-          <p class="text-sm font-medium text-text-heading truncate">
-            {{ authStore.user?.name ?? 'Carregando...' }}
-          </p>
-          <p class="text-xs text-text-muted truncate">
-            {{ authStore.user?.role === 'admin' ? 'Administrador' : 'Operador' }}
-          </p>
-        </div>
-
-        <!-- Botão de logout -->
+        <!-- Botão Alternador de Tema com animação elástica de giro -->
         <button
-          @click="authStore.logout()"
-          class="rounded-lg p-2 text-text-muted hover:bg-surface-hover hover:text-red-400 transition-colors"
-          title="Sair"
+          @click="toggleTheme"
+          class="relative flex items-center justify-center h-8 w-8 rounded-lg text-text-muted hover:text-amber-400 hover:bg-surface-hover/60 active:scale-90 transition-all duration-200 cursor-pointer shrink-0"
+          :title="isDark ? 'Mudar para tema claro' : 'Mudar para tema escuro'"
+          aria-label="Alternar tema"
         >
-          <LogOut class="h-4 w-4" />
+          <Transition name="theme-spin" mode="out-in">
+            <Sun
+              v-if="isDark"
+              key="sun"
+              class="h-4 w-4 text-amber-400"
+            />
+            <Moon
+              v-else
+              key="moon"
+              class="h-4 w-4 text-sky-400"
+            />
+          </Transition>
         </button>
       </div>
+
+      <!-- Botão de Sair com Padrão Pill Arredondado -->
+      <button
+        @click="authStore.logout()"
+        class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-full text-xs font-semibold text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 hover:border-rose-500/30 active:scale-[0.98] transition-all duration-200 cursor-pointer shadow-sm group"
+        title="Encerrar sessão"
+      >
+        <LogOut class="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
+        <span>Sair da conta</span>
+      </button>
     </div>
   </aside>
 </template>
@@ -181,6 +272,24 @@ onUnmounted(() => {
 }
 .fade-enter-from,
 .fade-leave-to {
+  opacity: 0;
+}
+
+/* Animação suave e elástica de rotação ao alternar o tema */
+.theme-spin-enter-active,
+.theme-spin-leave-active {
+  transition:
+    transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.2s ease;
+}
+
+.theme-spin-enter-from {
+  transform: rotate(-140deg) scale(0.3);
+  opacity: 0;
+}
+
+.theme-spin-leave-to {
+  transform: rotate(140deg) scale(0.3);
   opacity: 0;
 }
 </style>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, onActivated, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -208,9 +208,24 @@ function centerAndOpenPopup(id: number, lat: number, lng: number, zoomLevel = 17
   }
 }
 
+function invalidateSize() {
+  if (map) {
+    map.invalidateSize()
+  }
+}
+
+onActivated(() => {
+  if (map) {
+    setTimeout(() => {
+      map?.invalidateSize()
+    }, 50)
+  }
+})
+
 defineExpose({
   centerOn,
   centerAndOpenPopup,
+  invalidateSize,
 })
 </script>
 

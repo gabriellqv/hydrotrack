@@ -1,68 +1,91 @@
 <template>
-  <div
-    class="flex flex-col min-h-[calc(100vh-4rem)] lg:h-[calc(100vh-4rem)] space-y-3 lg:min-h-0 animate-pulse p-4 lg:p-5"
-  >
-    <div class="shrink-0 mb-4">
-      <Skeleton class="h-8 w-48 mb-2" />
-      <Skeleton class="h-4 w-64" />
+  <div class="space-y-6 lg:space-y-8 pb-10 animate-pulse">
+    <!-- Header Skeleton -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div>
+        <Skeleton class="h-8 w-48 mb-2" />
+        <Skeleton class="h-4 w-72" />
+      </div>
+      <Skeleton class="h-8 w-44 rounded-full" />
     </div>
 
-    <!-- Unified Dashboard Wrapper Skeleton -->
-    <div class="flex-1 flex flex-col lg:min-h-0">
-      <div class="grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-3 gap-6 lg:gap-8 flex-1">
-        <!-- Top Left: Gráfico Normal -->
-        <div
-          class="flex flex-col lg:row-span-2 bg-surface-card border border-border/50 rounded-xl p-4 lg:p-5"
-        >
-          <Skeleton class="h-5 w-40 mb-3" />
-          <div
-            class="flex-1 w-full bg-surface-hover/50 rounded-lg border border-border/30 p-4 flex items-end gap-2"
-          >
-            <!-- Simulated chart bars -->
-            <Skeleton
-              v-for="i in 12"
-              :key="i"
-              class="flex-1 rounded-t-sm"
-              :style="{ height: `${Math.max(20, Math.random() * 100)}%` }"
-            />
+    <!-- 6 KPI Cards Skeleton -->
+    <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 lg:gap-4">
+      <div
+        v-for="i in 6"
+        :key="i"
+        class="bg-surface-card border border-border/50 rounded-xl p-4 flex flex-col justify-between"
+      >
+        <div class="flex justify-between items-center mb-2">
+          <Skeleton class="h-3 w-16" />
+          <Skeleton class="h-6 w-6 rounded-lg" />
+        </div>
+        <Skeleton class="h-7 w-20 my-1" />
+        <div class="mt-2 pt-2 border-t border-border/30">
+          <Skeleton class="h-2.5 w-24" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Grid Skeleton: Chart + Map -->
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 lg:gap-8">
+      <div class="xl:col-span-7 bg-surface-card border border-border/50 rounded-xl p-5 lg:p-6">
+        <div class="flex justify-between items-center mb-4">
+          <div class="flex items-center gap-3">
+            <Skeleton class="h-9 w-9 rounded-xl" />
+            <div>
+              <Skeleton class="h-4 w-36 mb-1.5" />
+              <Skeleton class="h-3 w-48" />
+            </div>
+          </div>
+          <Skeleton class="h-7 w-28 rounded-xl" />
+        </div>
+        <Skeleton class="h-[320px] sm:h-[350px] lg:h-[380px] w-full rounded-xl" />
+      </div>
+
+      <div class="xl:col-span-5 bg-surface-card border border-border/50 rounded-xl p-5 lg:p-6">
+        <div class="flex justify-between items-center mb-4">
+          <div class="flex items-center gap-3">
+            <Skeleton class="h-9 w-9 rounded-xl" />
+            <div>
+              <Skeleton class="h-4 w-40 mb-1.5" />
+              <Skeleton class="h-3 w-48" />
+            </div>
+          </div>
+          <Skeleton class="h-6 w-20 rounded-lg" />
+        </div>
+        <Skeleton class="h-[320px] sm:h-[350px] lg:h-[380px] w-full rounded-xl" />
+      </div>
+    </div>
+
+    <!-- Bottom Grid Skeleton: Donut + Alerts -->
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 lg:gap-8">
+      <div class="xl:col-span-5 bg-surface-card border border-border/50 rounded-xl p-5 lg:p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <Skeleton class="h-9 w-9 rounded-xl" />
+          <div>
+            <Skeleton class="h-4 w-36 mb-1.5" />
+            <Skeleton class="h-3 w-44" />
           </div>
         </div>
-
-        <!-- Top Right: Mapa -->
-        <div
-          class="flex flex-col lg:row-span-2 bg-surface-card border border-border/50 rounded-xl p-4 lg:p-5"
-        >
-          <Skeleton class="h-5 w-48 mb-3" />
-          <!-- Data ribbon skeleton -->
-          <div class="flex gap-2 mb-3 h-12">
-            <Skeleton class="flex-1 rounded-lg" />
-            <Skeleton class="flex-1 rounded-lg" />
-            <Skeleton class="flex-1 rounded-lg" />
-            <Skeleton class="flex-1 rounded-lg" />
-          </div>
-          <Skeleton class="flex-1 w-full rounded-lg" />
+        <div class="h-[270px] lg:h-[290px] flex items-center justify-center">
+          <Skeleton circle class="h-36 w-36 lg:h-44 lg:w-44" />
         </div>
+      </div>
 
-        <!-- Bottom Left: Gráfico Pizza -->
-        <div
-          class="flex flex-col lg:row-span-1 bg-surface-card border border-border/50 rounded-xl p-4 lg:p-5"
-        >
-          <Skeleton class="h-5 w-40 mb-2" />
-          <div class="flex-1 flex items-center justify-center">
-            <Skeleton circle class="h-32 w-32 md:h-40 md:w-40" />
+      <div class="xl:col-span-7 bg-surface-card border border-border/50 rounded-xl p-5 lg:p-6">
+        <div class="flex justify-between items-center mb-4">
+          <div class="flex items-center gap-3">
+            <Skeleton class="h-9 w-9 rounded-xl" />
+            <div>
+              <Skeleton class="h-4 w-36 mb-1.5" />
+              <Skeleton class="h-3 w-52" />
+            </div>
           </div>
+          <Skeleton class="h-6 w-24 rounded-lg" />
         </div>
-
-        <!-- Bottom Right: Últimos Alertas -->
-        <div
-          class="flex flex-col lg:row-span-1 bg-surface-card border border-border/50 rounded-xl p-4 lg:p-5"
-        >
-          <Skeleton class="h-5 w-32 mb-2" />
-          <div class="flex-1 space-y-2">
-            <Skeleton class="h-12 w-full rounded-lg" />
-            <Skeleton class="h-12 w-full rounded-lg" />
-            <Skeleton class="h-12 w-full rounded-lg" />
-          </div>
+        <div class="h-[270px] lg:h-[290px] space-y-2.5">
+          <Skeleton v-for="i in 4" :key="i" class="h-12 w-full rounded-lg" />
         </div>
       </div>
     </div>
