@@ -19,7 +19,9 @@ onMounted(async () => {
   initTheme()
   if (authStore.token) {
     await authStore.fetchUser()
-    dashboardStore.fetchSummary()
+    // O badge de alertas no mobile depende do summary; falhas são tratadas
+    // pelo interceptor da API e não devem gerar unhandled rejection.
+    dashboardStore.fetchSummary().catch(() => {})
   }
 })
 </script>

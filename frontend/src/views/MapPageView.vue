@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, onActivated, watch, ref, computed } from 'vue'
+import { onUnmounted, onActivated, onDeactivated, watch, ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useDashboardStore } from '@/stores/dashboard'
 import BaseCard from '@/components/ui/BaseCard.vue'
@@ -83,22 +83,41 @@ function checkTargetHydrometer() {
   }
 }
 
-onMounted(() => {
-  store.fetchMap().then(() => {
-    checkTargetHydrometer()
-  })
-  pollingTimer = setInterval(() => store.fetchMap(), POLLING_INTERVAL)
-  checkTargetHydrometer()
-})
+function loadMap() {
+  return store
+    .fetchMap()
+    .catch(() => {
+      // Erros de rede são tratados pelo interceptor da API.
+    })
+    .then(() => checkTargetHydrometer())
+}
+
+/**
+ * Inicia o polling e a sincronização com a query string.
+ * A view é mantida pelo KeepAlive, então o ciclo usa onActivated/onDeactivated.
+ */
+function startPolling() {
+  stopPolling()
+  loadMap()
+  pollingTimer = setInterval(loadMap, POLLING_INTERVAL)
+}
+
+function stopPolling() {
+  if (pollingTimer) {
+    clearInterval(pollingTimer)
+    pollingTimer = null
+  }
+}
 
 onActivated(() => {
-  store.fetchMap().then(() => {
-    checkTargetHydrometer()
-  })
+  startPolling()
   setTimeout(() => {
     mapViewRef.value?.invalidateSize()
   }, 50)
-  checkTargetHydrometer()
+})
+
+onDeactivated(() => {
+  stopPolling()
 })
 
 watch(
@@ -109,10 +128,7 @@ watch(
 )
 
 onUnmounted(() => {
-  if (pollingTimer) {
-    clearInterval(pollingTimer)
-    pollingTimer = null
-  }
+  stopPolling()
 })
 
 function handleMarkerClick(hydrometer: Hydrometer) {

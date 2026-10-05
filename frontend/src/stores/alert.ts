@@ -17,7 +17,11 @@ export const useAlertStore = defineStore('alert', () => {
     resolved: '',
   })
 
+  /** Garante que apenas a resposta mais recente seja aplicada (evita race condition) */
+  let fetchSeq = 0
+
   async function fetchAlerts() {
+    const seq = ++fetchSeq
     if (!alerts.value.length) loading.value = true
     try {
       const params = new URLSearchParams()
@@ -25,9 +29,10 @@ export const useAlertStore = defineStore('alert', () => {
       if (filters.value.resolved) params.set('resolved', filters.value.resolved)
       const query = params.toString()
       const { data } = await api.get<{ data: Alert[] }>(`/alerts${query ? `?${query}` : ''}`)
+      if (seq !== fetchSeq) return
       alerts.value = data.data
     } finally {
-      loading.value = false
+      if (seq === fetchSeq) loading.value = false
     }
   }
 

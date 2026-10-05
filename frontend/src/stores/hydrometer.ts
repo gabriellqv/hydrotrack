@@ -20,6 +20,9 @@ export const useHydrometerStore = defineStore('hydrometer', () => {
   /** Indicador de carregamento */
   const loading = ref(false)
 
+  /** Garante que apenas a resposta mais recente seja aplicada (evita race condition) */
+  let fetchSeq = 0
+
   /** Metadados de paginação */
   const pagination = ref({
     currentPage: 1,
@@ -34,10 +37,12 @@ export const useHydrometerStore = defineStore('hydrometer', () => {
    * @param {Record<string, string>} filters - Filtros opcionais (neighborhood, status, type)
    */
   async function fetchHydrometers(page = 1, filters: Record<string, string> = {}) {
+    const seq = ++fetchSeq
     if (!hydrometers.value.length) loading.value = true
     try {
       const params = new URLSearchParams({ page: String(page), ...filters })
       const { data } = await api.get<PaginatedResponse<Hydrometer>>(`/hydrometers?${params}`)
+      if (seq !== fetchSeq) return
 
       hydrometers.value = data.data
       pagination.value = {
@@ -46,7 +51,7 @@ export const useHydrometerStore = defineStore('hydrometer', () => {
         total: data.meta.total,
       }
     } finally {
-      loading.value = false
+      if (seq === fetchSeq) loading.value = false
     }
   }
 
