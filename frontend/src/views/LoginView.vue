@@ -191,12 +191,16 @@ async function handleLogin() {
         <form @submit.prevent="handleLogin" novalidate class="space-y-4">
           <!-- Campo E-mail -->
           <div class="space-y-1.5">
-            <label class="block text-xs font-semibold text-text-body uppercase tracking-wider">
+            <label
+              for="login-email"
+              class="block text-xs font-semibold text-text-body uppercase tracking-wider"
+            >
               E-mail de Acesso
             </label>
             <div class="relative">
               <Mail class="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted" />
               <input
+                id="login-email"
                 v-model="email"
                 type="email"
                 placeholder="exemplo@hydrotrack.com"
@@ -208,12 +212,16 @@ async function handleLogin() {
 
           <!-- Campo Senha -->
           <div class="space-y-1.5">
-            <label class="block text-xs font-semibold text-text-body uppercase tracking-wider">
+            <label
+              for="login-password"
+              class="block text-xs font-semibold text-text-body uppercase tracking-wider"
+            >
               Senha
             </label>
             <div class="relative">
               <Lock class="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted" />
               <input
+                id="login-password"
                 v-model="password"
                 :type="showPassword ? 'text' : 'password'"
                 placeholder="••••••••"

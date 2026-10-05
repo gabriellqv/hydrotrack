@@ -1,5 +1,10 @@
 import { test, expect, type APIRequestContext } from '@playwright/test'
-import { createTestHydrometer, e2eConfig, readingScenarios, sendIngestReading } from './fixtures/states'
+import {
+  createTestHydrometer,
+  e2eConfig,
+  readingScenarios,
+  sendIngestReading,
+} from './fixtures/states'
 
 test.describe.configure({ mode: 'serial' })
 
@@ -28,11 +33,12 @@ test.describe('Fluxo critico', () => {
     await page.goto('/login')
 
     await expect(page).toHaveTitle(/HydroTrack/i)
-    await expect(page.getByRole('heading', { name: /Entrar na plataforma/i })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /HydroTrack/i })).toBeVisible()
+    await expect(page.getByLabel(/E-mail/i)).toBeVisible()
 
     await page.getByLabel(/E-mail/i).fill(e2eConfig.admin.email)
     await page.getByLabel(/Senha/i).fill(e2eConfig.admin.password)
-    await page.getByRole('button', { name: /Entrar/i }).click()
+    await page.getByRole('button', { name: /Acessar Plataforma/i }).click()
 
     await expect(page).toHaveURL('/')
     await expect(page.getByRole('heading', { name: /Dashboard/i })).toBeVisible()
@@ -63,7 +69,11 @@ test.describe('Fluxo critico', () => {
       test.skip(true, 'PLAYWRIGHT_INGEST_API_KEY nao configurada; pulando ingestao M2M')
     }
 
-    const response = await sendIngestReading(apiContext, hydrometerCode, readingScenarios.zero.valueM3)
+    const response = await sendIngestReading(
+      apiContext,
+      hydrometerCode,
+      readingScenarios.zero.valueM3,
+    )
     expect(response.ok()).toBeTruthy()
 
     await page.goto('/alerts')
@@ -101,6 +111,6 @@ test.describe('Fluxo critico', () => {
     await page.getByRole('button', { name: /Sair/i }).click()
 
     await expect(page).toHaveURL('/login')
-    await expect(page.getByRole('heading', { name: /Entrar na plataforma/i })).toBeVisible()
+    await expect(page.getByRole('button', { name: /Acessar Plataforma/i })).toBeVisible()
   })
 })
