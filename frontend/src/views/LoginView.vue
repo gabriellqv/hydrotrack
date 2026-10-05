@@ -40,9 +40,18 @@ const loading = ref(false)
 const error = ref('')
 const demoFilled = ref(false)
 
+/**
+ * Credenciais de demonstração. Só são embutidas no build de desenvolvimento
+ * e quando explicitamente fornecidas via VITE_DEMO_EMAIL/VITE_DEMO_PASSWORD,
+ * evitando expor credenciais do ambiente de produção.
+ */
+const demoEmail = import.meta.env.VITE_DEMO_EMAIL as string | undefined
+const demoPassword = import.meta.env.VITE_DEMO_PASSWORD as string | undefined
+const showDemo = import.meta.env.DEV && !!demoEmail && !!demoPassword
+
 function fillDemoCredentials() {
-  email.value = 'admin@hydrotrack.com'
-  password.value = 'admin123'
+  email.value = demoEmail ?? ''
+  password.value = demoPassword ?? ''
   error.value = ''
   demoFilled.value = true
   setTimeout(() => (demoFilled.value = false), 1800)
@@ -232,9 +241,10 @@ async function handleLogin() {
             </div>
           </div>
 
-          <!-- Botão de Acesso Rápido de Demonstração -->
+          <!-- Botão de Acesso Rápido de Demonstração (somente dev, se configurado) -->
           <div class="pt-1 flex items-center justify-between">
             <button
+              v-if="showDemo"
               type="button"
               @click="fillDemoCredentials"
               :class="[
