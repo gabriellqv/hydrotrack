@@ -34,7 +34,7 @@ export const useHydrometerStore = defineStore('hydrometer', () => {
    * @param {Record<string, string>} filters - Filtros opcionais (neighborhood, status, type)
    */
   async function fetchHydrometers(page = 1, filters: Record<string, string> = {}) {
-    loading.value = true
+    if (!hydrometers.value.length) loading.value = true
     try {
       const params = new URLSearchParams({ page: String(page), ...filters })
       const { data } = await api.get<PaginatedResponse<Hydrometer>>(`/hydrometers?${params}`)

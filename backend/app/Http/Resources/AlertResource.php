@@ -19,6 +19,7 @@ class AlertResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'hydrometer_id' => $this->hydrometer_id,
             'hydrometer' => new HydrometerResource($this->whenLoaded('hydrometer')),
             'type' => $this->type,
             'message' => $this->message,
