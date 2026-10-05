@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { api } from '@/services/api'
-import type { Alert } from '@/types'
+import type { Alert, AlertStats } from '@/types'
 import { useToastStore } from '@/stores/toast'
 
 /**
@@ -10,6 +10,9 @@ import { useToastStore } from '@/stores/toast'
 export const useAlertStore = defineStore('alert', () => {
   const alerts = ref<Alert[]>([])
   const loading = ref(false)
+
+  /** Métricas agregadas de todo o histórico (para os KPIs da Central de Alertas) */
+  const stats = ref<AlertStats | null>(null)
 
   /** Filtros ativos para a listagem de alertas */
   const filters = ref<{ type: string; resolved: string }>({
@@ -36,16 +39,22 @@ export const useAlertStore = defineStore('alert', () => {
     }
   }
 
+  /** Busca as métricas agregadas de alertas (totais e taxa de resolução) */
+  async function fetchStats() {
+    const { data } = await api.get<AlertStats>('/alerts/stats')
+    stats.value = data
+  }
+
   async function resolveAlert(id: number) {
     const toast = useToastStore()
     try {
       await api.patch(`/alerts/${id}/resolve`)
       toast.success('Alerta resolvido e arquivado com sucesso.')
-      await fetchAlerts()
+      await Promise.all([fetchAlerts(), fetchStats()])
     } catch {
       toast.error('Erro ao tentar resolver o alerta.')
     }
   }
 
-  return { alerts, loading, filters, fetchAlerts, resolveAlert }
+  return { alerts, stats, loading, filters, fetchAlerts, fetchStats, resolveAlert }
 })

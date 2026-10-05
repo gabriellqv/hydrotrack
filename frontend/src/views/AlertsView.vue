@@ -34,15 +34,14 @@ const store = useAlertStore()
 const searchQuery = ref('')
 const isRefreshing = ref(false)
 
-/** Contadores calculados a partir de todos os alertas */
-const totalCount = computed(() => store.alerts.length)
-const pendingCount = computed(() => store.alerts.filter((a) => !a.resolved).length)
-const resolvedCount = computed(() => store.alerts.filter((a) => a.resolved).length)
-
-const resolutionRate = computed(() => {
-  if (totalCount.value === 0) return 100
-  return Math.round((resolvedCount.value / totalCount.value) * 100)
-})
+/**
+ * Contadores dos KPIs vindos do agregado do backend (todo o histórico).
+ * Não devem ser derivados de `store.alerts`, que contém apenas a página atual.
+ */
+const totalCount = computed(() => store.stats?.total ?? 0)
+const pendingCount = computed(() => store.stats?.pending ?? 0)
+const resolvedCount = computed(() => store.stats?.resolved ?? 0)
+const resolutionRate = computed(() => store.stats?.resolution_rate ?? 100)
 
 /** Alertas filtrados por busca textual no client */
 const displayAlerts = computed(() => {
@@ -71,7 +70,7 @@ async function filterByResolved(resolved: string) {
 async function handleRefresh() {
   isRefreshing.value = true
   try {
-    await store.fetchAlerts()
+    await Promise.all([store.fetchAlerts(), store.fetchStats()])
   } finally {
     setTimeout(() => (isRefreshing.value = false), 600)
   }
@@ -86,10 +85,12 @@ function resetFilters() {
 
 onMounted(() => {
   store.fetchAlerts()
+  store.fetchStats().catch(() => {})
 })
 
 onActivated(() => {
   store.fetchAlerts()
+  store.fetchStats().catch(() => {})
 })
 </script>
 
