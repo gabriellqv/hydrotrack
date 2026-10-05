@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted, onActivated } from 'vue'
+import { computed, ref, onUnmounted, onActivated, onDeactivated } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useDashboardStore } from '@/stores/dashboard'
 import { useAuthStore } from '@/stores/auth'
@@ -54,29 +54,46 @@ const POLLING_INTERVAL = 15_000
 let pollingTimer: ReturnType<typeof setInterval> | null = null
 
 async function refreshDashboard() {
-  await Promise.all([
-    store.fetchSummary(),
-    store.fetchConsumption(),
-    store.fetchMap(),
-    store.fetchAlerts(),
-  ])
+  try {
+    await Promise.all([
+      store.fetchSummary(),
+      store.fetchConsumption(),
+      store.fetchMap(),
+      store.fetchAlerts(),
+    ])
+  } catch {
+    // Falhas de rede já são tratadas pelo interceptor da API; aqui evitamos
+    // que o polling em background gere unhandled rejection.
+  }
 }
 
-onMounted(() => {
+/**
+ * Inicia o polling. Como a view é mantida viva pelo KeepAlive do App,
+ * o ciclo é controlado por onActivated/onDeactivated (e não por onMounted).
+ */
+function startPolling() {
+  stopPolling()
   refreshDashboard()
   pollingTimer = setInterval(refreshDashboard, POLLING_INTERVAL)
-})
+}
 
-onActivated(() => {
-  // Atualiza em background sem travar a interface
-  refreshDashboard()
-})
-
-onUnmounted(() => {
+function stopPolling() {
   if (pollingTimer) {
     clearInterval(pollingTimer)
     pollingTimer = null
   }
+}
+
+onActivated(() => {
+  startPolling()
+})
+
+onDeactivated(() => {
+  stopPolling()
+})
+
+onUnmounted(() => {
+  stopPolling()
 })
 
 // Estado do botão de sincronização manual
