@@ -33,7 +33,7 @@ const colors = {
 </script>
 
 <template>
-  <div class="fixed bottom-4 right-4 z-[9999] flex flex-col gap-2 pointer-events-none">
+  <div class="fixed bottom-20 lg:bottom-4 right-4 z-[9999] flex flex-col gap-2 pointer-events-none">
     <TransitionGroup
       enter-active-class="transition duration-300 ease-out"
       enter-from-class="transform translate-y-4 opacity-0 scale-95"

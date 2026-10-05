@@ -7,15 +7,18 @@ import { ref } from 'vue'
  * a classe 'light' no elemento <html> para ativar as CSS variables
  * do tema claro.
  */
-const isDark = ref(false)
+const isDark = ref(true)
 
 /**
  * Inicializa o tema a partir do valor persistido no localStorage.
+ * O tema padrão do sistema é escuro (#111924).
  * Deve ser chamado uma vez no onMounted do App.vue.
  */
 function initTheme() {
   const saved = localStorage.getItem('theme')
-  if (saved === 'dark') {
+  if (saved === 'light') {
+    isDark.value = false
+  } else {
     isDark.value = true
   }
   applyTheme()
@@ -37,7 +40,9 @@ function applyTheme() {
   const html = document.documentElement
   if (isDark.value) {
     html.classList.remove('light')
+    html.classList.add('dark')
   } else {
+    html.classList.remove('dark')
     html.classList.add('light')
   }
 }

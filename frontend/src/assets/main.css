@@ -1,47 +1,75 @@
 @import 'tailwindcss';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ----------------------------------------------------------------
  * Tokens de Design — HydroTrack
  * Paleta corporativa inspirada em tons aquáticos (água/telemetria)
  * Suporte a tema claro e escuro via CSS custom properties.
  * ---------------------------------------------------------------- */
 
-/* === Tema Escuro (padrão) === */
-:root {
-  --color-surface: #0f172a;
-  --color-surface-card: #1e293b;
-  --color-surface-hover: #334155;
-  --color-text-heading: #f1f5f9;
-  --color-text-body: #cbd5e1;
-  --color-text-muted: #64748b;
-  --color-border: rgba(51, 65, 85, 0.5);
-  --color-border-hover: rgba(71, 85, 105, 0.6);
-  --sidebar-from: rgba(30, 41, 59, 0.7);
-  --sidebar-to: rgba(15, 23, 42, 0.7);
-  --sidebar-border: rgba(255, 255, 255, 0.1);
-  --shadow-card: 0 0.25rem 1.5rem rgba(0, 0, 0, 0.25);
-  --color-glass: rgba(30, 41, 59, 0.6); /* Dark Glass */
+@layer base {
+  /* === Tema Escuro (padrão) === */
+  :root {
+    --theme-surface: #111924;
+    --theme-surface-card: #182230;
+    --theme-surface-hover: #222f42;
+    --theme-text-heading: #f0f4f8;
+    --theme-text-body: #c5d1de;
+    --theme-text-muted: #6b829d;
+    --theme-border: rgba(56, 78, 106, 0.35);
+    --theme-border-hover: rgba(75, 104, 138, 0.5);
+    --theme-shadow-card: 0 0.5rem 2rem rgba(5, 10, 18, 0.35);
+    --theme-glass: rgba(17, 25, 36, 0.95); /* Deep Midnight Glass */
 
-  /* Espaçamentos e layout */
-  --sidebar-width: 16rem;
-  --layout-padding: 2rem;
-}
+    --sidebar-from: rgba(24, 34, 48, 0.85);
+    --sidebar-to: rgba(17, 25, 36, 0.95);
+    --sidebar-border: rgba(255, 255, 255, 0.08);
 
-/* === Tema Claro === */
-.light {
-  --color-surface: #f1f5f9;
-  --color-surface-card: #ffffff;
-  --color-surface-hover: #e2e8f0;
-  --color-text-heading: #0f172a;
-  --color-text-body: #334155;
-  --color-text-muted: #64748b;
-  --color-border: rgba(203, 213, 225, 0.6);
-  --color-border-hover: rgba(148, 163, 184, 0.5);
-  --sidebar-from: rgba(255, 255, 255, 0.85);
-  --sidebar-to: rgba(241, 245, 249, 0.85);
-  --sidebar-border: rgba(203, 213, 225, 0.5);
-  --shadow-card: 0 0.5rem 2rem rgba(0, 0, 0, 0.12);
-  --color-glass: rgba(255, 255, 255, 0.6); /* Light Glass */
+    /* Aliases diretos */
+    --color-surface: var(--theme-surface);
+    --color-surface-card: var(--theme-surface-card);
+    --color-surface-hover: var(--theme-surface-hover);
+    --color-text-heading: var(--theme-text-heading);
+    --color-text-body: var(--theme-text-body);
+    --color-text-muted: var(--theme-text-muted);
+    --color-border: var(--theme-border);
+    --color-border-hover: var(--theme-border-hover);
+    --color-glass: var(--theme-glass);
+
+    /* Espaçamentos e layout */
+    --sidebar-width: 16rem;
+    --layout-padding: 2rem;
+  }
+
+  /* === Tema Claro === */
+  .light {
+    --theme-surface: #f1f5f9;
+    --theme-surface-card: #ffffff;
+    --theme-surface-hover: #e2e8f0;
+    --theme-text-heading: #0f172a;
+    --theme-text-body: #334155;
+    --theme-text-muted: #64748b;
+    --theme-border: rgba(203, 213, 225, 0.6);
+    --theme-border-hover: rgba(148, 163, 184, 0.5);
+    --theme-shadow-card: 0 0.5rem 2rem rgba(0, 0, 0, 0.12);
+    --theme-glass: rgba(255, 255, 255, 0.95);
+
+    --sidebar-from: rgba(255, 255, 255, 0.85);
+    --sidebar-to: rgba(241, 245, 249, 0.85);
+    --sidebar-border: rgba(203, 213, 225, 0.5);
+
+    /* Aliases diretos */
+    --color-surface: var(--theme-surface);
+    --color-surface-card: var(--theme-surface-card);
+    --color-surface-hover: var(--theme-surface-hover);
+    --color-text-heading: var(--theme-text-heading);
+    --color-text-body: var(--theme-text-body);
+    --color-text-muted: var(--theme-text-muted);
+    --color-border: var(--theme-border);
+    --color-border-hover: var(--theme-border-hover);
+    --color-glass: var(--theme-glass);
+  }
 }
 
 @theme {
@@ -58,14 +86,14 @@
   --color-primary-900: #1e3a8a;
 
   /* Cores do Tema Dinâmico */
-  --color-surface: var(--color-surface);
-  --color-surface-card: var(--color-surface-card);
-  --color-surface-hover: var(--color-surface-hover);
-  --color-text-heading: var(--color-text-heading);
-  --color-text-body: var(--color-text-body);
-  --color-text-muted: var(--color-text-muted);
-  --color-border: var(--color-border);
-  --color-border-hover: var(--color-border-hover);
+  --color-surface: var(--theme-surface);
+  --color-surface-card: var(--theme-surface-card);
+  --color-surface-hover: var(--theme-surface-hover);
+  --color-text-heading: var(--theme-text-heading);
+  --color-text-body: var(--theme-text-body);
+  --color-text-muted: var(--theme-text-muted);
+  --color-border: var(--theme-border);
+  --color-border-hover: var(--theme-border-hover);
 
   /* Cores de status */
   --color-success: #22c55e;
@@ -73,26 +101,12 @@
   --color-danger: #ef4444;
   --color-muted: #94a3b8;
 
-  /* Background do layout (referência às variáveis dinâmicas) */
-  --color-surface: var(--color-surface);
-  --color-surface-card: var(--color-surface-card);
-  --color-surface-hover: var(--color-surface-hover);
-
-  /* Tipografia semântica */
-  --color-text-heading: var(--color-text-heading);
-  --color-text-body: var(--color-text-body);
-  --color-text-muted: var(--color-text-muted);
-
-  /* Bordas */
-  --color-border: var(--color-border);
-  --color-border-hover: var(--color-border-hover);
-
   /* Fontes */
   --font-sans: 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
   /* Sombras */
-  --shadow-card: var(--shadow-card);
+  --shadow-card: var(--theme-shadow-card);
 }
 
 /* Reset e base */
@@ -177,14 +191,13 @@ select {
  */
 body,
 aside,
+header,
 main,
-.bg-surface-card,
-[class*='border-border'],
-[class*='text-text-'] {
+nav,
+.bg-surface-card {
   transition:
     background-color 0.3s ease,
     border-color 0.3s ease,
-    color 0.2s ease,
     box-shadow 0.3s ease;
 }
 
@@ -234,4 +247,49 @@ main,
   .view-scroll-content::-webkit-scrollbar {
     display: none; /* Chrome, Safari, Opera */
   }
+}
+
+/* ----------------------------------------------------------------
+ * Estilos customizados para Popups do Leaflet
+ * ---------------------------------------------------------------- */
+.leaflet-popup-content-wrapper {
+  background: var(--color-surface-card) !important;
+  color: var(--color-text-body) !important;
+  border-radius: 1rem !important;
+  border: 1px solid var(--color-border) !important;
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.4),
+    0 8px 10px -6px rgba(0, 0, 0, 0.3) !important;
+  backdrop-filter: blur(12px) !important;
+  padding: 0.25rem !important;
+}
+
+.leaflet-popup-content {
+  margin: 0.875rem 1rem !important;
+  line-height: 1.5 !important;
+  font-family: var(--font-sans) !important;
+}
+
+.leaflet-popup-tip {
+  background: var(--color-surface-card) !important;
+  border: 1px solid var(--color-border) !important;
+}
+
+.leaflet-container a.leaflet-popup-close-button {
+  color: var(--color-text-muted) !important;
+  top: 8px !important;
+  right: 8px !important;
+  font-size: 16px !important;
+  width: 24px !important;
+  height: 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 9999px !important;
+  transition: all 0.15s ease !important;
+}
+
+.leaflet-container a.leaflet-popup-close-button:hover {
+  color: var(--color-text-heading) !important;
+  background: var(--color-surface-hover) !important;
 }

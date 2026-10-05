@@ -17,7 +17,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
   const selectedDays = ref<7 | 30 | 90>(30)
 
   async function fetchSummary() {
-    loading.value = true
+    if (!summary.value) loading.value = true
     try {
       const { data } = await api.get<DashboardSummary>('/dashboard/summary')
       summary.value = data

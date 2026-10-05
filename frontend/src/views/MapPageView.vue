@@ -1,38 +1,51 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, computed } from 'vue'
-import { RouterLink, useRoute } from 'vue-router'
+import { onMounted, onUnmounted, onActivated, watch, ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { useDashboardStore } from '@/stores/dashboard'
 import BaseCard from '@/components/ui/BaseCard.vue'
+import BaseButton from '@/components/ui/BaseButton.vue'
 import MapView from '@/components/MapView.vue'
-import StatusBadge from '@/components/StatusBadge.vue'
+import AnimatedCounter from '@/components/ui/AnimatedCounter.vue'
+import HydrometerInspectionCard from '@/components/HydrometerInspectionCard.vue'
+import { useTheme } from '@/composables/useTheme'
 import type { Hydrometer } from '@/types'
+import {
+  Search,
+  Crosshair,
+  X,
+  Radio,
+  Layers,
+  PanelRightClose,
+  PanelRightOpen,
+} from 'lucide-vue-next'
 
 /**
- * View Dedicada do Mapa.
+ * View Dedicada do Mapa de Telemetria.
  *
- * Utiliza o componente base MapView para exibir a mancha de dispositivos,
- * adicionando um painel lateral dinâmico para exibição de detalhes de telemetria
- * quando um pino é clicado.
- *
- * Implementa polling a cada 5 segundos para refletir mudanças de status
- * dos hidrômetros enquanto o simulador IoT está rodando.
+ * Exibe a malha de dispositivos distribuídos geograficamente em Bocaiúva-MG.
+ * Ocupa 100% da altura vertical disponível (até a borda inferior da tela),
+ * com suporte a:
+ * - Filtros rápidos com contadores animados por status
+ * - Busca textual por código, endereço ou bairro
+ * - Painel lateral retrátil de inspeção técnica
+ * - Centralização instantânea na cidade
+ * - Polling em tempo real a cada 5 segundos
  */
 
 const store = useDashboardStore()
 const route = useRoute()
+const { isDark } = useTheme()
+
 const selectedHydrometer = ref<Hydrometer | null>(null)
 const activeFilter = ref<'all' | 'online' | 'offline' | 'alert'>('all')
+const searchQuery = ref('')
+const showSidePanel = ref(true)
 
 const mapViewRef = ref<InstanceType<typeof MapView> | null>(null)
 
 /** Intervalo de polling em milissegundos (5s) */
 const POLLING_INTERVAL = 5_000
 let pollingTimer: ReturnType<typeof setInterval> | null = null
-
-const filteredHydrometers = computed(() => {
-  if (activeFilter.value === 'all') return store.mapHydrometers
-  return store.mapHydrometers.filter((h) => h.status === activeFilter.value)
-})
 
 const filterCounts = computed(() => ({
   all: store.mapHydrometers.length,
@@ -41,29 +54,59 @@ const filterCounts = computed(() => ({
   alert: store.mapHydrometers.filter((h) => h.status === 'alert').length,
 }))
 
-const typeMap: Record<string, string> = {
-  residential: 'Residencial',
-  commercial: 'Comercial',
-  industrial: 'Industrial',
-}
+const filteredHydrometers = computed(() => {
+  return store.mapHydrometers.filter((h) => {
+    const matchesFilter = activeFilter.value === 'all' || h.status === activeFilter.value
+    if (!matchesFilter) return false
 
-await store.fetchMap()
-onMounted(() => {
-  pollingTimer = setInterval(() => store.fetchMap(), POLLING_INTERVAL)
+    if (!searchQuery.value.trim()) return true
+    const q = searchQuery.value.toLowerCase().trim()
+    return (
+      h.code.toLowerCase().includes(q) ||
+      h.address.toLowerCase().includes(q) ||
+      h.neighborhood.toLowerCase().includes(q)
+    )
+  })
+})
 
-  // Verifica se o usuário chegou do botão "Ver no Mapa" na view de Detalhes
+function checkTargetHydrometer() {
   const targetId = Number(route.query.hydrometer_id)
   if (targetId) {
     const target = store.mapHydrometers.find((h) => h.id === targetId)
     if (target) {
       selectedHydrometer.value = target
-      // Aguarda um pouco para o Leaflet renderizar antes de voar para o ponto
+      showSidePanel.value = true
       setTimeout(() => {
         mapViewRef.value?.centerAndOpenPopup(target.id, target.latitude, target.longitude)
       }, 500)
     }
   }
+}
+
+onMounted(() => {
+  store.fetchMap().then(() => {
+    checkTargetHydrometer()
+  })
+  pollingTimer = setInterval(() => store.fetchMap(), POLLING_INTERVAL)
+  checkTargetHydrometer()
 })
+
+onActivated(() => {
+  store.fetchMap().then(() => {
+    checkTargetHydrometer()
+  })
+  setTimeout(() => {
+    mapViewRef.value?.invalidateSize()
+  }, 50)
+  checkTargetHydrometer()
+})
+
+watch(
+  () => route.query.hydrometer_id,
+  () => {
+    checkTargetHydrometer()
+  },
+)
 
 onUnmounted(() => {
   if (pollingTimer) {
@@ -74,80 +117,187 @@ onUnmounted(() => {
 
 function handleMarkerClick(hydrometer: Hydrometer) {
   selectedHydrometer.value = hydrometer
+  showSidePanel.value = true
+}
+
+function handleResetCenter() {
+  mapViewRef.value?.centerOn(-17.1085, -43.8143, 14)
+}
+
+function handleCenterOnSelected() {
+  if (!selectedHydrometer.value) return
+  mapViewRef.value?.centerOn(
+    Number(selectedHydrometer.value.latitude),
+    Number(selectedHydrometer.value.longitude),
+    17,
+  )
 }
 </script>
 
 <template>
   <div
-    class="animate-fade-in flex flex-col gap-4 min-h-[calc(100dvh-3.5rem-2rem)] lg:h-[calc(100dvh-4rem)] lg:overflow-hidden"
+    class="animate-fade-in flex flex-col gap-3 flex-1 min-h-0 h-[calc(100dvh-10rem)] lg:h-[calc(100dvh-2rem)] lg:overflow-hidden"
   >
-    <div>
-      <h1 class="text-2xl font-bold text-text-heading">Mapa</h1>
-      <p class="text-sm text-text-muted mt-1">
-        Distribuição geográfica dos hidrômetros em Bocaiúva-MG
-      </p>
-    </div>
+    <!-- Header e Controles Rápidos -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
+      <div>
+        <div class="flex items-center gap-2.5">
+          <h1 class="text-xl sm:text-2xl font-bold text-text-heading tracking-tight">
+            Mapa da Rede
+          </h1>
+          <span
+            class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary-500/10 border border-primary-500/20 text-primary-400"
+          >
+            <span class="w-1.5 h-1.5 rounded-full bg-primary-400 animate-pulse"></span>
+            <AnimatedCounter :value="store.mapHydrometers.length" /> dispositivos
+          </span>
+        </div>
+        <p class="text-xs sm:text-sm text-text-muted mt-0.5">
+          Distribuição geográfica e telemetria operacional • Bocaiúva-MG
+        </p>
+      </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 flex-1 min-h-0">
-      <!-- Mapa e Filtros -->
-      <div class="lg:col-span-3 flex flex-col gap-3 min-h-0">
-        <!-- Filtros Rápidos -->
-        <div
-          class="flex flex-wrap gap-3 bg-surface-card/60 backdrop-blur-xl rounded-xl px-4 py-3 border border-border ring-1 ring-white/5"
-        >
+      <!-- Barra de Ferramentas / Ações Rápidas -->
+      <div class="flex items-center gap-2">
+        <!-- Campo de Busca -->
+        <div class="relative w-full sm:w-60">
+          <Search class="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-muted" />
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Buscar código, rua..."
+            class="w-full pl-9 pr-8 py-1.5 rounded-full text-xs bg-surface-card border border-border text-text-body placeholder:text-text-muted focus:outline-none focus:border-primary-500/50 focus:ring-2 focus:ring-primary-500/10 transition-all shadow-sm"
+          />
           <button
-            @click="activeFilter = 'all'"
-            :class="[
-              'px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200',
-              activeFilter === 'all'
-                ? 'bg-primary-600 text-white shadow-lg shadow-primary-900/20 border-transparent'
-                : 'bg-surface-card border border-border text-text-muted hover:text-text-heading',
-            ]"
+            v-if="searchQuery"
+            @click="searchQuery = ''"
+            class="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-heading transition-colors"
           >
-            Todos <span class="ml-1 opacity-60">({{ filterCounts.all }})</span>
-          </button>
-          <button
-            @click="activeFilter = 'online'"
-            :class="[
-              'px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2',
-              activeFilter === 'online'
-                ? 'bg-green-600/20 border border-green-500/50 text-green-400 shadow-lg shadow-green-900/10'
-                : 'bg-surface-card border border-border text-text-muted hover:text-green-400 hover:border-green-500/30',
-            ]"
-          >
-            <span class="w-2 h-2 rounded-full bg-green-500"></span> Online
-            <span class="opacity-60">({{ filterCounts.online }})</span>
-          </button>
-          <button
-            @click="activeFilter = 'alert'"
-            :class="[
-              'px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2',
-              activeFilter === 'alert'
-                ? 'bg-red-600/20 border border-red-500/50 text-red-400 shadow-lg shadow-red-900/10'
-                : 'bg-surface-card border border-border text-text-muted hover:text-red-400 hover:border-red-500/30',
-            ]"
-          >
-            <span
-              class="w-2 h-2 rounded-full bg-red-500"
-              :class="{ 'animate-pulse': filterCounts.alert > 0 }"
-            ></span>
-            Alertas <span class="opacity-60">({{ filterCounts.alert }})</span>
-          </button>
-          <button
-            @click="activeFilter = 'offline'"
-            :class="[
-              'px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2',
-              activeFilter === 'offline'
-                ? 'bg-slate-700/50 border border-slate-500/50 text-slate-300 shadow-lg shadow-slate-900/10'
-                : 'bg-surface-card border border-border text-text-muted hover:text-slate-300 hover:border-slate-500/30',
-            ]"
-          >
-            <span class="w-2 h-2 rounded-full bg-slate-500"></span> Offline
-            <span class="opacity-60">({{ filterCounts.offline }})</span>
+            <X class="h-3.5 w-3.5" />
           </button>
         </div>
 
-        <BaseCard compact class="flex-1 min-h-[500px] lg:min-h-0 flex flex-col [&>*]:flex-1">
+        <!-- Botão Centralizar Cidade -->
+        <BaseButton
+          variant="secondary"
+          size="sm"
+          @click="handleResetCenter"
+          title="Centralizar mapa em Bocaiúva-MG"
+          class="shrink-0 text-xs"
+        >
+          <Crosshair class="h-3.5 w-3.5 mr-1 text-primary-400" />
+          Centralizar
+        </BaseButton>
+
+        <!-- Botão Alternar Painel Lateral -->
+        <BaseButton
+          variant="secondary"
+          size="sm"
+          @click="showSidePanel = !showSidePanel"
+          :title="showSidePanel ? 'Ocultar painel lateral' : 'Exibir painel lateral'"
+          class="shrink-0 text-xs hidden lg:inline-flex cursor-pointer select-none"
+        >
+          <component
+            :is="showSidePanel ? PanelRightClose : PanelRightOpen"
+            class="h-3.5 w-3.5 mr-1 text-text-muted"
+          />
+          {{ showSidePanel ? 'Ocultar Painel' : 'Exibir Painel' }}
+        </BaseButton>
+      </div>
+    </div>
+
+    <!-- Barra de Filtros Pill Standard -->
+    <div
+      class="flex flex-wrap items-center justify-between gap-2.5 bg-surface-card/60 backdrop-blur-xl rounded-2xl px-3.5 py-2 border border-border shrink-0 shadow-sm"
+    >
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-xs font-semibold text-text-muted flex items-center gap-1.5 mr-1">
+          <Layers class="h-3.5 w-3.5" /> Filtrar:
+        </span>
+
+        <!-- Todos -->
+        <button
+          @click="activeFilter = 'all'"
+          :class="[
+            'px-3 py-1 rounded-full text-xs font-semibold transition-all duration-200 active:scale-[0.98]',
+            activeFilter === 'all'
+              ? 'bg-primary-600 text-white shadow-md shadow-primary-900/20'
+              : 'bg-surface-card border border-border text-text-muted hover:text-text-heading hover:border-border-hover',
+          ]"
+        >
+          Todos
+          <span class="ml-1 opacity-70">(<AnimatedCounter :value="filterCounts.all" />)</span>
+        </button>
+
+        <!-- Online -->
+        <button
+          @click="activeFilter = 'online'"
+          :class="[
+            'px-3 py-1 rounded-full text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 active:scale-[0.98]',
+            activeFilter === 'online'
+              ? 'bg-emerald-600/20 border border-emerald-500/50 text-emerald-400 shadow-md shadow-emerald-900/10'
+              : 'bg-surface-card border border-border text-text-muted hover:text-emerald-400 hover:border-emerald-500/30',
+          ]"
+        >
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          Online
+          <span class="opacity-70">(<AnimatedCounter :value="filterCounts.online" />)</span>
+        </button>
+
+        <!-- Alertas -->
+        <button
+          @click="activeFilter = 'alert'"
+          :class="[
+            'px-3 py-1 rounded-full text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 active:scale-[0.98]',
+            activeFilter === 'alert'
+              ? 'bg-red-600/20 border border-red-500/50 text-red-400 shadow-md shadow-red-900/10'
+              : 'bg-surface-card border border-border text-text-muted hover:text-red-400 hover:border-red-500/30',
+          ]"
+        >
+          <span
+            class="w-1.5 h-1.5 rounded-full bg-red-500"
+            :class="{ 'animate-pulse': filterCounts.alert > 0 }"
+          ></span>
+          Em Alerta
+          <span class="opacity-70">(<AnimatedCounter :value="filterCounts.alert" />)</span>
+        </button>
+
+        <!-- Offline -->
+        <button
+          @click="activeFilter = 'offline'"
+          :class="[
+            'px-3 py-1 rounded-full text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 active:scale-[0.98]',
+            activeFilter === 'offline'
+              ? 'bg-slate-700/50 border border-slate-500/50 text-slate-300 shadow-md shadow-slate-900/10'
+              : 'bg-surface-card border border-border text-text-muted hover:text-slate-300 hover:border-slate-500/30',
+          ]"
+        >
+          <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+          Offline
+          <span class="opacity-70">(<AnimatedCounter :value="filterCounts.offline" />)</span>
+        </button>
+      </div>
+
+      <!-- Resumo de visíveis -->
+      <span class="text-xs text-text-muted hidden sm:inline">
+        Exibindo <strong class="text-text-heading">{{ filteredHydrometers.length }}</strong> de
+        {{ store.mapHydrometers.length }}
+      </span>
+    </div>
+
+    <!-- Grid: Mapa Interativo + Painel Lateral de Inspeção -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 flex-1 min-h-0">
+      <!-- Container do Mapa (ocupa 8/9 cols ou 12 cols se painel fechado) -->
+      <div
+        :class="[
+          'flex flex-col min-h-0 h-full transition-all duration-300',
+          showSidePanel ? 'lg:col-span-8 xl:col-span-9' : 'lg:col-span-12',
+        ]"
+      >
+        <BaseCard
+          compact
+          class="flex-1 flex flex-col [&>*]:flex-1 relative overflow-hidden rounded-2xl border border-border shadow-lg h-full !p-0"
+        >
           <MapView
             ref="mapViewRef"
             :hydrometers="filteredHydrometers"
@@ -156,58 +306,77 @@ function handleMarkerClick(hydrometer: Hydrometer) {
         </BaseCard>
       </div>
 
-      <!-- Painel lateral -->
-      <div>
-        <BaseCard :title="!selectedHydrometer ? 'Selecione um pino' : undefined">
-          <template v-if="selectedHydrometer">
-            <div class="flex items-center justify-between mb-4 pb-4 border-b border-border/50">
-              <h2 class="text-lg font-bold text-text-heading">
-                <RouterLink
-                  :to="{ name: 'hydrometer-detail', params: { id: selectedHydrometer.id } }"
-                  class="hover:text-primary-400 transition-colors"
-                >
-                  {{ selectedHydrometer.code }}
-                </RouterLink>
-              </h2>
-              <RouterLink
-                :to="{ name: 'hydrometer-detail', params: { id: selectedHydrometer.id } }"
-                class="text-xs text-primary-400 hover:text-primary-300 font-medium transition-colors"
+      <!-- Painel Lateral Desktop (coluna fixa no grid de 12 colunas) -->
+      <aside
+        v-if="showSidePanel"
+        class="hidden lg:flex lg:col-span-4 xl:col-span-3 flex-col min-h-0 h-full transition-all duration-300"
+      >
+        <!-- Estado: Hidrômetro Selecionado -->
+        <HydrometerInspectionCard
+          v-if="selectedHydrometer"
+          :hydrometer="selectedHydrometer"
+          :is-dark="isDark"
+          @close="selectedHydrometer = null"
+          @center="handleCenterOnSelected"
+        />
+
+        <!-- Estado: Nenhum Hidrômetro Selecionado -->
+        <div
+          v-else
+          class="h-full flex flex-col justify-between rounded-2xl p-5 border shadow-2xl text-center transition-all duration-300"
+          :class="[
+            isDark
+              ? 'bg-[#101724] border-slate-700/60 shadow-black/80 ring-1 ring-white/10'
+              : 'bg-white border-slate-200/90 shadow-slate-900/10 ring-1 ring-black/5',
+          ]"
+        >
+          <div class="flex flex-col items-center justify-center my-auto py-4">
+            <!-- Ícone radar de pulso -->
+            <div class="relative w-16 h-16 flex items-center justify-center mb-3">
+              <span
+                class="absolute inset-0 rounded-full bg-primary-500/10 animate-ping opacity-75"
+              ></span>
+              <div
+                class="relative w-12 h-12 rounded-full bg-primary-500/15 border border-primary-500/30 flex items-center justify-center text-primary-400 shadow-[0_0_15px_rgba(56,189,248,0.25)]"
               >
-                Ver detalhes &rarr;
-              </RouterLink>
+                <Radio class="h-6 w-6" />
+              </div>
             </div>
 
-            <div class="space-y-3 text-sm">
-              <div class="flex justify-between">
-                <span class="text-text-muted">Status</span>
-                <StatusBadge :status="selectedHydrometer.status" />
-              </div>
-              <div class="flex justify-between">
-                <span class="text-text-muted">Endereço</span>
-                <span class="text-text-body text-right">{{ selectedHydrometer.address }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-text-muted">Bairro</span>
-                <span class="text-text-body">{{ selectedHydrometer.neighborhood }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-text-muted">Tipo</span>
-                <span class="text-text-body">{{
-                  typeMap[selectedHydrometer.type] || selectedHydrometer.type
-                }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-text-muted">Coordenadas</span>
-                <span class="text-text-muted font-mono text-xs">
-                  {{ selectedHydrometer.latitude }}, {{ selectedHydrometer.longitude }}
-                </span>
-              </div>
-            </div>
-          </template>
-          <p v-else class="text-sm text-text-muted text-center py-8">
-            Clique em um pino no mapa para ver os detalhes.
-          </p>
-        </BaseCard>
+            <h3 class="text-base font-bold text-text-heading">Inspeção de Telemetria</h3>
+            <p class="text-xs text-text-muted mt-2 max-w-[240px] leading-relaxed">
+              Clique em qualquer marcador no mapa para inspecionar endereço, coordenadas e métricas
+              em tempo real.
+            </p>
+          </div>
+
+          <!-- Dica rápida de uso -->
+          <div
+            class="rounded-xl p-3.5 border text-left"
+            :class="[isDark ? 'bg-[#15202e] border-white/10' : 'bg-slate-50 border-slate-200/80']"
+          >
+            <span class="text-[10px] font-bold text-text-muted uppercase tracking-wider block mb-1">
+              Dica Operacional
+            </span>
+            <p class="text-xs text-text-body leading-relaxed">
+              Pontos <strong class="text-red-400">vermelhos piscantes</strong> indicam hidrômetros
+              com consumo excessivo ou anomalias críticas.
+            </p>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Card Overlay Mobile (apenas em telas móveis quando um hidrômetro está selecionado) -->
+      <div
+        v-if="selectedHydrometer"
+        class="lg:hidden fixed inset-x-3 bottom-20 z-50 pointer-events-auto max-h-[70vh] shadow-2xl transition-all duration-300"
+      >
+        <HydrometerInspectionCard
+          :hydrometer="selectedHydrometer"
+          :is-dark="isDark"
+          @close="selectedHydrometer = null"
+          @center="handleCenterOnSelected"
+        />
       </div>
     </div>
   </div>

@@ -2,16 +2,16 @@
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useDashboardStore } from '@/stores/dashboard'
 import { useTheme } from '@/composables/useTheme'
 import AppSidebar from '@/components/AppSidebar.vue'
+import MobileBottomNav from '@/components/MobileBottomNav.vue'
 import ScrollToTop from '@/components/ScrollToTop.vue'
 import ToastContainer from '@/components/ToastContainer.vue'
-import PageSkeleton from '@/components/ui/PageSkeleton.vue'
-import DashboardSkeleton from '@/components/ui/DashboardSkeleton.vue'
-import { Menu } from 'lucide-vue-next'
 
 const route = useRoute()
 const authStore = useAuthStore()
+const dashboardStore = useDashboardStore()
 const { initTheme } = useTheme()
 const sidebarOpen = ref(false)
 
@@ -19,6 +19,7 @@ onMounted(async () => {
   initTheme()
   if (authStore.token) {
     await authStore.fetchUser()
+    dashboardStore.fetchSummary()
   }
 })
 </script>
@@ -35,36 +36,49 @@ onMounted(async () => {
       <AppSidebar :open="sidebarOpen" @close="sidebarOpen = false" />
 
       <div class="flex flex-col min-h-screen lg:ml-[var(--sidebar-width)]">
-        <!-- Header mobile -->
+        <!-- Header mobile (Navbar) -->
         <header
-          class="sticky top-0 z-30 flex items-center gap-3 px-4 py-3 border-b border-border bg-surface/80 backdrop-blur-xl lg:hidden"
+          class="sticky top-0 z-30 flex items-center gap-2.5 px-4 py-3 border-b border-border bg-surface/80 backdrop-blur-xl lg:hidden"
         >
-          <button
-            @click="sidebarOpen = true"
-            class="rounded-lg p-2 text-text-muted hover:bg-surface-hover hover:text-text-heading transition-colors"
-            title="Abrir menu"
-          >
-            <Menu class="h-5 w-5" />
-          </button>
-          <img src="/favicon.svg" alt="HydroTrack" class="h-6 w-6" />
-          <span class="text-sm font-bold text-text-heading">HydroTrack</span>
+          <img src="/logo.png" alt="HydroTrack" class="h-8 w-8 object-contain drop-shadow" />
+          <span class="text-base font-bold text-text-heading">HydroTrack</span>
         </header>
 
         <!-- Conteúdo principal -->
-        <main class="flex-1 p-4 lg:p-8">
-          <RouterView v-slot="{ Component }">
-            <template v-if="Component">
-              <Suspense>
-                <component :is="Component" />
-                <template #fallback>
-                  <DashboardSkeleton v-if="route.name === 'dashboard'" />
-                  <PageSkeleton v-else />
-                </template>
-              </Suspense>
-            </template>
-          </RouterView>
+        <main
+          :class="[
+            'flex-1 flex flex-col w-full min-h-0 pb-20 lg:pb-0',
+            route.name === 'map' ? 'p-3 lg:p-4' : 'p-4 lg:p-6 xl:p-8',
+          ]"
+        >
+          <div
+            :class="[
+              'w-full mx-auto flex-1 flex flex-col min-h-0',
+              route.name === 'map' ? 'max-w-[1920px]' : 'max-w-[1680px]',
+            ]"
+          >
+            <RouterView v-slot="{ Component }">
+              <template v-if="Component">
+                <KeepAlive :max="8">
+                  <component
+                    :is="Component"
+                    :key="
+                      route.name === 'hydrometer-detail' ? route.fullPath : route.name || route.path
+                    "
+                  />
+                </KeepAlive>
+              </template>
+            </RouterView>
+          </div>
         </main>
       </div>
+
+      <!-- Barra de navegação inferior mobile (Bottom Navigation Bar) -->
+      <MobileBottomNav
+        :menu-open="sidebarOpen"
+        @toggle-menu="sidebarOpen = !sidebarOpen"
+        @close-menu="sidebarOpen = false"
+      />
 
       <ScrollToTop />
     </div>

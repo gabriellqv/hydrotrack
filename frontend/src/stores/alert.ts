@@ -18,7 +18,7 @@ export const useAlertStore = defineStore('alert', () => {
   })
 
   async function fetchAlerts() {
-    loading.value = true
+    if (!alerts.value.length) loading.value = true
     try {
       const params = new URLSearchParams()
       if (filters.value.type) params.set('type', filters.value.type)
