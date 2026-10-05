@@ -19,7 +19,13 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    // Origens permitidas configuráveis por ambiente. Em produção, defina
+    // CORS_ALLOWED_ORIGINS com o domínio exato do frontend (ex.: o domínio
+    // da Vercel). O wildcard '*' é incompatível com supports_credentials.
+    'allowed_origins' => array_filter(explode(',', env(
+        'CORS_ALLOWED_ORIGINS',
+        'http://localhost:5173,http://127.0.0.1:5173'
+    ))),
 
     'allowed_origins_patterns' => [],
 

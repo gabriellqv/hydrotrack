@@ -88,3 +88,6 @@ jobs:
 
       - name: Verificar tipos (TypeScript)
         run: npx vue-tsc --build
+
+      - name: Executar testes (Vitest)
+        run: npx vitest run

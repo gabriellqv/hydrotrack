@@ -255,3 +255,22 @@ A arquitetura fundamental e todas as funcionalidades obrigatórias do HydroTrack
 - Tipagem rigorosa, arquitetura limpa (Services) e sistema reativo blindado.
 
 O projeto está pronto para a simulação de um ambiente de produção ou auditoria técnica externa.
+
+## Configuracao de producao
+
+Checklist mínimo antes de publicar o backend e o frontend:
+
+| Variável | Valor em produção | Motivo |
+|---|---|---|
+| `APP_ENV` | `production` | Desabilita ferramentas de debug |
+| `APP_DEBUG` | `false` | Não expõe stack traces nem detalhes internos |
+| `APP_KEY` | gerar com `php artisan key:generate` | Chave única por ambiente |
+| `REGISTRATION_ENABLED` | `false` | Bloqueia registro público de usuários |
+| `INGEST_API_KEY` | valor forte e secreto | Autentica o endpoint M2M `/api/ingest` |
+| `CORS_ALLOWED_ORIGINS` | domínio exato do frontend | Substitui o wildcard `*` (incompatível com credenciais) |
+| `SANCTUM_STATEFUL_DOMAINS` | domínio do frontend | Permitir autenticação da SPA |
+| `SESSION_DOMAIN` | domínio do backend | Escopo do cookie de sessão |
+
+A API envia cabeçalhos de segurança (`Content-Security-Policy`, `X-Frame-Options`,
+`X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` e HSTS sob HTTPS)
+por meio do middleware `EnsureSecurityHeaders`.
