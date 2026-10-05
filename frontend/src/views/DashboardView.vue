@@ -581,7 +581,9 @@ const kpiCards = computed(() => [
               <h2 class="text-base font-bold text-text-heading tracking-tight truncate">
                 Últimas Anomalias
               </h2>
-              <p class="text-xs text-text-muted truncate">Eventos recentes de consumo atípico e offline</p>
+              <p class="text-xs text-text-muted truncate">
+                Eventos recentes de consumo atípico e offline
+              </p>
             </div>
           </div>
 

@@ -63,9 +63,7 @@ onMounted(async () => {
                   <component
                     :is="Component"
                     :key="
-                      route.name === 'hydrometer-detail'
-                        ? route.fullPath
-                        : (route.name || route.path)
+                      route.name === 'hydrometer-detail' ? route.fullPath : route.name || route.path
                     "
                   />
                 </KeepAlive>

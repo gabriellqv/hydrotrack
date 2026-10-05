@@ -353,15 +353,9 @@ function handleCenterOnSelected() {
           <!-- Dica rápida de uso -->
           <div
             class="rounded-xl p-3.5 border text-left"
-            :class="[
-              isDark
-                ? 'bg-[#15202e] border-white/10'
-                : 'bg-slate-50 border-slate-200/80',
-            ]"
+            :class="[isDark ? 'bg-[#15202e] border-white/10' : 'bg-slate-50 border-slate-200/80']"
           >
-            <span
-              class="text-[10px] font-bold text-text-muted uppercase tracking-wider block mb-1"
-            >
+            <span class="text-[10px] font-bold text-text-muted uppercase tracking-wider block mb-1">
               Dica Operacional
             </span>
             <p class="text-xs text-text-body leading-relaxed">

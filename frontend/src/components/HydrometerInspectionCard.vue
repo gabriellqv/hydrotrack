@@ -125,9 +125,7 @@ function copyToClipboard(text: string, type: 'coord' | 'code') {
         ]"
       >
         <div>
-          <span
-            class="text-[10px] font-bold text-text-muted uppercase tracking-wider block mb-0.5"
-          >
+          <span class="text-[10px] font-bold text-text-muted uppercase tracking-wider block mb-0.5">
             Endereço
           </span>
           <div class="flex items-start gap-1.5 text-xs text-text-heading font-medium">
@@ -137,9 +135,7 @@ function copyToClipboard(text: string, type: 'coord' | 'code') {
         </div>
 
         <div class="pt-2 border-t border-border/30">
-          <span
-            class="text-[10px] font-bold text-text-muted uppercase tracking-wider block mb-0.5"
-          >
+          <span class="text-[10px] font-bold text-text-muted uppercase tracking-wider block mb-0.5">
             Bairro
           </span>
           <div class="flex items-center gap-1.5 text-xs text-text-body font-medium">
@@ -178,9 +174,7 @@ function copyToClipboard(text: string, type: 'coord' | 'code') {
             : 'bg-slate-50 border-slate-200/80 shadow-sm',
         ]"
       >
-        <span
-          class="text-[10px] font-bold text-text-muted uppercase tracking-wider block"
-        >
+        <span class="text-[10px] font-bold text-text-muted uppercase tracking-wider block">
           Comunicação IoT
         </span>
         <div class="flex items-center justify-between text-xs">

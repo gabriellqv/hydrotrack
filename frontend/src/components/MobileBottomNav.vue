@@ -82,7 +82,7 @@ function handleItemClick(item: NavItem) {
 <template>
   <nav
     class="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-surface-card/95 backdrop-blur-2xl border-t border-border/80 shadow-[0_-6px_28px_rgba(0,0,0,0.35)] select-none transition-colors duration-300 rounded-t-2xl overflow-hidden"
-    style="padding-bottom: max(0.35rem, env(safe-area-inset-bottom, 0px));"
+    style="padding-bottom: max(0.35rem, env(safe-area-inset-bottom, 0px))"
     aria-label="Navegação móvel"
   >
     <div class="grid grid-cols-5 h-[64px] items-stretch px-1 relative">
@@ -111,11 +111,16 @@ function handleItemClick(item: NavItem) {
           <div
             :class="[
               'absolute inset-0 pointer-events-none transition-opacity duration-300 ease-out',
-              isItemActive(item)
-                ? 'opacity-100'
-                : 'opacity-0 group-hover:opacity-50',
+              isItemActive(item) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50',
             ]"
-            style="background: radial-gradient(ellipse 70% 85% at 50% 0%, rgba(56, 189, 248, 0.32) 0%, rgba(14, 165, 233, 0.12) 45%, transparent 75%);"
+            style="
+              background: radial-gradient(
+                ellipse 70% 85% at 50% 0%,
+                rgba(56, 189, 248, 0.32) 0%,
+                rgba(14, 165, 233, 0.12) 45%,
+                transparent 75%
+              );
+            "
           />
 
           <!-- 3. Ícone com Brilho Dinâmico -->
@@ -178,11 +183,16 @@ function handleItemClick(item: NavItem) {
           <div
             :class="[
               'absolute inset-0 pointer-events-none transition-opacity duration-300 ease-out',
-              isItemActive(item)
-                ? 'opacity-100'
-                : 'opacity-0 group-hover:opacity-50',
+              isItemActive(item) ? 'opacity-100' : 'opacity-0 group-hover:opacity-50',
             ]"
-            style="background: radial-gradient(ellipse 70% 85% at 50% 0%, rgba(56, 189, 248, 0.32) 0%, rgba(14, 165, 233, 0.12) 45%, transparent 75%);"
+            style="
+              background: radial-gradient(
+                ellipse 70% 85% at 50% 0%,
+                rgba(56, 189, 248, 0.32) 0%,
+                rgba(14, 165, 233, 0.12) 45%,
+                transparent 75%
+              );
+            "
           />
 
           <!-- 3. Ícone com Brilho Dinâmico -->

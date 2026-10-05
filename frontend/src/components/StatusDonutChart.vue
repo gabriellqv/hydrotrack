@@ -84,12 +84,11 @@ const chartData = computed(() => ({
   ],
 }))
 
-const externalTooltipHandler = (context: {
-  chart: ChartJS
-  tooltip: TooltipModel<'doughnut'>
-}) => {
+const externalTooltipHandler = (context: { chart: ChartJS; tooltip: TooltipModel<'doughnut'> }) => {
   const { chart, tooltip } = context
-  let tooltipEl = chart.canvas.parentElement?.querySelector('.donut-html-tooltip') as HTMLElement | null
+  let tooltipEl = chart.canvas.parentElement?.querySelector(
+    '.donut-html-tooltip',
+  ) as HTMLElement | null
 
   if (!tooltipEl && chart.canvas.parentElement) {
     tooltipEl = document.createElement('div')
@@ -191,7 +190,9 @@ const chartOptions: ChartOptions<'doughnut'> = {
     class="flex flex-col sm:flex-row items-center justify-between gap-5 sm:gap-6 w-full h-full min-h-0 py-1"
   >
     <!-- Gráfico Donut com Métrica Central -->
-    <div class="relative w-44 h-44 sm:w-48 sm:h-48 lg:w-52 lg:h-52 shrink-0 flex items-center justify-center">
+    <div
+      class="relative w-44 h-44 sm:w-48 sm:h-48 lg:w-52 lg:h-52 shrink-0 flex items-center justify-center"
+    >
       <Doughnut :data="chartData" :options="chartOptions" />
 
       <!-- Miolo com Métrica Central -->

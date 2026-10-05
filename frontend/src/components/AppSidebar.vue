@@ -103,7 +103,9 @@ onUnmounted(() => {
       <div class="flex items-center gap-3.5">
         <img src="/logo.png" alt="HydroTrack" class="h-11 w-11 object-contain drop-shadow-md" />
         <div>
-          <h1 class="text-xl font-bold text-text-heading tracking-tight leading-none">HydroTrack</h1>
+          <h1 class="text-xl font-bold text-text-heading tracking-tight leading-none">
+            HydroTrack
+          </h1>
           <p class="text-xs text-text-muted mt-1">Monitoramento Hídrico</p>
         </div>
       </div>
@@ -126,12 +128,12 @@ onUnmounted(() => {
         :class="[
           'group relative flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-200 overflow-visible',
           isActive(item)
-            ? (isDark
-                ? 'text-white bg-white/[0.08] border border-white/10 shadow-sm'
-                : 'text-slate-900 bg-primary-500/15 border border-primary-500/30 shadow-sm')
-            : (isDark
-                ? 'text-slate-400 hover:text-white hover:bg-white/[0.06] border border-transparent'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/80 border border-transparent'),
+            ? isDark
+              ? 'text-white bg-white/[0.08] border border-white/10 shadow-sm'
+              : 'text-slate-900 bg-primary-500/15 border border-primary-500/30 shadow-sm'
+            : isDark
+              ? 'text-slate-400 hover:text-white hover:bg-white/[0.06] border border-transparent'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/80 border border-transparent',
         ]"
       >
         <!-- Accent Neon Curvado na Esquerda (Ativo & Hover) idêntico à referência, em azul -->
@@ -158,12 +160,12 @@ onUnmounted(() => {
           :class="[
             'absolute inset-0 rounded-xl pointer-events-none transition-opacity duration-300',
             isDark
-              ? (isActive(item)
-                  ? 'opacity-100 bg-gradient-to-r from-sky-500/15 via-primary-500/5 to-transparent'
-                  : 'opacity-0 group-hover:opacity-100 bg-gradient-to-r from-sky-500/10 via-primary-500/5 to-transparent')
-              : (isActive(item)
-                  ? 'opacity-100 bg-gradient-to-r from-primary-500/15 via-sky-500/5 to-transparent'
-                  : 'opacity-0 group-hover:opacity-100 bg-gradient-to-r from-primary-500/10 via-sky-500/5 to-transparent'),
+              ? isActive(item)
+                ? 'opacity-100 bg-gradient-to-r from-sky-500/15 via-primary-500/5 to-transparent'
+                : 'opacity-0 group-hover:opacity-100 bg-gradient-to-r from-sky-500/10 via-primary-500/5 to-transparent'
+              : isActive(item)
+                ? 'opacity-100 bg-gradient-to-r from-primary-500/15 via-sky-500/5 to-transparent'
+                : 'opacity-0 group-hover:opacity-100 bg-gradient-to-r from-primary-500/10 via-sky-500/5 to-transparent',
           ]"
         />
 
@@ -173,12 +175,12 @@ onUnmounted(() => {
           :class="[
             'h-5 w-5 transition-all duration-200 z-10',
             isActive(item)
-              ? (isDark
-                  ? 'text-primary-400 drop-shadow-[0_0_8px_rgba(56,189,248,0.45)] scale-105'
-                  : 'text-primary-600 drop-shadow-sm scale-105')
-              : (isDark
-                  ? 'text-slate-400 group-hover:text-primary-400 group-hover:scale-105'
-                  : 'text-slate-500 group-hover:text-primary-600 group-hover:scale-105'),
+              ? isDark
+                ? 'text-primary-400 drop-shadow-[0_0_8px_rgba(56,189,248,0.45)] scale-105'
+                : 'text-primary-600 drop-shadow-sm scale-105'
+              : isDark
+                ? 'text-slate-400 group-hover:text-primary-400 group-hover:scale-105'
+                : 'text-slate-500 group-hover:text-primary-600 group-hover:scale-105',
           ]"
         />
 
@@ -186,10 +188,12 @@ onUnmounted(() => {
           :class="[
             'z-10 transition-colors duration-200',
             isActive(item)
-              ? (isDark ? 'font-semibold text-white' : 'font-bold text-slate-900')
-              : (isDark
-                  ? 'font-medium text-slate-400 group-hover:text-white'
-                  : 'font-medium text-slate-600 group-hover:text-slate-900'),
+              ? isDark
+                ? 'font-semibold text-white'
+                : 'font-bold text-slate-900'
+              : isDark
+                ? 'font-medium text-slate-400 group-hover:text-white'
+                : 'font-medium text-slate-600 group-hover:text-slate-900',
           ]"
         >
           {{ item.label }}
@@ -200,12 +204,10 @@ onUnmounted(() => {
     <!-- Rodapé: Perfil do Usuário, Alternador de Tema e Logout -->
     <div
       class="border-t border-border p-3.5 space-y-2.5"
-      style="padding-bottom: max(0.875rem, env(safe-area-inset-bottom, 0px));"
+      style="padding-bottom: max(0.875rem, env(safe-area-inset-bottom, 0px))"
     >
       <!-- Informações do usuário logado + botão de alternar tema -->
-      <div
-        class="flex items-center justify-between gap-2.5 px-1 py-1"
-      >
+      <div class="flex items-center justify-between gap-2.5 px-1 py-1">
         <!-- Avatar com indicador de status online -->
         <div class="flex items-center gap-2.5 min-w-0">
           <div class="relative shrink-0">
@@ -238,16 +240,8 @@ onUnmounted(() => {
           aria-label="Alternar tema"
         >
           <Transition name="theme-spin" mode="out-in">
-            <Sun
-              v-if="isDark"
-              key="sun"
-              class="h-4 w-4 text-amber-400"
-            />
-            <Moon
-              v-else
-              key="moon"
-              class="h-4 w-4 text-sky-400"
-            />
+            <Sun v-if="isDark" key="sun" class="h-4 w-4 text-amber-400" />
+            <Moon v-else key="moon" class="h-4 w-4 text-sky-400" />
           </Transition>
         </button>
       </div>
