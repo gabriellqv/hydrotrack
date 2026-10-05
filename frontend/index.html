@@ -21,12 +21,12 @@
     <script>
       ;(function () {
         try {
-          if (localStorage.getItem('theme') === 'light') {
-            document.documentElement.classList.add('light')
-          } else {
-            // O padrão do sistema é escuro (#111924)
-            document.documentElement.classList.remove('light')
-          }
+          const isLight = localStorage.getItem('theme') === 'light'
+          // O tema padrão do sistema é escuro (#111924). As duas classes
+          // (.dark/.light) são aplicadas no primeiro paint para que as
+          // variantes dark: do Tailwind não pisquem antes do onMounted.
+          document.documentElement.classList.toggle('dark', !isLight)
+          document.documentElement.classList.toggle('light', isLight)
         } catch (e) {}
       })()
     </script>
