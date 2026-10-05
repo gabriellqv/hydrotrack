@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, onActivated, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import type { Hydrometer } from '@/types'
+import { MAP_CENTER, MAP_DEFAULT_ZOOM, MAP_FOCUS_ZOOM } from '@/constants/app'
 
 /**
  * Componente de mapa interativo que renderiza hidrômetros como pinos coloridos.
@@ -31,9 +32,9 @@ let map: L.Map | null = null
 let markersLayer: L.LayerGroup | null = null
 const markersById = new Map<number, L.Marker>()
 
-/** Centro de Bocaiúva-MG (Praça Wandick Dumont) */
-const BOCAIUVA_CENTER: L.LatLngTuple = [-17.1085, -43.8143]
-const DEFAULT_ZOOM = 14
+/** Centro da malha, convertido para a tupla esperada pelo Leaflet */
+const BOCAIUVA_CENTER: L.LatLngTuple = [MAP_CENTER.latitude, MAP_CENTER.longitude]
+const DEFAULT_ZOOM = MAP_DEFAULT_ZOOM
 
 /**
  * Retorna a cor do marcador com base no status do hidrômetro.
@@ -96,24 +97,35 @@ function renderMarkers() {
       alert: 'Em Alerta',
     }
 
+    // Popup construído via DOM/textContent (e não innerHTML) para evitar
+    // XSS a partir de campos controláveis (código, endereço, bairro).
     const popupContent = document.createElement('div')
-    popupContent.innerHTML = `
-      <a href="#" class="font-bold !text-primary-500 hover:!text-primary-400 hover:underline transition-colors block text-base mb-1 popup-link">
-        ${h.code}
-      </a>
-      ${h.address}<br>
-      <em class="text-xs opacity-75">${h.neighborhood}</em><br>
-      Status: <strong style="color: ${getMarkerColor(h.status)};">${(statusMap[h.status] || h.status).toUpperCase()}</strong>
-    `
 
-    // Ocultar o outline padrão e adicionar a ação do Vue Router no clique
-    const linkEl = popupContent.querySelector('.popup-link')
-    if (linkEl) {
-      linkEl.addEventListener('click', (e) => {
-        e.preventDefault()
-        router.push({ name: 'hydrometer-detail', params: { id: h.id } })
-      })
-    }
+    const linkEl = document.createElement('a')
+    linkEl.href = '#'
+    linkEl.className =
+      'font-bold !text-primary-500 hover:!text-primary-400 hover:underline transition-colors block text-base mb-1'
+    linkEl.textContent = h.code
+    linkEl.addEventListener('click', (e) => {
+      e.preventDefault()
+      router.push({ name: 'hydrometer-detail', params: { id: h.id } })
+    })
+    popupContent.appendChild(linkEl)
+
+    popupContent.appendChild(document.createTextNode(h.address))
+    popupContent.appendChild(document.createElement('br'))
+
+    const neighborhoodEl = document.createElement('em')
+    neighborhoodEl.className = 'text-xs opacity-75'
+    neighborhoodEl.textContent = h.neighborhood
+    popupContent.appendChild(neighborhoodEl)
+    popupContent.appendChild(document.createElement('br'))
+
+    popupContent.appendChild(document.createTextNode('Status: '))
+    const statusEl = document.createElement('strong')
+    statusEl.style.color = getMarkerColor(h.status)
+    statusEl.textContent = (statusMap[h.status] || h.status).toUpperCase()
+    popupContent.appendChild(statusEl)
 
     marker.bindPopup(popupContent)
 
@@ -187,7 +199,7 @@ watch(() => props.hydrometers, renderMarkers)
 /**
  * Permite que componentes pais centralizem o mapa em coordenadas específicas.
  */
-function centerOn(lat: number, lng: number, zoomLevel = 17) {
+function centerOn(lat: number, lng: number, zoomLevel = MAP_FOCUS_ZOOM) {
   if (map) {
     map.flyTo([lat, lng], zoomLevel, { duration: 1.5 })
   }
@@ -196,7 +208,7 @@ function centerOn(lat: number, lng: number, zoomLevel = 17) {
 /**
  * Voa até o hidrômetro e abre automaticamente seu popup de detalhes após a viagem.
  */
-function centerAndOpenPopup(id: number, lat: number, lng: number, zoomLevel = 17) {
+function centerAndOpenPopup(id: number, lat: number, lng: number, zoomLevel = MAP_FOCUS_ZOOM) {
   if (map) {
     map.flyTo([lat, lng], zoomLevel, { duration: 1.5 })
     map.once('moveend', () => {
@@ -208,9 +220,24 @@ function centerAndOpenPopup(id: number, lat: number, lng: number, zoomLevel = 17
   }
 }
 
+function invalidateSize() {
+  if (map) {
+    map.invalidateSize()
+  }
+}
+
+onActivated(() => {
+  if (map) {
+    setTimeout(() => {
+      map?.invalidateSize()
+    }, 50)
+  }
+})
+
 defineExpose({
   centerOn,
   centerAndOpenPopup,
+  invalidateSize,
 })
 </script>
 

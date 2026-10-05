@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useHydrometerStore } from '@/stores/hydrometer'
 import { useAlertStore } from '@/stores/alert'
@@ -29,12 +29,32 @@ const typeMap: Record<string, string> = {
   industrial: 'Industrial',
 }
 
-const id = Number(route.params.id)
-if (isNaN(id)) {
-  router.push({ name: 'hydrometers' })
-} else {
-  await store.fetchHydrometer(id)
+const id = computed(() => Number(route.params.id))
+
+async function loadHydrometer() {
+  if (isNaN(id.value)) {
+    router.push({ name: 'hydrometers' })
+    return
+  }
+  try {
+    await store.fetchHydrometer(id.value)
+  } catch {
+    // Erro tratado pela store/api
+  }
 }
+
+onMounted(() => {
+  loadHydrometer()
+})
+
+watch(
+  () => route.params.id,
+  (newId) => {
+    if (newId) {
+      loadHydrometer()
+    }
+  },
+)
 
 /** Mapeia leituras para o formato esperado pelo ConsumptionChart */
 function readingsToChartData() {

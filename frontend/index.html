@@ -3,7 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="alternate icon" href="/favicon.png" type="image/png" />
+    <link rel="alternate icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta
       name="description"
       content="HydroTrack - Sistema de telemetria hídrica para monitoramento inteligente de hidrômetros"
@@ -19,12 +21,12 @@
     <script>
       ;(function () {
         try {
-          if (localStorage.getItem('theme') === 'dark') {
-            document.documentElement.classList.remove('light')
-          } else {
-            // O padrão do sistema é claro
-            document.documentElement.classList.add('light')
-          }
+          const isLight = localStorage.getItem('theme') === 'light'
+          // O tema padrão do sistema é escuro (#111924). As duas classes
+          // (.dark/.light) são aplicadas no primeiro paint para que as
+          // variantes dark: do Tailwind não pisquem antes do onMounted.
+          document.documentElement.classList.toggle('dark', !isLight)
+          document.documentElement.classList.toggle('light', isLight)
         } catch (e) {}
       })()
     </script>
