@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureIsAdmin;
+use App\Http\Middleware\EnsureSecurityHeaders;
 use App\Http\Middleware\EnsureValidApiKey;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -18,6 +19,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => EnsureIsAdmin::class,
             'ingest.auth' => EnsureValidApiKey::class,
         ]);
+
+        // Cabeçalhos de segurança em todas as respostas (API + health check)
+        $middleware->append(EnsureSecurityHeaders::class);
 
         /** Configuração de CORS para permitir requisições do frontend Vue (porta 5173) */
         $middleware->validateCsrfTokens(except: [

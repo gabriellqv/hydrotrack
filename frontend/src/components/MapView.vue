@@ -97,24 +97,35 @@ function renderMarkers() {
       alert: 'Em Alerta',
     }
 
+    // Popup construído via DOM/textContent (e não innerHTML) para evitar
+    // XSS a partir de campos controláveis (código, endereço, bairro).
     const popupContent = document.createElement('div')
-    popupContent.innerHTML = `
-      <a href="#" class="font-bold !text-primary-500 hover:!text-primary-400 hover:underline transition-colors block text-base mb-1 popup-link">
-        ${h.code}
-      </a>
-      ${h.address}<br>
-      <em class="text-xs opacity-75">${h.neighborhood}</em><br>
-      Status: <strong style="color: ${getMarkerColor(h.status)};">${(statusMap[h.status] || h.status).toUpperCase()}</strong>
-    `
 
-    // Ocultar o outline padrão e adicionar a ação do Vue Router no clique
-    const linkEl = popupContent.querySelector('.popup-link')
-    if (linkEl) {
-      linkEl.addEventListener('click', (e) => {
-        e.preventDefault()
-        router.push({ name: 'hydrometer-detail', params: { id: h.id } })
-      })
-    }
+    const linkEl = document.createElement('a')
+    linkEl.href = '#'
+    linkEl.className =
+      'font-bold !text-primary-500 hover:!text-primary-400 hover:underline transition-colors block text-base mb-1'
+    linkEl.textContent = h.code
+    linkEl.addEventListener('click', (e) => {
+      e.preventDefault()
+      router.push({ name: 'hydrometer-detail', params: { id: h.id } })
+    })
+    popupContent.appendChild(linkEl)
+
+    popupContent.appendChild(document.createTextNode(h.address))
+    popupContent.appendChild(document.createElement('br'))
+
+    const neighborhoodEl = document.createElement('em')
+    neighborhoodEl.className = 'text-xs opacity-75'
+    neighborhoodEl.textContent = h.neighborhood
+    popupContent.appendChild(neighborhoodEl)
+    popupContent.appendChild(document.createElement('br'))
+
+    popupContent.appendChild(document.createTextNode('Status: '))
+    const statusEl = document.createElement('strong')
+    statusEl.style.color = getMarkerColor(h.status)
+    statusEl.textContent = (statusMap[h.status] || h.status).toUpperCase()
+    popupContent.appendChild(statusEl)
 
     marker.bindPopup(popupContent)
 
