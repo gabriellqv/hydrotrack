@@ -56,6 +56,16 @@ export interface Alert {
 }
 
 /**
+ * Métricas agregadas de alertas (todo o histórico, não apenas uma página).
+ */
+export interface AlertStats {
+  total: number
+  resolved: number
+  pending: number
+  resolution_rate: number
+}
+
+/**
  * Dados resumidos para os cards do dashboard.
  */
 export interface DashboardSummary {

@@ -38,6 +38,33 @@ class AlertController extends Controller
     }
 
     /**
+     * Retorna as métricas agregadas de alertas.
+     *
+     * Os KPIs da Central de Alertas precisam refletir todo o histórico,
+     * e não apenas a página atual da listagem paginada. Usa uma única
+     * agregação condicional para evitar 3 queries de COUNT separadas.
+     *
+     * @return JsonResponse Totais de alertas e taxa de resolução (%)
+     */
+    public function stats(): JsonResponse
+    {
+        $stats = Alert::selectRaw('
+            COUNT(*) as total,
+            SUM(CASE WHEN resolved = 1 THEN 1 ELSE 0 END) as resolved
+        ')->first();
+
+        $total = (int) $stats->total;
+        $resolved = (int) $stats->resolved;
+
+        return response()->json([
+            'total' => $total,
+            'resolved' => $resolved,
+            'pending' => $total - $resolved,
+            'resolution_rate' => $total > 0 ? (int) round(($resolved / $total) * 100) : 100,
+        ]);
+    }
+
+    /**
      * Marca um alerta como resolvido pelo operador.
      *
      * @param  Alert  $alert  Resolvido via Route Model Binding
