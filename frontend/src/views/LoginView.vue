@@ -4,6 +4,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
 import { useTheme } from '@/composables/useTheme'
+import { OPERATION_CITY } from '@/constants/app'
 import { api, ApiError } from '@/services/api'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import {
@@ -266,7 +267,7 @@ async function handleLogin() {
               <span>{{ demoFilled ? 'Credenciais Inseridas!' : 'Preencher Demo Admin' }}</span>
             </button>
 
-            <span class="text-[11px] text-text-muted font-mono">Bocaiúva-MG</span>
+            <span class="text-[11px] text-text-muted font-mono">{{ OPERATION_CITY }}</span>
           </div>
 
           <!-- Botão Entrar -->

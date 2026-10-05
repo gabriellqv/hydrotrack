@@ -7,7 +7,7 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 import MapView from '@/components/MapView.vue'
 import AnimatedCounter from '@/components/ui/AnimatedCounter.vue'
 import HydrometerInspectionCard from '@/components/HydrometerInspectionCard.vue'
-import { useTheme } from '@/composables/useTheme'
+import { OPERATION_CITY, MAP_CENTER, MAP_DEFAULT_ZOOM, MAP_POLLING_INTERVAL } from '@/constants/app'
 import type { Hydrometer } from '@/types'
 import {
   Search,
@@ -22,7 +22,7 @@ import {
 /**
  * View Dedicada do Mapa de Telemetria.
  *
- * Exibe a malha de dispositivos distribuídos geograficamente em Bocaiúva-MG.
+ * Exibe a malha de dispositivos distribuídos geograficamente na cidade de operação.
  * Ocupa 100% da altura vertical disponível (até a borda inferior da tela),
  * com suporte a:
  * - Filtros rápidos com contadores animados por status
@@ -34,7 +34,6 @@ import {
 
 const store = useDashboardStore()
 const route = useRoute()
-const { isDark } = useTheme()
 
 const selectedHydrometer = ref<Hydrometer | null>(null)
 const activeFilter = ref<'all' | 'online' | 'offline' | 'alert'>('all')
@@ -44,7 +43,7 @@ const showSidePanel = ref(true)
 const mapViewRef = ref<InstanceType<typeof MapView> | null>(null)
 
 /** Intervalo de polling em milissegundos (5s) */
-const POLLING_INTERVAL = 5_000
+const POLLING_INTERVAL = MAP_POLLING_INTERVAL
 let pollingTimer: ReturnType<typeof setInterval> | null = null
 
 const filterCounts = computed(() => ({
@@ -137,7 +136,7 @@ function handleMarkerClick(hydrometer: Hydrometer) {
 }
 
 function handleResetCenter() {
-  mapViewRef.value?.centerOn(-17.1085, -43.8143, 14)
+  mapViewRef.value?.centerOn(MAP_CENTER.latitude, MAP_CENTER.longitude, MAP_DEFAULT_ZOOM)
 }
 
 function handleCenterOnSelected() {
@@ -169,7 +168,7 @@ function handleCenterOnSelected() {
           </span>
         </div>
         <p class="text-xs sm:text-sm text-text-muted mt-0.5">
-          Distribuição geográfica e telemetria operacional • Bocaiúva-MG
+          Distribuição geográfica e telemetria operacional • {{ OPERATION_CITY }}
         </p>
       </div>
 
@@ -198,7 +197,7 @@ function handleCenterOnSelected() {
           variant="secondary"
           size="sm"
           @click="handleResetCenter"
-          title="Centralizar mapa em Bocaiúva-MG"
+          :title="`Centralizar mapa em ${OPERATION_CITY}`"
           class="shrink-0 text-xs"
         >
           <Crosshair class="h-3.5 w-3.5 mr-1 text-primary-400" />
@@ -331,7 +330,6 @@ function handleCenterOnSelected() {
         <HydrometerInspectionCard
           v-if="selectedHydrometer"
           :hydrometer="selectedHydrometer"
-          :is-dark="isDark"
           @close="selectedHydrometer = null"
           @center="handleCenterOnSelected"
         />
@@ -339,12 +337,7 @@ function handleCenterOnSelected() {
         <!-- Estado: Nenhum Hidrômetro Selecionado -->
         <div
           v-else
-          class="h-full flex flex-col justify-between rounded-2xl p-5 border shadow-2xl text-center transition-all duration-300"
-          :class="[
-            isDark
-              ? 'bg-[#101724] border-slate-700/60 shadow-black/80 ring-1 ring-white/10'
-              : 'bg-white border-slate-200/90 shadow-slate-900/10 ring-1 ring-black/5',
-          ]"
+          class="h-full flex flex-col justify-between rounded-2xl p-5 border bg-surface-card border-border shadow-2xl ring-1 ring-black/5 dark:ring-white/10 text-center transition-all duration-300"
         >
           <div class="flex flex-col items-center justify-center my-auto py-4">
             <!-- Ícone radar de pulso -->
@@ -367,10 +360,7 @@ function handleCenterOnSelected() {
           </div>
 
           <!-- Dica rápida de uso -->
-          <div
-            class="rounded-xl p-3.5 border text-left"
-            :class="[isDark ? 'bg-[#15202e] border-white/10' : 'bg-slate-50 border-slate-200/80']"
-          >
+          <div class="rounded-xl p-3.5 border bg-surface/40 border-border/60 text-left">
             <span class="text-[10px] font-bold text-text-muted uppercase tracking-wider block mb-1">
               Dica Operacional
             </span>
@@ -389,7 +379,6 @@ function handleCenterOnSelected() {
       >
         <HydrometerInspectionCard
           :hydrometer="selectedHydrometer"
-          :is-dark="isDark"
           @close="selectedHydrometer = null"
           @center="handleCenterOnSelected"
         />

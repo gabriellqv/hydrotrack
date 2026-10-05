@@ -48,6 +48,8 @@ services:
       - /app/node_modules
     environment:
       VITE_API_BASE_URL: http://localhost:8000/api
+      VITE_DEV_HOST: 0.0.0.0
+      VITE_USE_POLLING: 'true'
 
 volumes:
   mysql_data:

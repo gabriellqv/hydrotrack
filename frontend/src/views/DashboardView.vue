@@ -10,6 +10,7 @@ import MapView from '@/components/MapView.vue'
 import StatusDonutChart from '@/components/StatusDonutChart.vue'
 import RecentAlerts from '@/components/RecentAlerts.vue'
 import AnimatedCounter from '@/components/ui/AnimatedCounter.vue'
+import { OPERATION_CITY, DASHBOARD_POLLING_INTERVAL } from '@/constants/app'
 import {
   Droplets,
   Wifi,
@@ -50,7 +51,7 @@ async function changePeriod(days: 7 | 30 | 90) {
   await store.fetchConsumption(days)
 }
 
-const POLLING_INTERVAL = 15_000
+const POLLING_INTERVAL = DASHBOARD_POLLING_INTERVAL
 let pollingTimer: ReturnType<typeof setInterval> | null = null
 
 async function refreshDashboard() {
@@ -290,7 +291,9 @@ const kpiCards = computed(() => [
               >Rede IoT Conectada</span
             >
             <span class="text-emerald-500/40">•</span>
-            <span class="text-emerald-600 dark:text-emerald-400 font-bold">Bocaiúva-MG</span>
+            <span class="text-emerald-600 dark:text-emerald-400 font-bold">{{
+              OPERATION_CITY
+            }}</span>
           </div>
         </div>
         <p class="text-sm text-text-muted mt-0.5">

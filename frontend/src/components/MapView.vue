@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import type { Hydrometer } from '@/types'
+import { MAP_CENTER, MAP_DEFAULT_ZOOM, MAP_FOCUS_ZOOM } from '@/constants/app'
 
 /**
  * Componente de mapa interativo que renderiza hidrômetros como pinos coloridos.
@@ -31,9 +32,9 @@ let map: L.Map | null = null
 let markersLayer: L.LayerGroup | null = null
 const markersById = new Map<number, L.Marker>()
 
-/** Centro de Bocaiúva-MG (Praça Wandick Dumont) */
-const BOCAIUVA_CENTER: L.LatLngTuple = [-17.1085, -43.8143]
-const DEFAULT_ZOOM = 14
+/** Centro da malha, convertido para a tupla esperada pelo Leaflet */
+const BOCAIUVA_CENTER: L.LatLngTuple = [MAP_CENTER.latitude, MAP_CENTER.longitude]
+const DEFAULT_ZOOM = MAP_DEFAULT_ZOOM
 
 /**
  * Retorna a cor do marcador com base no status do hidrômetro.
@@ -187,7 +188,7 @@ watch(() => props.hydrometers, renderMarkers)
 /**
  * Permite que componentes pais centralizem o mapa em coordenadas específicas.
  */
-function centerOn(lat: number, lng: number, zoomLevel = 17) {
+function centerOn(lat: number, lng: number, zoomLevel = MAP_FOCUS_ZOOM) {
   if (map) {
     map.flyTo([lat, lng], zoomLevel, { duration: 1.5 })
   }
@@ -196,7 +197,7 @@ function centerOn(lat: number, lng: number, zoomLevel = 17) {
 /**
  * Voa até o hidrômetro e abre automaticamente seu popup de detalhes após a viagem.
  */
-function centerAndOpenPopup(id: number, lat: number, lng: number, zoomLevel = 17) {
+function centerAndOpenPopup(id: number, lat: number, lng: number, zoomLevel = MAP_FOCUS_ZOOM) {
   if (map) {
     map.flyTo([lat, lng], zoomLevel, { duration: 1.5 })
     map.once('moveend', () => {

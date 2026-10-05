@@ -1,13 +1,6 @@
 <script setup lang="ts">
 /**
- * BaseButton.vue
- *
- * Novo padrão visual de botões do HydroTrack:
- * - Formato pílula (rounded-full) com cantos perfeitamente arredondados.
- * - Tipografia semibold nítida com espaçamento ergonômico.
- * - Variantes: Primary (azul com sombra suave), Secondary (surface-card com borda fina),
- *   Danger (vermelho translúcido) e Ghost (transparente).
- * - Feedback tátil instantâneo via active:scale-[0.98].
+ * Botão base do HydroTrack, em formato pílula.
  *
  * @prop {'primary' | 'secondary' | 'danger' | 'ghost'} variant - Estilo visual
  * @prop {'sm' | 'md' | 'lg'} size - Tamanho do botão
