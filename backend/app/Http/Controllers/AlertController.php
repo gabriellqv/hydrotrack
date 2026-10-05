@@ -48,13 +48,15 @@ class AlertController extends Controller
      */
     public function stats(): JsonResponse
     {
-        $stats = Alert::selectRaw('
-            COUNT(*) as total,
-            SUM(CASE WHEN resolved = 1 THEN 1 ELSE 0 END) as resolved
-        ')->first();
+        // Usa o query builder para evitar o cast booleano do model, que
+        // converteria o alias agregado `resolved` (contagem) em true/false.
+        $stats = Alert::query()
+            ->selectRaw('COUNT(*) as total')
+            ->selectRaw('SUM(CASE WHEN resolved = 1 THEN 1 ELSE 0 END) as resolved_count')
+            ->first();
 
         $total = (int) $stats->total;
-        $resolved = (int) $stats->resolved;
+        $resolved = (int) $stats->resolved_count;
 
         return response()->json([
             'total' => $total,
