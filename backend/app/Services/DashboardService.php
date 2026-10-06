@@ -52,12 +52,20 @@ class DashboardService
                 SUM(CASE WHEN status = 'alert' THEN 1 ELSE 0 END) as alert
             ")->first();
 
+            $todayCount = Reading::whereDate('reading_at', Carbon::today())->count();
+            if ($todayCount === 0) {
+                $latestReadingAt = Reading::max('reading_at');
+                if ($latestReadingAt) {
+                    $todayCount = Reading::whereDate('reading_at', Carbon::parse($latestReadingAt)->toDateString())->count();
+                }
+            }
+
             return [
                 'total_hydrometers' => (int) $stats->total_hydrometers,
                 'online' => (int) $stats->online,
                 'offline' => (int) $stats->offline,
                 'alert' => (int) $stats->alert,
-                'total_readings_today' => Reading::whereDate('reading_at', Carbon::today())->count(),
+                'total_readings_today' => $todayCount,
                 'pending_alerts' => Alert::where('resolved', false)->count(),
             ];
         });
@@ -75,13 +83,36 @@ class DashboardService
     public function getConsumptionChart(int $days = 30): array
     {
         return Cache::remember("dashboard:consumption:{$days}", self::CACHE_TTL_SHORT, function () use ($days) {
-            return Reading::query()
-                ->selectRaw('DATE(reading_at) as date, SUM(value_m3) as total_m3')
-                ->where('reading_at', '>=', Carbon::now()->subDays($days))
-                ->groupByRaw('DATE(reading_at)')
-                ->orderByRaw('DATE(reading_at)')
-                ->get()
-                ->toArray();
+            $hasRecent = Reading::where('reading_at', '>=', Carbon::now()->subDays($days))->exists();
+
+            if ($hasRecent) {
+                return Reading::query()
+                    ->selectRaw('DATE(reading_at) as date, SUM(value_m3) as total_m3')
+                    ->where('reading_at', '>=', Carbon::now()->subDays($days))
+                    ->groupByRaw('DATE(reading_at)')
+                    ->orderByRaw('DATE(reading_at)')
+                    ->get()
+                    ->toArray();
+            }
+
+            // Fallback para ambientes de demonstração com dados históricos semeados no passado:
+            // ancora a janela na data da última leitura existente para manter o gráfico funcional.
+            $latestReadingAt = Reading::max('reading_at');
+            if ($latestReadingAt) {
+                $refEnd = Carbon::parse($latestReadingAt);
+                $refStart = $refEnd->copy()->subDays($days);
+
+                return Reading::query()
+                    ->selectRaw('DATE(reading_at) as date, SUM(value_m3) as total_m3')
+                    ->where('reading_at', '>=', $refStart)
+                    ->where('reading_at', '<=', $refEnd)
+                    ->groupByRaw('DATE(reading_at)')
+                    ->orderByRaw('DATE(reading_at)')
+                    ->get()
+                    ->toArray();
+            }
+
+            return [];
         });
     }
 

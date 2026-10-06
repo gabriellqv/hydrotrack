@@ -36,12 +36,21 @@ const isRefreshing = ref(false)
 
 /**
  * Contadores dos KPIs vindos do agregado do backend (todo o histórico).
- * Não devem ser derivados de `store.alerts`, que contém apenas a página atual.
+ * Não devem ser derivados de `store.alerts`, exceto como fallback gracioso caso
+ * o endpoint de métricas agregadas esteja indisponível ou em transição.
  */
-const totalCount = computed(() => store.stats?.total ?? 0)
-const pendingCount = computed(() => store.stats?.pending ?? 0)
-const resolvedCount = computed(() => store.stats?.resolved ?? 0)
-const resolutionRate = computed(() => store.stats?.resolution_rate ?? 100)
+const totalCount = computed(() => store.stats?.total ?? store.alerts.length)
+const pendingCount = computed(
+  () => store.stats?.pending ?? store.alerts.filter((a) => !a.resolved).length,
+)
+const resolvedCount = computed(
+  () => store.stats?.resolved ?? store.alerts.filter((a) => a.resolved).length,
+)
+const resolutionRate = computed(() => {
+  if (store.stats) return store.stats.resolution_rate
+  if (totalCount.value === 0) return 100
+  return Math.round((resolvedCount.value / totalCount.value) * 100)
+})
 
 /** Alertas filtrados por busca textual no client */
 const displayAlerts = computed(() => {
@@ -83,12 +92,18 @@ function resetFilters() {
   store.fetchAlerts()
 }
 
+let isInitialMount = true
+
 onMounted(() => {
   store.fetchAlerts()
   store.fetchStats().catch(() => {})
 })
 
 onActivated(() => {
+  if (isInitialMount) {
+    isInitialMount = false
+    return
+  }
   store.fetchAlerts()
   store.fetchStats().catch(() => {})
 })

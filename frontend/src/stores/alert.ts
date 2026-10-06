@@ -41,8 +41,14 @@ export const useAlertStore = defineStore('alert', () => {
 
   /** Busca as métricas agregadas de alertas (totais e taxa de resolução) */
   async function fetchStats() {
-    const { data } = await api.get<AlertStats>('/alerts/stats')
-    stats.value = data
+    try {
+      const { data } = await api.get<AlertStats>('/alerts/stats')
+      stats.value = data
+    } catch {
+      // Se o endpoint não estiver disponível ou falhar, mantém stats nulo
+      // para permitir que as views utilizem fallback reativo nos KPIs.
+      stats.value = null
+    }
   }
 
   async function resolveAlert(id: number) {
