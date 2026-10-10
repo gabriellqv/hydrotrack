@@ -54,4 +54,13 @@ describe('useAlertStore', () => {
     expect(api.get).toHaveBeenCalledWith('/alerts/stats')
     expect(store.stats).toEqual({ total: 40, resolved: 10, pending: 30, resolution_rate: 25 })
   })
+
+  it('mantém stats como null ao ocorrer erro na busca de métricas', async () => {
+    vi.mocked(api.get).mockRejectedValue(new Error('Endpoint indisponível'))
+
+    const store = useAlertStore()
+    await store.fetchStats()
+
+    expect(store.stats).toBeNull()
+  })
 })

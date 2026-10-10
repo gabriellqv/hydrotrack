@@ -521,8 +521,26 @@ const kpiCards = computed(() => [
         <!-- Área do Gráfico Reativo com Altura Proporcional -->
         <div class="h-[290px] sm:h-[320px] lg:h-[340px] w-full min-h-0 pt-1">
           <ConsumptionChart v-if="store.consumption.length" :data="store.consumption" />
-          <div v-else class="h-full flex items-center justify-center">
+          <div
+            v-else-if="store.loadingConsumption || (store.loading && !store.consumption.length)"
+            class="h-full flex flex-col items-center justify-center gap-2"
+          >
+            <RefreshCw class="h-6 w-6 text-primary-400 animate-spin" />
             <p class="text-sm text-text-muted">Carregando dados de consumo...</p>
+          </div>
+          <div
+            v-else
+            class="h-full flex flex-col items-center justify-center text-center p-6 rounded-xl border border-dashed border-border/60 bg-surface/30"
+          >
+            <div class="p-3 rounded-full bg-surface-hover/80 text-text-muted mb-2.5">
+              <TrendingUp class="h-6 w-6" />
+            </div>
+            <p class="text-sm font-semibold text-text-heading">
+              Nenhum dado de consumo registrado no período
+            </p>
+            <p class="text-xs text-text-muted max-w-sm mt-1">
+              Selecione outro intervalo (7d, 30d ou 90d) ou envie telemetria via simulador IoT.
+            </p>
           </div>
         </div>
       </BaseCard>

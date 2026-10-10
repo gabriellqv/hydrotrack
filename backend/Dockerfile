@@ -56,8 +56,9 @@ RUN touch .env
 # Expor a porta do servidor embutido do PHP
 EXPOSE 8000
 
-# Entrypoint: exporta env vars do Render para .env, roda migrations e inicia o servidor
+# Entrypoint: exporta env vars do Render para .env, limpa caches, roda migrations e inicia o servidor
 CMD sh -c '\
-    env | grep -E "^(APP_|DB_|SESSION_|SANCTUM_|FRONTEND_|MYSQL_|PORT=|INGEST_)" > /var/www/html/.env && \
+    env | grep -E "^(APP_|DB_|SESSION_|SANCTUM_|FRONTEND_|MYSQL_|PORT=|INGEST_|CORS_|REGISTRATION_)" > /var/www/html/.env && \
+    php artisan optimize:clear && \
     php artisan migrate --force && \
     php artisan serve --host=0.0.0.0 --port=8000'

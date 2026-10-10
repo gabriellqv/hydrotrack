@@ -47,3 +47,39 @@ it('retorna o resumo correto do dashboard', function () {
             'pending_alerts' => 2,
         ]);
 });
+
+it('retorna dados do grafico de consumo dentro do periodo recente', function () {
+    $user = User::factory()->create();
+    $hydrometer = Hydrometer::factory()->create();
+
+    Reading::factory()->create([
+        'hydrometer_id' => $hydrometer->id,
+        'value_m3' => 5.5,
+        'reading_at' => now()->subDays(2),
+    ]);
+
+    $response = $this->actingAs($user)->getJson('/api/dashboard/consumption?days=30');
+
+    $response->assertOk()
+        ->assertJsonCount(1)
+        ->assertJsonStructure([['date', 'total_m3']]);
+});
+
+it('ancora o grafico de consumo na leitura mais recente como fallback para dados historicos', function () {
+    $user = User::factory()->create();
+    $hydrometer = Hydrometer::factory()->create();
+
+    // Leituras de 60 dias atrás (fora dos últimos 30 dias a contar de hoje)
+    $oldDate = now()->subDays(60);
+    Reading::factory()->create([
+        'hydrometer_id' => $hydrometer->id,
+        'value_m3' => 4.2,
+        'reading_at' => $oldDate,
+    ]);
+
+    $response = $this->actingAs($user)->getJson('/api/dashboard/consumption?days=30');
+
+    $response->assertOk()
+        ->assertJsonCount(1)
+        ->assertJsonPath('0.date', $oldDate->toDateString());
+});
